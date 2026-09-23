@@ -6,6 +6,13 @@
 CREATE SCHEMA SpotANote;
 USE SpotANote;
 
+-- create user for datavase connection access
+-- DROP USER 'spotanote_user'@'localhost';
+FLUSH PRIVILEGES;
+CREATE USER IF NOT EXISTS 'spotanote_user'@'localhost' IDENTIFIED BY 'password';
+GRANT ALL PRIVILEGES ON SpotANote.* TO 'spotanote_user'@'localhost';
+FLUSH PRIVILEGES;
+
 -- create tables
 
 -- Role
@@ -76,9 +83,10 @@ INSERT INTO Role (id, role_name) VALUES
 
 -- User inserts
 INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2) VALUES
-(7071707, hazelp, hazelpswd1, Hazel, TRUE, 1, 2), -- name has to be public for an artist
-(3031303, jarredn, jarredpswd2, Jarred, FALSE, 1),
-(5150515, connors, connorpswd3, Connor, TRUE, 3); -- record holders should also have public names
+(7071707, "hazelp", "hazelpswd1", "Hazel", TRUE, 1, 2), -- name has to be public for an artist
+(3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, NULL),
+(5150515, "connors", "connorpswd3", "Connor", TRUE, 3, NULL), -- record holders should also have public names
+(1, "test", "testpswd", "Test", FALSE, 1, 2);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
