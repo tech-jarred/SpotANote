@@ -25,7 +25,7 @@ public class MusicUpload {
 
     //database connection parameters
     private static final String DB_URL = "jdbc:mysql://localhost:3306/SpotANote";
-    private static final String DB_USER = "username";
+    private static final String DB_USER = "spotanote_user";
     private static final String DB_PASSWORD = "password";
 
     /*
