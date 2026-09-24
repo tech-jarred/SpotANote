@@ -1,31 +1,48 @@
-<main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Login</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
 
-  <html>
+    <div class="main-wrapper">
+        <div class="card">
+            <div class="login-header">
+                <h2 class="page-title">Spotanote</h2>
+                <p class="subtitle">Please log in to access your account</p>
+            </div>
 
-    <head>  
-      <h2>Login Page</h2>
-    </head>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        placeholder="Enter your username" 
+                        required 
+                        autofocus
+                    >
+                </div>
 
-  <body>
-  <p>Please Login Into The Application</p>
-  
-  <h1>Type Username</h1>
-    <input type="text" widgth="80" name="username">  
-  <h1>Type Password</h1>
-     <input type="text" widgth="80" name="password">  
-  </h1>
-    <h1> 
-      <input type="submit" value="Submit"></body>
-    </h1>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
 
+                <button type="submit" class="btn-submit">Sign In</button>
+            </form>
+        </div>
+    </div>
 
-<!--This is just a placeholder for the background-->
-<body style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
-</main>
-
-  </body>
-
-
-
-
-
+</body>
+</html>
