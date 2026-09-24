@@ -12,12 +12,10 @@ import org.junit.jupiter.api.Test;
 
 
 public class MusicUploadTest {
-    /*@Test
-    void sampleTest(){
-        int result = 2 + 2;
-        assertEquals(4, result, "Sample Unit Test");
-    }*/
-
+    
+    /*
+    Tests to see if the music has been uploaded correctly
+     */
     @Test
     void validUploadTest()
     {
@@ -32,6 +30,9 @@ public class MusicUploadTest {
         assertTrue(generatedID > 0, "Music Upload Unsuccessful: music ID does not exist, instead it was " + generatedID);
     }
 
+    /*
+    Tests to see what happens when attempting to upload without a music file
+     */
     @Test
     void missingFileTest()
     {
@@ -46,6 +47,9 @@ public class MusicUploadTest {
         });
     }
 
+    /*
+    Tests to see what happens when attempting to upload without a song name
+     */
     @Test
     void missingSongNameTest()
     {
@@ -60,6 +64,9 @@ public class MusicUploadTest {
         });
     }
 
+    /*
+    Tests to see what happens when attempting to upload without a record
+     */
     @Test
     void missingRecordTest()
     {
@@ -74,6 +81,9 @@ public class MusicUploadTest {
         });
     }
 
+    /*
+    Tests to see what happens when attempting to upload without song duration
+     */
     @Test
     void missingDurationTest()
     {
@@ -88,6 +98,9 @@ public class MusicUploadTest {
         });
     }
 
+    /*
+    Tests to see what happens when attempting to upload two music files
+     */
     @Test
     void doubleFileUploadTest()
     {
