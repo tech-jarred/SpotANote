@@ -62,7 +62,10 @@ public class App {
                 // Verify user is actually logged in (prevents person from typing /home in URL to bypass login page)
                 if (currentUser == null){ ctx.redirect("/login"); }
 
-                else { ctx.result("Welcome, " + currentUser.getName() + "!");}
+                else {
+                    // Render Home.html file, passing username through for Pebble formatting.
+                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername()));
+                }
             });
 
             /**
