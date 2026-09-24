@@ -1,11 +1,29 @@
 package com.spotanote;
+import io.javalin.Javalin;
+import io.javalin.rendering.template.JavalinPebble;
 
 public class App {
     public static void main(String[] args){
-        // just a placeholder
-        System.out.println("Hello world!");
+        // Initialize and begin running Javalin server
+        Javalin app = Javalin.create(config -> {
+            config.staticFiles.add("/public"); // Tells app to locate static files from src/main/resources/public
+            config.fileRenderer(new JavalinPebble()); // Sets up the file renderer to be used
 
-        //basic testing to see if database connections work for MusicUpload.Java
-        MusicUpload.musicUpload("Testing", 1, "Testing", 1);
+            // Define all routes to be used in application.
+            config.routes.get("/", ctx -> {
+                ctx.redirect("/login");
+            });
+
+            config.routes.get("/login", ctx -> {
+                ctx.render("public/LoginPage.html");
+            });
+
+            config.routes.get("/home", ctx -> {
+                ctx.result("Welcome to the Home Page!");
+            });
+        }).start(7000);
+
+        // Print location of where server is running.
+        System.out.println("Server running at http://localhost:7000/");
     }
 }
