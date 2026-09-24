@@ -1,0 +1,44 @@
+# ==========================================
+# Maven Build Output
+# ==========================================
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.rar
+
+# ==========================================
+# IDE & Editor Settings
+# ==========================================
+# VS Code (Crucial: prevents sharing your personal local settings like maven.executable.path)
+.vscode/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# ==========================================
+# macOS System Files
+# ==========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ==========================================
+# Windows System Files
+# ==========================================
+Thumbs.db
+Desktop.ini
+
+# ==========================================
+# Log Files
+# ==========================================
+*.log

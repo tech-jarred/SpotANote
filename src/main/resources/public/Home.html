@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <!-- Form triggers Javalin's POST /logout route -->
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <div class="card">
+            <h2 class="page-title">Welcome, {{ username }}!</h2>
+            <p class="subtitle">You have successfully signed into the system.</p>
+        </div>
+    </div>
+
+</body>
+</html>
