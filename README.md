@@ -10,3 +10,6 @@ Note that App.java is the driver class
 In the terminal, run: ./mvnw exec:java -Dexec.mainClass="com.spotanote.App" -- this will run the program
 
 *Note: For both of the above, this works on MacOS/Linux. For Windows, replace ./mvnw with .\mvnw*
+
+
+mvn compile --% exec:java -Dexec.mainClass=com.spotanote.App
