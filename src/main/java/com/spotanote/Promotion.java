@@ -1,5 +1,5 @@
+package com.spotanote;
 //import java.util.Objects;
-//package com.spotanote;
 
 public class Promotion {
 
