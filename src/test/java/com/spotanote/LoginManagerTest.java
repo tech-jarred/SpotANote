@@ -24,7 +24,7 @@ private LoginManager loginManager;
 
         // Checks to make sure object returned has correct information about user who signed in.
         assertEquals("jarredn", user.getUsername());
-        assertEquals("3031303", user.getId());
+        assertEquals(3031303, user.getId());
         assertTrue("Jarred".equals(user.getName()));
         assertTrue("Listener".equals(user.getRole()));
     }
