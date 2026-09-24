@@ -34,14 +34,31 @@ CREATE TABLE User (
     FOREIGN KEY (roleid2) REFERENCES Role(id)
 );
 
+-- Record
+CREATE TABLE Record (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_name VARCHAR(100) NOT NULL UNIQUE,
+    record_manager_id INT NOT NULL,
+    FOREIGN KEY (record_manager_id) REFERENCES Role(id)
+);
+
+-- Record Member
+CREATE TABLE RecordMember (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_id INT NOT NULL,
+    artist_id INT NOT NULL UNIQUE,
+    FOREIGN KEY (record_id) REFERENCES Record(id),
+    FOREIGN KEY (artist_id) REFERENCES Role(id)
+);
+
 -- Song
 CREATE TABLE Song (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     song_name VARCHAR(100) NOT NULL,
     song_duration INT, -- will be in seconds
-    file_path VARCHAR(300) NOT NULL,
-    artist_id INT NOT NULL,
-    FOREIGN KEY (artist_id) REFERENCES User(id)
+    file_path VARCHAR(300) NOT NULL UNIQUE,
+    record_member_id INT NOT NULL, -- encompasses artist_id and record_id
+    FOREIGN KEY (record_member_id) REFERENCES RecordMember(id)
 );
 
 -- Playlist
@@ -86,7 +103,16 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 (7071707, "hazelp", "hazelpswd1", "Hazel", TRUE, 1, 2), -- name has to be public for an artist
 (3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, NULL),
 (5150515, "connors", "connorpswd3", "Connor", TRUE, 3, NULL), -- record holders should also have public names
-(1, "test", "testpswd", "Test", FALSE, 1, 2);
+(1, "test", "testpswd", "Test", FALSE, 1, 2),
+(2, "recordtest", "recordpswd", "Record", TRUE, 3, NULL);
+
+-- Record inserts
+INSERT INTO Record (record_name, record_manager_id) VALUES
+("Test Record", 2);
+
+-- Record Member inserts
+INSERT INTO RecordMember(record_id, artist_id) VALUES
+(1, 1);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
@@ -107,3 +133,8 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 
 -- Current Queue inserts
 
+
+-- select statements
+
+SELECT *
+FROM Song;

@@ -37,31 +37,57 @@ public class MusicUpload {
      *  @param artist id which is the int id for the artist, this will eventually have its own helper method
      *  @return song id produced by adding the song to the mysql database
      */
-    public static int musicUpload(String songName, int songLength, String filePath, int artistID)
+    public static int musicUpload(String songName, int songLength, String filePath, int recordMemberID)
     {
-        String sql = "INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES (?, ?, ?, ?)";
+        //checking for missing data
+        if (songName == null || songName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Song name cannot be null or empty");
+        }
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null or empty");
+        }
+        if (recordMemberID <= 0) {
+            throw new IllegalArgumentException("Invalid record member ID");
+        }
+        if (songLength <= 0) {
+            throw new IllegalArgumentException("Song duration must be more than 0");
+        }
 
-        //try-catch block to connect to the database and insert into a song into the database
-        try (
-            Connection connect = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            PreparedStatement prepstmt = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-            )
-        {
-            //bind values to placeholders
-            prepstmt.setString(1, songName);
-            prepstmt.setInt(2, songLength);
-            prepstmt.setString(3, filePath);
-            prepstmt.setInt(4, artistID);
+        //checks to see if theres already an upload with that file
+        String checkDuplicateSql = "SELECT COUNT(*) FROM Song WHERE file_path = ?";
 
-            int affectedRows = prepstmt.executeUpdate();
+        //sql insert statement
+        String sql = "INSERT INTO Song (song_name, song_duration, file_path, record_member_id) VALUES (?, ?, ?, ?)";
 
-            if (affectedRows > 0) {
-                //fetching the generated key (id column)
-                try (ResultSet generatedKeys = prepstmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int generatedId = generatedKeys.getInt(1);
-                        System.out.println("Music Uploaded Successfully! Generated Song ID: " + generatedId);
-                        return generatedId;
+        //try-catch block to connect to the database and insert a song into the database
+        try (Connection connect = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        
+            //check for duplicate files (to fix last test)
+            try (PreparedStatement checkStmt = connect.prepareStatement(checkDuplicateSql)) {
+                checkStmt.setString(1, filePath);
+                try (ResultSet rs = checkStmt.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new IllegalArgumentException("Duplicate upload: File path already exists in database.");
+                    }
+                }
+            }
+    
+            //inserting into the database
+            try (PreparedStatement prepstmt = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                prepstmt.setString(1, songName);
+                prepstmt.setInt(2, songLength);
+                prepstmt.setString(3, filePath);
+                prepstmt.setInt(4, recordMemberID);
+    
+                int affectedRows = prepstmt.executeUpdate();
+    
+                if (affectedRows > 0) {
+                    try (ResultSet generatedKeys = prepstmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            int generatedId = generatedKeys.getInt(1);
+                            System.out.println("Music Uploaded Successfully!");
+                            return generatedId;
+                        }
                     }
                 }
             }
