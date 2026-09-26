@@ -138,3 +138,18 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 
 SELECT *
 FROM Song;
+
+
+
+
+
+--Promotion
+CREATE TABLE Promotion (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    promotion_name VARCHAR(100) NOT NULL,
+    promotion_description VARCHAR(300) NOT NULL,
+    song_name VARCHAR(100) NOT NULL,
+    record_id INT NOT NULL,
+    FOREIGN KEY (song_name) REFERENCES Song(song_name),
+    FOREIGN KEY (record_id) REFERENCES Record(id)
+);

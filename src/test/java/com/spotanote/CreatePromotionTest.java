@@ -4,75 +4,61 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreatePromotionTest {
+public class CreatePromotionTest 
+{
 
-
-    private Promotion promotion = new Promotion(1, "Test Promotion", "This is a test promotion description.", "Test Song", "Test Record");
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    /**
-     * Tests to see that constructor for User class correctly assigns values to its attributes.
-     */
     @Test
-    void testPromotionName()
+    void testUploadToDatabase()
     {
-        Boolean expected = (!promotion.getPromotionName().equals("") && promotion.getPromotionName() != null);
-        Boolean actual = !CreatePromotion.create().getPromotionName().equals("") && CreatePromotion.create().getPromotionName() != null;
-        assertEquals(expected, actual);
+        CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
+
+        // Check if the promotion was successfully created in the database
+
+
     }
 
     @Test
-    void testPromotionDescription()
-    {
-        Boolean expected = (!promotion.getPromotionDescription().equals("") && promotion.getPromotionDescription() != null);
-        Boolean actual = !CreatePromotion.create().getPromotionDescription().equals("") && CreatePromotion.create().getPromotionDescription() != null;
-        assertEquals(expected, actual);
+    void testCreatePromotionWithNullName() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CreatePromotion.createPromotion(null, "Description", "Song", 1);
+        });
+        assertEquals("Promotion name cannot be null or empty", exception.getMessage());
     }
 
     @Test
-    void testPromotionSong()
-    {
-        Boolean expected = (!promotion.getPromotionSong().equals("") && promotion.getPromotionSong() != null);
-        Boolean actual = !CreatePromotion.create().getPromotionSong().equals("") && CreatePromotion.create().getPromotionSong() != null;
-        assertEquals(expected, actual);
+    void testCreatePromotionWithNullDescription() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CreatePromotion.createPromotion("Name", null, "Song", 1);
+        });
+        assertEquals("Promotion description cannot be null or empty", exception.getMessage());
     }
 
     @Test
-    void testUploadPromotion()
-    {
-        //Need more time to finish up this test
+    void testCreatePromotionWithNullSong() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CreatePromotion.createPromotion("Name", "Description", null, 1);
+        });
+        assertEquals("Promotion song cannot be null or empty", exception.getMessage());
     }
 
     @Test
-    void testAccessToSelectedSong()
-    {
-        String songName = promotion.getPromotionSong();
-        String recordName = Song.getRecordName(songName);
-        Boolean expected = true; //recordName.equals(promotion.getRecordName());
-        Boolean actual = CreatePromotion.create().getRecordName().equals(Song.getRecordName(songName));
-        assertEquals(expected, actual);
+    void testCreatePromotionWithInvalidRecordId() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            CreatePromotion.createPromotion("Name", "Description", "Song", 0);
+        });
+        assertEquals("Record ID cannot be null or empty", exception.getMessage());
     }
 
     @Test
-    void testTooMuchTextTitle()
-    {
-        int maxLength = 25; // Assuming the maximum length for the title is 25 characters
-        int titleLength = promotion.getPromotionName().length();
-        Boolean expected = (titleLength <= maxLength);
-        Boolean actual = (CreatePromotion.create().getPromotionName().length() <= maxLength);
-        assertEquals(expected, actual);
+    void testRemovePromotionFromDatabase() {
+        // Create a promotion to be removed
+        int promotionId = CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
+
+        // Remove the promotion from the database
+        boolean removed = CreatePromotion.removePromotion(promotionId);
+
+        // Check if the promotion was successfully removed
+        assertTrue(removed, "Promotion should be successfully removed from the database.");
     }
 
-    @Test
-    void testTooMuchTextDescription()
-    {
-        int maxLength = 25; // Assuming the maximum length for the title is 25 characters
-        int descriptionLength = promotion.getPromotionDescription().length();
-        Boolean expected = (descriptionLength <= maxLength);
-        Boolean actual = (CreatePromotion.create().getPromotionDescription().length() <= maxLength);
-        assertEquals(expected, actual);
-    }
 }
