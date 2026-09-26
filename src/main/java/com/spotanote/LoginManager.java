@@ -6,18 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class LoginManager {
-    //database connection parameters
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/SpotANote";
-    private static final String DB_USER = "spotanote_user";
-    private static final String DB_PASSWORD = "password";
-
-    /**
-     * @return a Connection object, will now be connected to database.
-     */
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-    }
-
     /**
      * The purpose of this function is to authenticate a user by validating their entered credentials against information in database.
      * 
@@ -34,7 +22,7 @@ public class LoginManager {
 
         // If both fields are provided, attempt authentication.
         String sqlQuery = "SELECT user.id, username, name, role_name as role, password FROM user JOIN role on roleid1 = role.id WHERE username = ?"; // preparing the string this way "sanitizes" user input, preventing an SQL injection attack.
-        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlQuery)){ // this attempts to connect to database
+        try (Connection conn = DBExplorer.getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlQuery)){ // this attempts to connect to database
             stmt.setString(1, username);
             
             // Attempt executing the query once connected to database
