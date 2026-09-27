@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SongTest {
     // make instance of Song class to test against.
-    private Song song = new Song(1, "Please Please Please", Duration.ofSeconds(186), "/music/please_please_please.mp3");
+    private Song song = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
 
     /**
      * Tests to see that constructor for Song class correctly assigns values to its attributes.
