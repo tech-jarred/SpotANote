@@ -1,6 +1,7 @@
 package com.spotanote;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinPebble;
+import java.time.Duration;
 
 public class App {
     // Initialize needed helper classes.
@@ -58,14 +59,72 @@ public class App {
              */
             config.routes.get("/home", ctx -> {
                 User currentUser = ctx.sessionAttribute("currentUser");
+                Song currentSong = ctx.sessionAttribute("currentSong");
+                if (currentSong == null){ // have a fall back default song/sound in case there is no current song in session.
+                    currentSong = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
+                }
 
                 // Verify user is actually logged in (prevents person from typing /home in URL to bypass login page)
                 if (currentUser == null){ ctx.redirect("/login"); }
 
                 else {
                     // Render Home.html file, passing username through for Pebble formatting.
-                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername()));
+                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername(), "current_song_file_path", currentSong.getFilePath()));
                 }
+            });
+
+            /**
+             * /music
+             * 
+             * This route is the landing page for all music on the platform. Users can select either an individual song OR playlist from this page.
+             */
+            config.routes.get("/music", ctx -> {
+                // Verify user is logged in
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                // Render music selection page
+                ctx.render("public/music.html");
+            });
+
+            /**
+             * /select-song route
+             * 
+             * This will handle updating the currentSong in a user's session to whatever song they've selected from music screen.
+             */
+            config.routes.post("/select-song", ctx -> {
+                // Verify user is logged in, if not redirect to login page.
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                // Read songId from song user selected from the msuic page
+                String songIdParam = ctx.formParam("songId");
+
+                if (songIdParam != null) {
+                    int songId = Integer.parseInt(songIdParam);
+                    Song selectedSong = null;
+
+                    // Map the ID to the appropriate Song instance
+                    if (songId == 1) {
+                        selectedSong = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
+                    } else if (songId == 2) {
+                        selectedSong = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
+                    }
+
+                    // Store selected song in session attribute if valid
+                    if (selectedSong != null) {
+                        ctx.sessionAttribute("currentSong", selectedSong);
+                    }
+                }
+
+                // Redirect back to home route
+                ctx.redirect("/home");
             });
 
             /**

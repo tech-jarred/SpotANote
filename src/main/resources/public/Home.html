@@ -12,7 +12,8 @@
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
-            <!-- Form triggers Javalin's POST /logout route -->
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
@@ -29,7 +30,7 @@
 
     <!-- Adding button for audio control. -->
     <audio controls>
-      <source src="/music/please_please_please.mp3" type="audio/mpeg">
+      <source src="{{ current_song_file_path }}" type="audio/mpeg">
     </audio>
 </body>
 </html>
