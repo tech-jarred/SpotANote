@@ -25,7 +25,7 @@ CREATE TABLE Role (
 CREATE TABLE User (
 	id INT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(20) NOT NULL UNIQUE,
+    password VARCHAR(20) NOT NULL,
     name VARCHAR(50) NULL,
     is_name_public BOOLEAN NOT NULL DEFAULT FALSE,
     roleid1 INT NOT NULL,
@@ -67,6 +67,7 @@ CREATE TABLE Playlist (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     playlist_name VARCHAR(150) NOT NULL,
+    playlist_is_public BOOLEAN NOT NULL DEFAULT FALSE, 
     FOREIGN KEY (user_id) REFERENCES User(id)
 );
 
