@@ -80,7 +80,7 @@ public class App {
         });
 
         // Start the application.
-        app.start(7000);
+        app.start(7000); //use port 8080 if something is running on port 7000
         
         // Print location of where server is running.
         System.out.println("Server running at http://localhost:7000/");
