@@ -4,62 +4,30 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreatePromotionTest 
-{
+
+
+
+public class recordTest {
 
     @Test
-    void testUploadToDatabase()
-    {
-        CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
+    void testRecordInsideDatabase(){
+        //testing to see if the record id is inside of the database and ability to grab it
+        String recordName = recordInfo.getRecordName(1);
+        assertEquals("Test Record", recordName, "Record name does not match expected value.");
+    }
 
-        // Check if the promotion was successfully created in the database
-
-
+    @Test 
+    void testRecordNotInsideDatabase(){
+        //testing to see if the record id is inside of the database and ability to grab it
+        String recordName = recordInfo.getRecordName(9999);
+        assertNull(recordName, "Record name should be null for non-existent record ID.");
     }
 
     @Test
-    void testCreatePromotionWithNullName() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            CreatePromotion.createPromotion(null, "Description", "Song", 1);
-        });
-        assertEquals("Promotion name cannot be null or empty", exception.getMessage());
+    void testNullNameRecord(){
+        //testing to see if the record id is inside of the database and ability to grab it
+        String recordName = recordInfo.getRecordName(0);
+        assertNull(recordName, "Record name should be null for non-existent record ID.");
     }
-
-    @Test
-    void testCreatePromotionWithNullDescription() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            CreatePromotion.createPromotion("Name", null, "Song", 1);
-        });
-        assertEquals("Promotion description cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void testCreatePromotionWithNullSong() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            CreatePromotion.createPromotion("Name", "Description", null, 1);
-        });
-        assertEquals("Promotion song cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void testCreatePromotionWithInvalidRecordId() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            CreatePromotion.createPromotion("Name", "Description", "Song", 0);
-        });
-        assertEquals("Record ID cannot be null or empty", exception.getMessage());
-    }
-/** 
-    @Test
-    void testRemovePromotionFromDatabase() {
-        // Create a promotion to be removed
-        int promotionId = CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
-
-        // Remove the promotion from the database
-        boolean removed = CreatePromotion.removePromotion(promotionId);
-
-        // Check if the promotion was successfully removed
-        assertTrue(removed, "Promotion should be successfully removed from the database.");
-    }
-        */
-
+    
 }
