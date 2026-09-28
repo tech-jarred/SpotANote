@@ -77,7 +77,39 @@ public class App {
                 ctx.req().getSession().invalidate();
                 ctx.redirect("/login");
             });
+
+            //This is the route for the create promotion page, which is only accessible to users with the role of "record"
+            config.routes.post("/createPromotion", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Verify user is actually logged in (prevents person from typing /createPromotion in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                // Verify user has the role of "record"
+                else if (!currentUser.getRole().equals("record")){ ctx.status(403).result("You do not have permission to access this page."); }
+
+                else {
+                    // Render CreatePromotion.html file, passing username through for Pebble formatting.
+                    ctx.render("public/CreatePromotion.html", java.util.Map.of("username", currentUser.getUsername()));
+                }
+            });
+
+            //grabbing profile information for the user, and displaying it on the profile page
+            config.routes.get("/profile", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Verify user is actually logged in (prevents person from typing /profile in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render Profile.html file, passing username through for Pebble formatting.
+                    ctx.render("public/Profile.html", java.util.Map.of("username", currentUser.getUsername(), "name", currentUser.getName(), "role", currentUser.getRole()));
+                }
+            });
+
+
         });
+
 
         // Start the application.
         app.start(7000);
