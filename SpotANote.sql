@@ -1,6 +1,6 @@
 
 -- delete schema for debugging purposes
--- DROP SCHEMA SpotANote;
+DROP SCHEMA SpotANote;
 
 -- create statements
 CREATE SCHEMA SpotANote;
@@ -67,7 +67,7 @@ CREATE TABLE Playlist (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     playlist_name VARCHAR(150) NOT NULL,
-    playlist_is_public BOOLEAN NOT NULL DEFAULT FALSE, 
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, 
     FOREIGN KEY (user_id) REFERENCES User(id)
 );
 
@@ -138,4 +138,9 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 -- select statements
 
 SELECT *
-FROM Song;
+FROM Playlist;
+
+SELECT *
+FROM User;
+
+-- DELETE FROM Song WHERE file_path LIKE '/songs/%';
