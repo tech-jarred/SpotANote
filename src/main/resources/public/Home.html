@@ -47,19 +47,19 @@
 
         // Handles sending request to server to updated the latest time stamp of song whenever page changes or music is paused.
         function syncTimestamp() {
-            if (!audio || audio.paused || isNaN(audio.currentTime)) return;
+            if (!audio || isNaN(audio.currentTime)) return;
 
             const params = new URLSearchParams();
             params.append('seconds', audio.currentTime.toString());
 
-            // Target URL matches your Java route casing (/api/song/timeStamp)
+            // Send a background fetch request to route /api/song/timeStamp to sync timeStamp with backend.
             fetch('/api/song/timeStamp', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 body: params,
-                keepalive: true
+                keepalive: true // will keep fetch request alive even if the page is closed or DOM is destroyed.
             }).catch(err => console.error('Failed to sync timestamp:', err));
         }
 
