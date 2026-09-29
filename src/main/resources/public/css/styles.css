@@ -139,3 +139,59 @@ body {
     background: rgba(239, 68, 68, 0.85);
     border-color: transparent;
 }
+
+/* Home Page Centered Audio Player & Welcome Banner */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 480px;
+    gap: 2rem;
+}
+
+.player-card {
+    width: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 2.25rem 2rem;
+}
+
+.player-title {
+    color: #2e1065;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.audio-player {
+    width: 100%;
+    outline: none;
+    border-radius: 8px;
+}
+
+/* Subtle Welcome Banner at the Bottom */
+.welcome-banner {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 0.75rem 1.75rem;
+    text-align: center;
+    color: #e0e7ff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-text {
+    font-size: 0.88rem;
+    color: #f3f4f6;
+}
+
+.welcome-subtext {
+    font-size: 0.75rem;
+    color: #c7d2fe;
+    margin-top: 0.15rem;
+}

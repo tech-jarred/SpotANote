@@ -22,22 +22,29 @@
 
     <!-- Main Content Area -->
     <div class="main-wrapper">
-        <div class="card">
-            <h2 class="page-title">Welcome, {{ username }}!</h2>
-            <p class="subtitle">You have successfully signed into the system.</p>
+        <div class="home-container">
+            
+            <!-- Centered Audio Control Card -->
+            <div class="card player-card">
+                <h2 class="player-title">{{ songName }}</h2>
+                <audio id="myAudio" src="{{ current_song_file_path }}" controls controlsList="nodownload" preload="metadata" class="audio-player">
+                </audio>
+            </div>
+
+            <!-- Small Welcome Message at Bottom -->
+            <div class="welcome-banner">
+                <p class="welcome-text">Welcome, <strong>{{ username }}</strong>!</p>
+                <p class="welcome-subtext">You have successfully signed into Spotanote.</p>
+            </div>
+
         </div>
     </div>
 
-    <!-- Adding button for audio control. -->
-    <audio id="myAudio" controls controlsList="nodownload" preload="metadata">
-      <source src="{{ current_song_file_path }}" type="audio/mpeg">
-    </audio>
-
-    <!-- This javscript will allow user to skim through song AND checks for timeStamp attribute (sets song to where it last was) -->
+    <!-- JavaScript Sync -->
     <script>
         const audio = document.getElementById('myAudio');
 
-        // Resumes the song at the last time stamp it was playing at.
+        // Resumes the song at the last timestamp it was playing at
         audio.addEventListener('loadedmetadata', () => {
             const savedTime = parseFloat("{{ timeStamp | default(0) }}");
             if (!isNaN(savedTime) && savedTime > 0 && savedTime < audio.duration) {
@@ -45,14 +52,13 @@
             }
         });
 
-        // Handles sending request to server to updated the latest time stamp of song whenever page changes or music is paused.
+        // Handles sending request to server to update latest timestamp
         function syncTimestamp() {
-            if (!audio || audio.paused || isNaN(audio.currentTime)) return;
+            if (!audio || isNaN(audio.currentTime)) return;
 
             const params = new URLSearchParams();
             params.append('seconds', audio.currentTime.toString());
 
-            // Target URL matches your Java route casing (/api/song/timeStamp)
             fetch('/api/song/timeStamp', {
                 method: 'POST',
                 headers: {
