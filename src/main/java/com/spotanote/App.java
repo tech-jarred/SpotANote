@@ -62,6 +62,7 @@ public class App {
                 Song currentSong = ctx.sessionAttribute("currentSong");
                 if (currentSong == null){ // have a fall back default song/sound in case there is no current song in session.
                     currentSong = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
+                    currentSong.setTimeStampFromSeconds(60);
                 }
 
                 // Verify user is actually logged in (prevents person from typing /home in URL to bypass login page)
@@ -69,7 +70,9 @@ public class App {
 
                 else {
                     // Render Home.html file, passing username through for Pebble formatting.
-                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername(), "current_song_file_path", currentSong.getFilePath()));
+                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername(),
+                                                                    "current_song_file_path", currentSong.getFilePath(),
+                                                                    "timeStamp", currentSong.getTimeStamp().toSeconds()));
                 }
             });
 
