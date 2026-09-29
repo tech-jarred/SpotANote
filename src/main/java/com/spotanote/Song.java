@@ -78,6 +78,42 @@ public class Song {
         }
         return songArtist;
     }
+
+    public static void makeSongPublic(int songId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "UPDATE Song SET song_is_public = true WHERE song_Id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, songId);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Song set to public successfully");
+                } else {
+                    System.out.println("No song found with the given ID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error making song public: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void makeSongPrivate(int songId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "UPDATE Song SET song_is_public = false WHERE song_Id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, songId);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Song set to private successfully");
+                } else {
+                    System.out.println("No song found with the given ID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error making song private: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
 
 
