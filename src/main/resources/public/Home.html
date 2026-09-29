@@ -29,17 +29,43 @@
     </div>
 
     <!-- Adding button for audio control. -->
-    <audio id="myAudio" controls controlsList="nodownload">
+    <audio id="myAudio" controls controlsList="nodownload" preload="metadata">
       <source src="{{ current_song_file_path }}" type="audio/mpeg">
     </audio>
 
+    <!-- This javscript will allow user to skim through song AND checks for timeStamp attribute (sets song to where it last was) -->
     <script>
         const audio = document.getElementById('myAudio');
 
-        // Wait for the browser to load the audio duration and metadata
+        // Resumes the song at the last time stamp it was playing at.
         audio.addEventListener('loadedmetadata', () => {
-            audio.currentTime = {{ timeStamp }}; // Jump straight to time stamp from song object in back end.
+            const savedTime = parseFloat("{{ timeStamp | default(0) }}");
+            if (!isNaN(savedTime) && savedTime > 0 && savedTime < audio.duration) {
+                audio.currentTime = savedTime;
+            }
         });
+
+        // Handles sending request to server to updated the latest time stamp of song whenever page changes or music is paused.
+        function syncTimestamp() {
+            if (!audio || audio.paused || isNaN(audio.currentTime)) return;
+
+            const params = new URLSearchParams();
+            params.append('seconds', audio.currentTime.toString());
+
+            // Target URL matches your Java route casing (/api/song/timeStamp)
+            fetch('/api/song/timeStamp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: params,
+                keepalive: true
+            }).catch(err => console.error('Failed to sync timestamp:', err));
+        }
+
+        // Fire sync on pause or page navigation
+        audio.addEventListener('pause', syncTimestamp);
+        window.addEventListener('pagehide', syncTimestamp);
     </script>
 </body>
 </html>

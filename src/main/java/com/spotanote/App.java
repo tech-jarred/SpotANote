@@ -63,6 +63,7 @@ public class App {
                 if (currentSong == null){ // have a fall back default song/sound in case there is no current song in session.
                     currentSong = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
                     currentSong.setTimeStampFromSeconds(60);
+                    ctx.sessionAttribute("currentSong", currentSong);
                 }
 
                 // Verify user is actually logged in (prevents person from typing /home in URL to bypass login page)
@@ -139,6 +140,36 @@ public class App {
                 ctx.req().getSession().invalidate();
                 ctx.redirect("/login");
             });
+
+            /**
+             * The below routes will not render any pages on the front end, and are solely responsible for processing data
+             * sent from the front end.
+             */
+
+            /**
+             * /api/song/timeStamp
+             * 
+             * This route will be responsible for updating the timeStamp of the current song being played, allowing user
+             * to pause, and navigate through the site, and return to /home and continue listening from where they left off.
+             */
+            config.routes.post("/api/song/timeStamp", ctx -> {
+                // Initialize needed values for this route.
+                Song currentSong = ctx.sessionAttribute("currentSong");
+                String timeStampInSeconds = ctx.formParam("seconds");
+                
+                // As long as there is a currentSong and a timeStamp from the forum, update the time stamp of the current song.
+                if (currentSong != null && timeStampInSeconds != null){
+                    double seconds = Double.parseDouble(timeStampInSeconds);
+                    currentSong.setTimeStampFromSeconds(seconds);
+                    ctx.sessionAttribute("currentSong", currentSong);
+                    ctx.status(200); // tells the client the server successfully processed request.
+                }
+                else{
+                    ctx.status(500); // tells frontend the request came through but wasn't able to finished to due an internal service error.
+                }
+
+            });
+
         });
 
         // Start the application.
