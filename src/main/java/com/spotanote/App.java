@@ -119,6 +119,30 @@ public class App {
                 }
             });
 
+            config.routes.get("/specificSong", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int songId = ctx.sessionAttribute("songId");
+
+                // Verify user is actually logged in (prevents person from typing /specificSong in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render SpecificSong.html file, passing username through for Pebble formatting.
+                    ctx.render("public/SpecificSong.html", java.util.Map.of("username", currentUser.getUsername(), "songName", Song.getSongName(songId), "songId", songId, "artist", Song.getSongArtist(songId)));
+                }
+            });
+            
+            config.routes.get("/playlists", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Verify user is actually logged in (prevents person from typing /playlists in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render Playlists.html file, passing username through for Pebble formatting.
+                    ctx.render("public/Playlists.html", java.util.Map.of("username", currentUser.getUsername()));
+                }
+            });
 
 
         });
