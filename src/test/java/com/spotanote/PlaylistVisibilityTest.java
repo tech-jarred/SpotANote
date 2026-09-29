@@ -92,7 +92,6 @@ public class PlaylistVisibilityTest {
             PlaylistVisibility.privatePlaylist(incorrectPlaylistID);
         } catch (SQLException e) {
             System.err.println("Playlist Private Unsuccessful: the incorrect playlist was privated " + e.getMessage());
-        } finally {
         }
     }
 
