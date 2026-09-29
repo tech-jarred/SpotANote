@@ -154,4 +154,45 @@ public class CreatePromotion {
         return null; // Return null if the promotion does not exist or there was an error
     }
 
+    public static int getPromotionRecordId(int promotionId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT record_Id FROM Promotion WHERE promotion_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, promotionId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("record_Id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Return -1 if the promotion does not exist or there was an error
+    }
+
+    public static CreatePromotion[] getAllPromotionIds() {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT promotion_id FROM Promotion";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    // Count the number of rows
+                    resultSet.last();
+                    int rowCount = resultSet.getRow();
+                    resultSet.beforeFirst();
+
+                    CreatePromotion[] promotionIds = new CreatePromotion[rowCount];
+                    int index = 0;
+                    while (resultSet.next()) {
+                        promotionIds[index++] = new CreatePromotion();
+                    }
+                    return promotionIds;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new CreatePromotion[0]; // Return an empty array if there was an error
+    }
+
 }

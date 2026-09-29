@@ -150,6 +150,21 @@ CREATE TABLE SongPrivacy (
     FOREIGN KEY (song_id) REFERENCES Song(id)
 );
 
+CREATE TABLE PlaylistPrivacy (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    playlist_id INT NOT NULL,
+    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (playlist_id) REFERENCES Playlist(id)
+);
+
+CREATE TABLE UserFollowers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    follower_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (follower_id) REFERENCES User(id)
+);
+
 
 
 SELECT * FROM Playlist WHERE playlist_is_public = TRUE;

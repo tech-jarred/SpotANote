@@ -144,6 +144,18 @@ public class App {
                 }
             });
 
+            config.routes.get("/promotions", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Verify user is actually logged in (prevents person from typing /promotions in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render Promotions.html file, passing username through for Pebble formatting.
+                    ctx.render("public/Promotions.html", java.util.Map.of("username", currentUser.getUsername(), "promotions", CreatePromotion.getAllPromotionIds()));
+                }
+            });
+
 
         });
 
