@@ -37,6 +37,30 @@ public class Song {
         return songName;
     }
 
+
+        public static Song[] getAllSongs() throws SQLException{
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT * FROM Song";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    // Count the number of rows
+                    resultSet.last();
+                    int rowCount = resultSet.getRow();
+                    resultSet.beforeFirst();
+
+                    Song[] songs = new Song[rowCount];
+                    int index = 0;
+                    while (resultSet.next()) {
+                        songs[index++] = new Song();
+                    }
+                    return songs;
+                }
+            }
+        }
+    
+    }
+
+
     public static String getSongArtist(int songId) {
         String songArtist = null;
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -54,7 +78,6 @@ public class Song {
         }
         return songArtist;
     }
-    
 }
 
 

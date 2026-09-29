@@ -139,3 +139,27 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 
 SELECT *
 FROM Song;
+
+
+
+--creating private or not database
+CREATE TABLE SongPrivacy (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    song_id INT NOT NULL,
+    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (song_id) REFERENCES Song(id)
+);
+
+
+
+SELECT * FROM Playlist WHERE playlist_is_public = TRUE;
+
+SELECT * FROM SONG JOIN SongPrivacy ON Song.id = SongPrivacy.song_id WHERE SongPrivacy.isPrivate = FALSE;
+
+UPDATE Playlist
+SET playlist_is_public = TRUE
+WHERE id = 1;
+
+UPDATE Playlist
+SET playlist_is_public = FALSE
+WHERE id = 1;

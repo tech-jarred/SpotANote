@@ -107,6 +107,19 @@ public class App {
                 }
             });
 
+            config.routes.get("/songPage", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Verify user is actually logged in (prevents person from typing /songPage in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render SongPage.html file, passing username through for Pebble formatting.
+                    ctx.render("public/SongPage.html", java.util.Map.of("username", currentUser.getUsername(), "SongList", Song.getAllSongs()));
+                }
+            });
+
+
 
         });
 
