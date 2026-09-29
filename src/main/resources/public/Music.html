@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Music Library</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+        <div class="card">
+            <h2 class="page-title">Music Choices</h2>
+            <p class="subtitle">Select a song to set it as your current track.</p>
+        </div>
+
+        <!-- Hardcoded Song List -->
+        <div class="song-list">
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Please Please Please</h4>
+                    <p>Sabrina Carpenter • 3:07</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="1">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Revenge</h4>
+                    <p>CaptainSparklez • 3:39</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="2">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
