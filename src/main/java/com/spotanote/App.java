@@ -73,7 +73,8 @@ public class App {
                     // Render Home.html file, passing username through for Pebble formatting.
                     ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getUsername(),
                                                                     "current_song_file_path", currentSong.getFilePath(),
-                                                                    "timeStamp", currentSong.getTimeStamp().toSeconds()));
+                                                                    "timeStamp", currentSong.getTimeStamp().toSeconds(),
+                                                                    "songName", currentSong.getName()));
                 }
             });
 
