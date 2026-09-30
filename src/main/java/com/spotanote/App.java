@@ -156,6 +156,19 @@ public class App {
                 }
             });
 
+            config.routes.get("/specificPromotion", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int promotionId = ctx.sessionAttribute("promotionId");
+
+                // Verify user is actually logged in (prevents person from typing /specificPromotion in URL to bypass login page)
+                if (currentUser == null){ ctx.redirect("/login"); }
+
+                else {
+                    // Render SpecificPromotion.html file, passing username through for Pebble formatting.
+                    ctx.render("public/SpecificPromotion.html", java.util.Map.of("username", currentUser.getUsername(), "promotionName", CreatePromotion.getPromotionName(promotionId), "promotionDescription", CreatePromotion.getPromotionDescription(promotionId), "promotionSong", CreatePromotion.getPromotionSong(promotionId), "recordId", CreatePromotion.getPromotionRecordId(promotionId)));
+                }
+            });
+
 
         });
 

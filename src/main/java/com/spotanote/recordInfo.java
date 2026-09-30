@@ -36,5 +36,17 @@ public class recordInfo {
         return recordName;
     }
 
-
+    //ability for user to follow a record with the UserFollowers table
+    public static void followRecord(int userId, int recordId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "INSERT INTO UserFollowers (user_Id, record_Id) VALUES (?, ?)";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, userId);
+                statement.setInt(2, recordId);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
