@@ -114,6 +114,26 @@ public class Song {
             e.printStackTrace();
         }
     }
+
+
+    //Removing / Deleting a song from the database
+    public static void deleteSong(int songId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "DELETE FROM Song WHERE song_Id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, songId);
+                int rowsAffected = statement.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Song deleted successfully");
+                } else {
+                    System.out.println("No song found with the given ID");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error deleting song: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
 
 
