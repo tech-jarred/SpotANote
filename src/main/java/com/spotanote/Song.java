@@ -64,12 +64,12 @@ public class Song {
     public static String getSongArtist(int songId) {
         String songArtist = null;
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT song_artist FROM Song WHERE song_Id = ?";
+            String sql = "SELECT record_member_id FROM Song WHERE id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, songId);
                 try (ResultSet resultSet = statement.executeQuery()) {
                     if (resultSet.next()) {
-                        songArtist = resultSet.getString("song_artist");
+                        songArtist = resultSet.getString("record_member_id");
                     }
                 }
             }
@@ -81,7 +81,7 @@ public class Song {
 
     public static void makeSongPublic(int songId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "UPDATE Song SET song_is_public = true WHERE song_Id = ?";
+            String sql = "UPDATE Song SET SongPrivacy = true WHERE song_Id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, songId);
                 int rowsAffected = statement.executeUpdate();
@@ -99,7 +99,7 @@ public class Song {
 
     public static void makeSongPrivate(int songId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "UPDATE Song SET song_is_public = false WHERE song_Id = ?";
+            String sql = "UPDATE Song SET SongPrivacy = false WHERE song_Id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, songId);
                 int rowsAffected = statement.executeUpdate();
