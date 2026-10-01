@@ -1,0 +1,16 @@
+        <!-- Navigation Bar Used From My Previous Work -->
+    <div>
+                <a href="CreatePromotion.html">Create Promotion</a>
+                <a href="Promotions.html">Promotions</a>
+                <a href="Profile.html">Profile</a>
+                <a href="SongPage.html">Song Page</a>
+                <a href="LoginPage.html">Logout</a>
+    </div>
+
+
+<p>Welcome to the Song Page! Here you can view a list of songs available in our system. Each song is displayed below:</p>
+<!-- Now we need to display the list of songs  by looping through the SongList -->
+{% for song in SongList %}
+    <p>{{ song.getSongName() }}</p>
+    <p>{{ song.getSongId() }}</p>
+{% endfor %}
