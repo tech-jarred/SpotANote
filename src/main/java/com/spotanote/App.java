@@ -4,10 +4,10 @@ import io.javalin.rendering.template.JavalinPebble;
 import java.time.Duration;
 
 public class App {
-    // Initialize needed helper classes.
-    private static final LoginManager authy = new LoginManager();
+    public static Javalin createApp(){
+        // Initialize needed helper classes.
+        LoginManager authy = new LoginManager();
 
-    public static void main(String[] args){
         // Initialize and begin running Javalin server
         Javalin app = Javalin.create(config -> {
             config.staticFiles.add("/public"); // Tells app to locate static files from src/main/resources/public
@@ -173,10 +173,19 @@ public class App {
 
         });
 
+        return app;
+
+    }
+
+    public static void main(String[] args){
+        // Create Javalin instance.
+        Javalin app = createApp();
+        int port = 7000;
+
         // Start the application.
-        app.start(7000); //use port 8080 if something is running on port 7000
+        app.start(port); //use port 8080 if something is running on port 7000
         
         // Print location of where server is running.
-        System.out.println("Server running at http://localhost:7000/");
+        System.out.println("Server running at http://localhost:" + port + '/');
     }
 }

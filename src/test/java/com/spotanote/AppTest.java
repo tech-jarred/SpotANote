@@ -8,26 +8,7 @@ public class AppTest {
 
     // A helper method which will create a temporary instance of web app so routes can be tested.
     private Javalin createApp() {
-        LoginManager loginManager = new LoginManager();
-
-        return Javalin.create(config -> {
-            config.routes.post("/login", ctx -> {
-                String username = ctx.formParam("username");
-                String password = ctx.formParam("password");
-                User user = loginManager.authenticate(username, password);
-                if (user != null) {
-                    ctx.sessionAttribute("currentUser", user);
-                    ctx.redirect("/home");
-                } else {
-                    ctx.status(401).result("Invalid username or password.");
-                }
-            });
-
-            config.routes.post("/logout", ctx -> {
-                ctx.req().getSession().invalidate();
-                ctx.redirect("/login");
-            });
-        });
+        return App.createApp();
     }
 
     /**
