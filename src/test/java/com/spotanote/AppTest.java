@@ -1,6 +1,7 @@
 package com.spotanote;
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
+import io.javalin.testtools.HttpClient;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,6 +12,12 @@ public class AppTest {
     // A helper method which will create a temporary instance of web app so routes can be tested.
     private Javalin createApp() {
         return App.createApp();
+    }
+
+    // A helper method to validate that authentication is successful in any test which has a precondition of a user being logged in.
+    private void loginTestUser(HttpClient client) {
+        var response = client.post("/login", "username=jarredn&password=jarredpswd2");
+        assertEquals(302, response.code(), "Precondition Failed: Could not authenticate test user.");
     }
 
     /**
@@ -41,16 +48,16 @@ public class AppTest {
     }
 
     /**
-     * Tests 
+     * Tests if the backend can handle a request from frontend to upadte timeStamp attribute, as well as pass back that information
+     * when reloading home page (simulating a successful music pause and resume)
      */
     @Test
-    @DisplayName("IDENTIFIER: Successful-Music-Pause")
-    void testSuccessfulMusicPause() {
+    void testSuccessfulMusicPauseAndResume() {
         Javalin app = App.createApp();
 
         JavalinTest.test(app, (server, client) -> {
             // Simulate user logging in.
-            client.post("/login", "username=jarredn&password=jarredpswd2"); 
+            loginTestUser(client);; 
 
             // Similate user being redirected to home screen.
             client.get("/home");
@@ -68,6 +75,47 @@ public class AppTest {
             // Verify the time user paused at (75 seconds) is present in the reconstructed Home.html file.
             assertTrue(responseBody.contains("parseFloat(\"75.0\")") || responseBody.contains("parseFloat(\"75\")"), 
                 "Expected /home response to contain the updated song timestamp of 75 seconds, but it did not.");
+        });
+    }
+
+    /**
+     * Tests if a user is able to select a song from music page and then play it from the beginning.
+     */
+    @Test
+    void testSuccessfulSongSelectionAndPlayback() {
+        Javalin app = App.createApp();
+
+        JavalinTest.test(app, (server, client) -> {
+            // Validate precondition of logging in.
+            loginTestUser(client);
+
+            // Simulate and verify user navigating to music selection page.
+            var musicPageResponse = client.get("/music");
+            assertEquals(200, musicPageResponse.code(), "Should successfully render the music library page.");
+
+            // Simulate user selecting song "Revenge" from music page.
+            var selectSongResponse = client.post("/select-song", "songId=2");
+
+            // Verify selecting a song results in user being redirected to /home route.
+            assertEquals(302, selectSongResponse.code());
+            assertTrue(selectSongResponse.headers().get("Location").toString().contains("/home"), "Expected redirect location to contain /home");
+
+            // Verify song starts at 0 secongs when loaded on home page.
+            var homeResponse = client.get("/home");
+            assertEquals(200, homeResponse.code());
+
+            // Verify the HTML contains the file path for "Revenge", meaning correct song was added to session variable.
+            String responseBody = homeResponse.body().string();
+            assertTrue(responseBody.contains("/music/revenge.mp3"), 
+                "Expected home page to load the file path for 'Revenge'.");
+
+            // Verify the HTML contains the song name "Revenge"
+            assertTrue(responseBody.contains("Revenge"), 
+                "Expected home page to render the song title 'Revenge'.");
+
+            // Verify the timestamp starts from the beginning (0 seconds)
+            assertTrue(responseBody.contains("parseFloat(\"0\")"), 
+                "Expected song to begin playing from 0 seconds.");
         });
     }
 }
