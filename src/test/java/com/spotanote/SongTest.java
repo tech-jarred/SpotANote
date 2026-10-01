@@ -24,7 +24,6 @@ public class SongTest {
     @Test
     void testSettingTimeStampValidInput(){
         song.setTimeStampFromSeconds(25);
-
         assertEquals(Duration.ofSeconds(25), song.getTimeStamp());
     }
 

@@ -5,10 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotanote - Music Library</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* CSS rules to guarantee centered scrolling alignment */
+        .main-wrapper {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card {
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 1.5rem;
+        }
+
+        .song-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .song-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .song-info h4 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1.1rem;
+        }
+
+        .song-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Top Navigation Bar -->
+    
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
@@ -20,15 +66,17 @@
         </div>
     </nav>
 
-    <!-- Main Content Area -->
+    
     <div class="main-wrapper">
         <div class="card">
             <h2 class="page-title">Music Choices</h2>
             <p class="subtitle">Select a song to set it as your current track.</p>
         </div>
 
-        <!-- Hardcoded Song List -->
+        
         <div class="song-list">
+            
+            
             <div class="card song-card">
                 <div class="song-info">
                     <h4>Please Please Please</h4>
@@ -40,6 +88,7 @@
                 </form>
             </div>
 
+            
             <div class="card song-card">
                 <div class="song-info">
                     <h4>Revenge</h4>
@@ -50,6 +99,139 @@
                     <button type="submit" class="btn-select">Select</button>
                 </form>
             </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Bailando</h4>
+                    <p>Enrique Iglesias • 4:14</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="3">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Danza Kuduro</h4>
+                    <p>Don Omar ft. Lucenzo • 3:55</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="4">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Don't Mine At Night</h4>
+                    <p>BebopVox • 3:34</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="5">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Drive By</h4>
+                    <p>Train • 3:17</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="6">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Fallen Kingdom</h4>
+                    <p>CaptainSparklez • 4:12</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="7">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Hips Don't Lie</h4>
+                    <p>Shakira ft. Wyclef Jean • 3:38</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="8">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Lao a Lao</h4>
+                    <p>Prince Royce • 3:04</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="9">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Ocean Man</h4>
+                    <p>Ween • 2:06</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="10">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Pa'lla Voy</h4>
+                    <p>Marc Anthony • 4:23</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="11">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Triforce Medley</h4>
+                    <p>The Legend of Zelda • 4:02</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="12">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
+            
+            <div class="card song-card">
+                <div class="song-info">
+                    <h4>Vivir Mi Vida</h4>
+                    <p>Marc Anthony • 4:12</p>
+                </div>
+                <form action="/select-song" method="POST">
+                    <input type="hidden" name="songId" value="13">
+                    <button type="submit" class="btn-select">Select</button>
+                </form>
+            </div>
+
         </div>
     </div>
 
