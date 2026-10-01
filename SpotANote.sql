@@ -137,10 +137,40 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 
 -- select statements
 
-SELECT *
-FROM Playlist;
 
-SELECT *
-FROM User;
+--creating private or not database
+CREATE TABLE SongPrivacy (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    song_id INT NOT NULL,
+    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (song_id) REFERENCES Song(id)
+);
 
--- DELETE FROM Song WHERE file_path LIKE '/songs/%';
+CREATE TABLE PlaylistPrivacy (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    playlist_id INT NOT NULL,
+    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (playlist_id) REFERENCES Playlist(id)
+);
+
+CREATE TABLE UserFollowers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    follower_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (follower_id) REFERENCES User(id)
+);
+
+
+
+SELECT * FROM Playlist WHERE playlist_is_public = TRUE;
+
+SELECT * FROM SONG JOIN SongPrivacy ON Song.id = SongPrivacy.song_id WHERE SongPrivacy.isPrivate = FALSE;
+
+UPDATE Playlist
+SET playlist_is_public = TRUE
+WHERE id = 1;
+
+UPDATE Playlist
+SET playlist_is_public = FALSE
+WHERE id = 1;
