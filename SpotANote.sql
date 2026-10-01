@@ -146,14 +146,14 @@ FROM Song;
 CREATE TABLE SongPrivacy (
     id INT AUTO_INCREMENT PRIMARY KEY,
     song_id INT NOT NULL,
-    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    isPublic BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (song_id) REFERENCES Song(id)
 );
 
 CREATE TABLE PlaylistPrivacy (
     id INT AUTO_INCREMENT PRIMARY KEY,
     playlist_id INT NOT NULL,
-    isPrivate BOOLEAN NOT NULL DEFAULT FALSE,
+    isPublic BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (playlist_id) REFERENCES Playlist(id)
 );
 

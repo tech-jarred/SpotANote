@@ -79,6 +79,23 @@ public class Song {
         return songArtist;
     }
 
+    public static Boolean isPublic(int songId) throws SQLException
+    {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT isPublic FROM SongPrivacy WHERE song_Id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) 
+            {
+                try (ResultSet resultSet = statement.executeQuery()) {
+                return resultSet.next() && resultSet.getBoolean("isPublic");
+                }
+            } catch (SQLException e) 
+            {
+                e.printStackTrace();
+                return false;
+            }
+        }   
+    }
+
     public static void makeSongPublic(int songId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "UPDATE Song SET SongPrivacy = true WHERE song_Id = ?";
@@ -117,7 +134,7 @@ public class Song {
 
 
     //Removing / Deleting a song from the database
-    public static void deleteSong(int songId) {
+    public static boolean deleteSong(int songId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "DELETE FROM Song WHERE song_Id = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -125,6 +142,7 @@ public class Song {
                 int rowsAffected = statement.executeUpdate();
                 if (rowsAffected > 0) {
                     System.out.println("Song deleted successfully");
+                    return true;
                 } else {
                     System.out.println("No song found with the given ID");
                 }
@@ -132,7 +150,9 @@ public class Song {
         } catch (SQLException e) {
             System.err.println("Error deleting song: " + e.getMessage());
             e.printStackTrace();
+            return false;
         }
+        return false;
     }
 }
 
