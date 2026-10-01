@@ -5,8 +5,6 @@ import io.javalin.testtools.HttpClient;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.DisplayName;
-
 public class AppTest {
 
     // A helper method which will create a temporary instance of web app so routes can be tested.
