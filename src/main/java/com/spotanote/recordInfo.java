@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class recordInfo {
+public class RecordInfo {
             //database connection parameters
     private static final String DB_URL = "jdbc:mysql://localhost:3306/SpotANote";
     private static final String DB_USER = "spotanote_user";
