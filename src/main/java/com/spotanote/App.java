@@ -120,6 +120,28 @@ public class App {
                         selectedSong = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
                     } else if (songId == 2) {
                         selectedSong = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
+                    } else if (songId == 3) {
+                        selectedSong = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
+                    } else if (songId == 4) {
+                        selectedSong = new Song(4, "Danza Kuduro", Duration.ofSeconds(235), "/music/danza_kuduro.mp3");
+                    } else if (songId == 5) {
+                        selectedSong = new Song(5, "Don't Mine At Night", Duration.ofSeconds(214), "/music/dont_mine_at_night.mp3");
+                    } else if (songId == 6) {
+                        selectedSong = new Song(6, "Drive By", Duration.ofSeconds(197), "/music/drive_by.mp3");
+                    } else if (songId == 7) {
+                        selectedSong = new Song(7, "Fallen Kingdom", Duration.ofSeconds(252), "/music/fallen_kingdom.mp3");
+                    } else if (songId == 8){
+                        selectedSong = new Song(8, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
+                    } else if (songId == 9){
+                        selectedSong = new Song(9, "Lao a Lao", Duration.ofSeconds(184), "/music/lao_a_lao.mp3");
+                    } else if (songId == 10){
+                        selectedSong = new Song(10, "Ocean Man", Duration.ofSeconds(126), "/music/ocean_man.mp3");
+                    } else if (songId == 11){
+                        selectedSong = new Song(11, "Pa'lla Voy", Duration.ofSeconds(263), "/music/palla_voy.mp3");
+                    } else if (songId == 12){
+                        selectedSong = new Song(12, "Triforce Medley", Duration.ofSeconds(242), "/music/tloz_triforce_medley_40.mp3");
+                    } else if (songId == 13){
+                        selectedSong = new Song(13, "Vivir Mi Vida", Duration.ofSeconds(252), "/music/vivir_mi_vida.mp3");
                     }
 
                     // Store selected song in session attribute if valid

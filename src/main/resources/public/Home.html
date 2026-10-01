@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- Top Navigation Bar -->
+    
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
@@ -20,18 +20,43 @@
         </div>
     </nav>
 
-    <!-- Main Content Area -->
+    
     <div class="main-wrapper">
         <div class="home-container">
             
-            <!-- Centered Audio Control Card -->
+            
             <div class="card player-card">
                 <h2 class="player-title">{{ songName }}</h2>
-                <audio id="myAudio" src="{{ current_song_file_path }}" controls controlsList="nodownload" preload="metadata" class="audio-player">
-                </audio>
+                
+                
+                <audio id="myAudio" src="{{ current_song_file_path }}" preload="auto"></audio>
+
+                
+                <div class="custom-player-container">
+                    <div class="controls-row">
+                        
+                        <button id="playPauseBtn" class="btn-play-circle" aria-label="Play">
+                            
+                            <svg id="playIcon" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                            
+                            <svg id="pauseIcon" viewBox="0 0 24 24" style="display: none;">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                            </svg>
+                        </button>
+
+                        
+                        <input type="range" id="seekBar" class="seek-bar" value="0" min="0" step="0.1">
+
+                        
+                        <span id="timeDisplay" class="time-display">0:00 / 0:00</span>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Small Welcome Message at Bottom -->
+            
             <div class="welcome-banner">
                 <p class="welcome-text">Welcome, <strong>{{ username }}</strong>!</p>
                 <p class="welcome-subtext">You have successfully signed into Spotanote.</p>
@@ -40,19 +65,100 @@
         </div>
     </div>
 
-    <!-- JavaScript Sync -->
+    
     <script>
         const audio = document.getElementById('myAudio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const pauseIcon = document.getElementById('pauseIcon');
+        const seekBar = document.getElementById('seekBar');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const savedTime = parseFloat("{{ timeStamp | default(0) }}");
 
-        // Resumes the song at the last timestamp it was playing at
-        audio.addEventListener('loadedmetadata', () => {
-            const savedTime = parseFloat("{{ timeStamp | default(0) }}");
-            if (!isNaN(savedTime) && savedTime > 0 && savedTime < audio.duration) {
-                audio.currentTime = savedTime;
+        let isScrubbing = false;
+
+        // Converts total seconds to MM:SS string without using ES6 template literals
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds <= 0) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ":" + (secs < 10 ? "0" : "") + secs;
+        }
+
+        // Updates timer label safely
+        function updateTimeDisplay(seconds) {
+            const current = formatTime(seconds !== undefined ? seconds : audio.currentTime);
+            const total = formatTime(audio.duration);
+            timeDisplay.textContent = current + " / " + total;
+        }
+
+        // Toggle Play / Pause state and update icon visibility
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+            } else {
+                audio.pause();
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
             }
         });
 
-        // Handles sending request to server to update latest timestamp
+        // Initialize range slider and saved timestamp once media metadata is loaded
+        audio.addEventListener('loadedmetadata', () => {
+            seekBar.max = audio.duration;
+            updateTimeDisplay();
+
+            if (!isNaN(savedTime) && savedTime > 0 && savedTime < audio.duration) {
+                audio.currentTime = savedTime;
+                seekBar.value = savedTime;
+                updateTimeDisplay();
+            }
+        });
+
+        // Continuous sync as song plays
+        audio.addEventListener('timeupdate', () => {
+            if (!isScrubbing) {
+                seekBar.value = audio.currentTime;
+                updateTimeDisplay();
+            }
+        });
+
+        // User starts dragging/interacting with slider
+        seekBar.addEventListener('pointerdown', () => {
+            isScrubbing = true;
+        });
+
+        // Dynamic time feedback while dragging
+        seekBar.addEventListener('input', () => {
+            isScrubbing = true;
+            updateTimeDisplay(seekBar.value);
+        });
+
+        // User releases slider - commit change and clear focus
+        function finishScrubbing() {
+            if (isScrubbing) {
+                audio.currentTime = seekBar.value;
+                isScrubbing = false;
+                seekBar.blur(); // Remove focus outline and unlock automatic slider progression
+                updateTimeDisplay();
+            }
+        }
+
+        seekBar.addEventListener('change', finishScrubbing);
+        seekBar.addEventListener('pointerup', finishScrubbing);
+
+        // Reset UI upon song completion
+        audio.addEventListener('ended', () => {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            seekBar.value = 0;
+            audio.currentTime = 0;
+            syncTimestamp();
+        });
+
+        // Sync timestamp with Javalin backend
         function syncTimestamp() {
             if (!audio || isNaN(audio.currentTime)) return;
 
@@ -69,7 +175,6 @@
             }).catch(err => console.error('Failed to sync timestamp:', err));
         }
 
-        // Fire sync on pause or page navigation
         audio.addEventListener('pause', syncTimestamp);
         window.addEventListener('pagehide', syncTimestamp);
     </script>
