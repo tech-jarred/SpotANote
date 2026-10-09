@@ -247,9 +247,9 @@ public class App {
                 String promotionName = CreatePromotion.getPromotionName(1);
                 String promotionDescription = CreatePromotion.getPromotionDescription(1);
                 String promotionSong = CreatePromotion.getPromotionSong(1);
-                System.out.println("Promotion Name: " + promotionName);
-                System.out.println("Promotion Description: " + promotionDescription);
-                System.out.println("Promotion Song: " + promotionSong);
+                //System.out.println("Promotion Name: " + promotionName);
+                //System.out.println("Promotion Description: " + promotionDescription);
+                //System.out.println("Promotion Song: " + promotionSong);
 
                 if (promotionName == null || promotionDescription == null || promotionSong == null) {
                     //if any of the information is null, return a 404 error to the client.
@@ -267,7 +267,7 @@ public class App {
             config.routes.get("/specific-promotion/{id}", ctx -> {
                 int id = Integer.parseInt(ctx.pathParam("id"));
 
-                System.out.println("\n\nFetching promotion ID: " + id+"\n\n");
+                //System.out.println("\n\npromotion ID: " + id+"\n\n");
 
                 String name = CreatePromotion.getPromotionName(id);
                 String description = CreatePromotion.getPromotionDescription(id);
