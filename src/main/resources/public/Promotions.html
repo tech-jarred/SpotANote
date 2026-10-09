@@ -1,28 +1,43 @@
+<main>
 
-<main>  
-    
   <html>
 
-    <head>  
-      <h2> Create Promotion Page</h2>
-    </head>
+  <head>
+    <h2>Available Promotions</h2>
+  </head>
 
 
-        <!-- Navigation Bar Used From My Previous Work -->
-    <div>
-                <a href="CreatePromotion.html">Create Promotion</a>
-                <a href="Promotions.html">Promotions</a>
-                <a href="LoginPage.html">Logout</a>
-    </div>
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/api/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
 
 
 
-       <div style="text-align: center;"><h1>Please Choose A Promotion</h1></div>
+{% for promotion in promotions %}
+  <div>
+    <h2>
+      <a href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}">
+        {{ promotion.promotionName }}
+      </a>
+    </h2>
+  </div>
+{% else %}
+  <p>No promotions found.</p>
+{% endfor %}
 
 
+  <!--This is just a placeholder for the background-->
 
-<!--This is just a placeholder for the background-->
-<body style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
+  <body
+    style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
 </main>
 
 </main>

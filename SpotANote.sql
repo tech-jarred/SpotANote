@@ -91,6 +91,15 @@ CREATE TABLE CurrentQueue (
     FOREIGN KEY (song_id) REFERENCES Song(id)
 );
 
+CREATE TABLE Promotion (
+    promotion_id INT AUTO_INCREMENT PRIMARY KEY,
+    promotion_name VARCHAR(100) NOT NULL,
+    promotion_description TEXT NOT NULL,
+    promotion_song VARCHAR(300) NOT NULL,
+    record_id INT NOT NULL,
+    FOREIGN KEY (record_id) REFERENCES Record(id)
+);
+
 -- insert statements
 
 -- Role inserts
@@ -114,6 +123,12 @@ INSERT INTO Record (record_name, record_manager_id) VALUES
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES
 (1, 1);
+
+
+INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
+("Summer Hits", "A collection of the hottest tracks for the summer season.", "/audio/summer_hits.mp3", 1),
+("Chill Vibes", "Relax and unwind with these chill tunes.", "/audio/chill_vibes.mp3", 1),
+("Top 40", "The most popular songs right now.", "/audio/top_40.mp3", 1);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
