@@ -223,61 +223,42 @@ public class App {
 
             });
 
-            config.routes.get("/api/promotions", ctx -> {
+
+            //This route will be responsible for displaying all promotions to the user.
+            //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
+            config.routes.get("/promotions", ctx -> {
+                //grabbing the list of all promotions from the CreatePromotion class
                 CreatePromotion[] promotionArray = CreatePromotion.getAllPromotions();
 
                 if (promotionArray == null) {
                     ctx.status(500).result("Failed to retrieve promotions");
                     return;
                 }
-
+                //and filtering out any null values.
                 promotionArray = java.util.Arrays.stream(promotionArray)
                         .filter(java.util.Objects::nonNull)
                         .toArray(CreatePromotion[]::new);
-
+                //then rendering the promotions.html page and passing the list of promotions to it.
                 ctx.render("public/promotions.html", Map.of("promotions", promotionArray));
             });
-            config.routes.get("/promotions", ctx -> {
-                ctx.render("public/promotions.html");
-            });
 
 
-            config.routes.get("/api/specific-promotion", ctx -> {
-                // just displaying the first promotion to test the route.
-                String promotionName = CreatePromotion.getPromotionName(1);
-                String promotionDescription = CreatePromotion.getPromotionDescription(1);
-                String promotionSong = CreatePromotion.getPromotionSong(1);
-                //System.out.println("Promotion Name: " + promotionName);
-                //System.out.println("Promotion Description: " + promotionDescription);
-                //System.out.println("Promotion Song: " + promotionSong);
-
-                if (promotionName == null || promotionDescription == null || promotionSong == null) {
-                    //if any of the information is null, return a 404 error to the client.
-                    ctx.status(404).result("Promotion not found");
-                } else {
-                    //now we need to show the information to the html file
-                    ctx.render("public/SpecificPromotion.html", Map.of(
-                            "promotionName", promotionName,
-                            "promotionDescription", promotionDescription,
-                            "promotionSong", promotionSong
-                    ));
-                }
-            });
-
+            //This route will be responsible for displaying a specific promotion to the user.
+            //once the user clicks on a promotion from the list, they will be redirected to this route, which will display the details of the promotion.
             config.routes.get("/specific-promotion/{id}", ctx -> {
                 int id = Integer.parseInt(ctx.pathParam("id"));
-
                 //System.out.println("\n\npromotion ID: " + id+"\n\n");
-
+                //grabbing the promotion details from the CreatePromotion class using the promotion ID.
                 String name = CreatePromotion.getPromotionName(id);
                 String description = CreatePromotion.getPromotionDescription(id);
                 String song = CreatePromotion.getPromotionSong(id);
 
+                //making sure that the promotion is not null, if not, return a 404 error.
                 if (name == null || description == null || song == null) {
                     ctx.status(404).result("Promotion not found");
                     return;
                 }
-
+                //passing the information to the SpecificPromotion.html page to be displayed to the user.
                 ctx.render("public/SpecificPromotion.html", Map.of(
                         "promotionName", name,
                         "promotionDescription", description,

@@ -126,9 +126,10 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 
 
 INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
-("Summer Hits", "A collection of the hottest tracks for the summer season.", "/audio/summer_hits.mp3", 1),
-("Chill Vibes", "Relax and unwind with these chill tunes.", "/audio/chill_vibes.mp3", 1),
-("Top 40", "The most popular songs right now.", "/audio/top_40.mp3", 1);
+("Summer Hits", "A collection of the hottest tracks for the summer season.", "Soaking Sets", 1),
+("Chill Vibes", "Relax and unwind with these chill tunes.", "Frosty Frills", 1),
+("Top 40", "The most popular songs right now.", "Crazy Crew", 1),
+("Autumn Hits", "A song of the from the hottest tracks for the autumn season.", "Crimson Cloak", 1);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
