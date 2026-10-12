@@ -13,11 +13,17 @@ public class CreatePromotion {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/SpotANote";
     private static final String DB_USER = "spotanote_user";
     private static final String DB_PASSWORD = "password";
+    public String promotionName;
+    public String promotionDescription;
+    public String promotionSong;
+    public int recordId;
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
 
-
+    public CreatePromotion() {
+        // Default constructor
+    }
 
     public static int createPromotion(String promotionName, String promotionDescription, String promotionSong, int recordId) 
     {
@@ -152,6 +158,67 @@ public class CreatePromotion {
             e.printStackTrace();
         }
         return null; // Return null if the promotion does not exist or there was an error
+    }
+
+    public static int getPromotionRecordId(int promotionId) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT record_Id FROM Promotion WHERE promotion_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, promotionId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("record_Id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Return -1 if the promotion does not exist or there was an error
+    }
+
+    public static int getPromotionIdByName(String promotionName) {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT promotion_id FROM Promotion WHERE promotion_name = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, promotionName);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt("promotion_id");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1; // Return -1 if the promotion does not exist or there was an error
+    }
+
+
+    public static CreatePromotion[] getAllPromotions()
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT * FROM Promotion";
+            try (PreparedStatement statement = connection.prepareStatement(sql);
+                 ResultSet resultSet = statement.executeQuery()) {
+                // Create an array to hold the promotions
+                CreatePromotion[] promotions = new CreatePromotion[100]; // Adjust size as needed
+                int index = 0;
+                while (resultSet.next()) {
+                    // Create a new CreatePromotion object for each promotion
+                    CreatePromotion promotion = new CreatePromotion();
+                    promotion.promotionName = resultSet.getString("promotion_name");
+                    promotion.promotionDescription = resultSet.getString("promotion_description");
+                    promotion.promotionSong = resultSet.getString("promotion_song");
+                    promotion.recordId = resultSet.getInt("record_Id");
+                    promotions[index++] = promotion;
+                }
+                return promotions;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

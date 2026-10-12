@@ -48,6 +48,11 @@ public class CreatePromotionTest
         });
         assertEquals("Record ID cannot be null or empty", exception.getMessage());
     }
+
+    @Test void getAllPromotions()
+    {
+        
+    }
 /** 
     @Test
     void testRemovePromotionFromDatabase() {
