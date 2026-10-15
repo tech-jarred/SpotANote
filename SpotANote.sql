@@ -100,6 +100,14 @@ CREATE TABLE Promotion (
     FOREIGN KEY (record_id) REFERENCES Record(id)
 );
 
+CREATE TABLE LikePromotion (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    promotion_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
+);
+
 -- insert statements
 
 -- Role inserts
@@ -119,6 +127,9 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 -- Record inserts
 INSERT INTO Record (record_name, record_manager_id) VALUES
 ("Test Record", 2);
+("Second Record", 3);
+("Third Record", 4);
+("Fourth Record", 5);
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES

@@ -252,17 +252,52 @@ public class App {
                 String name = CreatePromotion.getPromotionName(id);
                 String description = CreatePromotion.getPromotionDescription(id);
                 String song = CreatePromotion.getPromotionSong(id);
-
+                User currentUser = ctx.sessionAttribute("currentUser");
+                Boolean hasLiked = CreatePromotion.isPromotionLikedByUser(id, currentUser.getId());
                 //making sure that the promotion is not null, if not, return a 404 error.
                 if (name == null || description == null || song == null) {
                     ctx.status(404).result("Promotion not found");
                     return;
                 }
-                //passing the information to the SpecificPromotion.html page to be displayed to the user.
-                ctx.render("public/SpecificPromotion.html", Map.of(
+
+                System.out.println("Liked: " + hasLiked);
+                if(hasLiked == true)
+                {
+                    ctx.render("public/SpecificPromotion.html", Map.of(
                         "promotionName", name,
                         "promotionDescription", description,
-                        "promotionSong", song));
+                        "promotionSong", song,
+                        "promotion_id", id,
+                        "userId", currentUser.getId(),
+                        "hasLiked", "Unlike"));
+                }
+                else
+                {
+                    ctx.render("public/SpecificPromotion.html", Map.of(
+                        "promotionName", name,
+                        "promotionDescription", description,
+                        "promotionSong", song,
+                        "promotion_id", id,
+                        "userId", currentUser.getId(),
+                        "hasLiked", "Like"));
+                }
+            });
+
+            config.routes.post("/likePromotion", ctx -> {
+                // Get the promotion ID from the form parameter
+                int promotionId = Integer.parseInt(ctx.formParam("promotionId"));
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+                int userId = currentUser.getId();
+
+                // Call the likePromotion method
+                CreatePromotion.likePromotion(promotionId, userId);
+
+                // Redirect back to the specific promotion page
+                ctx.redirect("/specific-promotion/" + promotionId);
             });
 
 
