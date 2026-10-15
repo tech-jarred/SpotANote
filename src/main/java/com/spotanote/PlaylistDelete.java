@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class PlaylistDelete {
 
     /*
-     * Delete Playlist  function
+     * Delete Playlist function
      * 
      *  @param playlist id which is the int id corrisponding to the playlist id in the database
      *  @ return no returns, only success/error statements will be sent
