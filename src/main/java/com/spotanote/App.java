@@ -253,6 +253,7 @@ public class App {
                 String description = CreatePromotion.getPromotionDescription(id);
                 String song = CreatePromotion.getPromotionSong(id);
                 User currentUser = ctx.sessionAttribute("currentUser");
+                int likeAmount = CreatePromotion.getLikeAmount(id);
                 Boolean hasLiked = CreatePromotion.isPromotionLikedByUser(id, currentUser.getId());
                 //making sure that the promotion is not null, if not, return a 404 error.
                 if (name == null || description == null || song == null) {
@@ -269,7 +270,8 @@ public class App {
                         "promotionSong", song,
                         "promotion_id", id,
                         "userId", currentUser.getId(),
-                        "hasLiked", "Unlike"));
+                        "hasLiked", "Unlike",
+                        "likeAmount", likeAmount));
                 }
                 else
                 {
@@ -279,7 +281,8 @@ public class App {
                         "promotionSong", song,
                         "promotion_id", id,
                         "userId", currentUser.getId(),
-                        "hasLiked", "Like"));
+                        "hasLiked", "Like",
+                        "likeAmount", likeAmount));
                 }
             });
 
