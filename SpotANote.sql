@@ -123,6 +123,8 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 (5150515, "connors", "connorpswd3", "Connor", TRUE, 3, NULL), -- record holders should also have public names
 (1, "test", "testpswd", "Test", FALSE, 1, 2),
 (2, "recordtest", "recordpswd", "Record", TRUE, 3, NULL);
+(3, "recordtest2", "testpswd", "Bot", TRUE, 3, NULL);
+(4, "recordtest3", "testpswd", "Bot2", TRUE, 3, NULL);
 
 -- Record inserts
 INSERT INTO Record (record_name, record_manager_id) VALUES
