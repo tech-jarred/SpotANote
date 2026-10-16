@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.mysql.cj.protocol.Resultset;
+
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinPebble;
 
@@ -77,7 +79,8 @@ public class CreatePromotion {
     //and returns either true or false based on it
     public static boolean promotionExists(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT COUNT(*) FROM Promotion WHERE id = ?";
+            String sql = "SELECT COUNT(*) FROM promotion WHERE promotion_id = ?";
+            System.out.println("PromotionId: "+ promotionId);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, promotionId);
                 try (ResultSet resultSet = statement.executeQuery()) {

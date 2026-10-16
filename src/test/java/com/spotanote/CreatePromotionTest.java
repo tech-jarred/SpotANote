@@ -11,12 +11,12 @@ public class CreatePromotionTest
 {
     int currentPromotionId;
 
-        @BeforeEach
+    @BeforeEach
     void setUp() 
     {
         // Set up any necessary preconditions for the tests, such as creating a promotion in the database.
-        CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 1);
-        int promotionId = CreatePromotion.getPromotionIdByName("Test Promotion");
+        CreatePromotion.createPromotion("Test Promotion2", "This is a test promotion.", "Test Song", 1);
+        int promotionId = CreatePromotion.getPromotionIdByName("Test Promotion2");
         //System.out.println("Promotion ID: " + promotionId);
         assertTrue(promotionId > 0, "Promotion should be created");
         this.currentPromotionId = promotionId;
@@ -35,13 +35,27 @@ public class CreatePromotionTest
     }
 
     @Test
-    void testUploadToDatabase()
+    void testUploadToDatabase() throws SQLException
     {
-        CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
-
+        //CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
+        CreatePromotion.createPromotion("TestPromotion", "From Testing To See if it exists", "Test Song", 1);
         // Check if the promotion was successfully created in the database
+        int id = CreatePromotion.getPromotionIdByName("TestPromotion");
+        boolean outcome = CreatePromotion.promotionExists(id);
 
+        CreatePromotion.removePromotion(id);
+        assertTrue(outcome);
 
+    }
+
+    //testing to see if the removePromotion function works correctly
+    @Test
+    void removePromotion()
+    {
+        CreatePromotion.createPromotion("Test Deletion", "This is a test promotion.", "Test Song", 2);
+        int id = CreatePromotion.getPromotionIdByName("Test Deletion");
+        boolean outcome = CreatePromotion.removePromotion(id);
+        assertTrue(outcome);
     }
 
     @Test
@@ -76,9 +90,42 @@ public class CreatePromotionTest
         assertEquals("Record ID cannot be null or empty", exception.getMessage());
     }
 
+    //here we are trying to test to see if we can get all the promotions from inside the database
     @Test void getAllPromotions()
     {
         
+    }
+
+    @Test 
+    void savingCorrectTitle()
+    {
+        CreatePromotion.createPromotion("Name2", "Description", "Song", 1);
+        int id = CreatePromotion.getPromotionIdByName("Name2");
+        String actual = CreatePromotion.getPromotionName(id);
+        String correctName = "Name2";
+        CreatePromotion.removePromotion(id);
+        assertEquals(correctName, actual);
+    }
+    @Test 
+    void savingCorrectDescription()
+    {
+        CreatePromotion.createPromotion("Name2", "Description", "Song", 1);
+        int id = CreatePromotion.getPromotionIdByName("Name2");
+        String actual = CreatePromotion.getPromotionDescription(id);
+        String correctName = "Description";
+        CreatePromotion.removePromotion(id);
+        assertEquals(correctName, actual);
+    }
+
+    @Test
+    void savingCorrectSong()
+    {
+        CreatePromotion.createPromotion("Name2", "Description", "SongTest", 1);
+        int id = CreatePromotion.getPromotionIdByName("Name2");
+        String actual = CreatePromotion.getPromotionSong(id);
+        String correctName = "SongTest";
+        CreatePromotion.removePromotion(id);
+        assertEquals(correctName, actual);
     }
 
     //here we are testing the like promotion functionality that was created in CreatePromotion.java. This test will check if the like promotion functionality is working as expected.
@@ -123,6 +170,9 @@ public class CreatePromotionTest
 
     }
 
+    //here we are just testing to see if we can count the right number of likes that is associated with the promotion
+    //also if the account / user has already liked it we don't unlike because we are just checking to see if there
+    //are the right nnumber of likes in the database
     @Test
     void testLikeAmount() throws SQLException
     {
