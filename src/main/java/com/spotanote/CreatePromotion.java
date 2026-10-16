@@ -1,9 +1,13 @@
 package com.spotanote;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import com.mysql.cj.protocol.Resultset;
 
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinPebble;
@@ -25,6 +29,8 @@ public class CreatePromotion {
         // Default constructor
     }
 
+    //here we are returning the promotionId of the newly created promotion
+    //and takes in the name, description, song name as strings and also  takes in the recordId as an int
     public static int createPromotion(String promotionName, String promotionDescription, String promotionSong, int recordId) 
     {
         // Validate input parameters
@@ -69,9 +75,12 @@ public class CreatePromotion {
         return -1; // Return -1 if the insertion failed for any reason
     }
 
+    //here we check to make sure that the promotion exists in the database
+    //and returns either true or false based on it
     public static boolean promotionExists(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "SELECT COUNT(*) FROM Promotion WHERE id = ?";
+            String sql = "SELECT COUNT(*) FROM promotion WHERE promotion_id = ?";
+            System.out.println("PromotionId: "+ promotionId);
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, promotionId);
                 try (ResultSet resultSet = statement.executeQuery()) {
@@ -109,6 +118,7 @@ public class CreatePromotion {
         }
     }
 
+    //here we are returning the promotion name based on the promotion id
     public static String getPromotionName(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_name FROM Promotion WHERE promotion_id = ?";
@@ -126,6 +136,7 @@ public class CreatePromotion {
         return null; // Return null if the promotion does not exist or there was an error
     }
 
+    //here we are returning the promotion description based on the promotion id
     public static String getPromotionDescription(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_description FROM Promotion WHERE promotion_id = ?";
@@ -143,6 +154,7 @@ public class CreatePromotion {
         return null; // Return null if the promotion does not exist or there was an error
     }
 
+    //here we return a string of what the promotion song name is based on the promotionId
     public static String getPromotionSong(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_song FROM Promotion WHERE promotion_id = ?";
@@ -160,6 +172,8 @@ public class CreatePromotion {
         return null; // Return null if the promotion does not exist or there was an error
     }
 
+    //here we are getting the record id associated with the given promotion
+    //takes in a promotionId and returns the id of the record
     public static int getPromotionRecordId(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT record_Id FROM Promotion WHERE promotion_id = ?";
@@ -177,6 +191,7 @@ public class CreatePromotion {
         return -1; // Return -1 if the promotion does not exist or there was an error
     }
 
+    //returns the id of the promotion name that was given and returns -1 if there was any errors or if it doesn't exist
     public static int getPromotionIdByName(String promotionName) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_id FROM Promotion WHERE promotion_name = ?";
@@ -195,6 +210,8 @@ public class CreatePromotion {
     }
 
 
+    //this takes all of the promotions that are stored in the database
+    //this returns an array of all promotions and their attributes using the CreatePromotion datatype
     public static CreatePromotion[] getAllPromotions()
     {
         try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -219,6 +236,128 @@ public class CreatePromotion {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    //here I am going to create the function that will like the current promotion
+    //based on the promotionId and userId making sure that someone can only like a promotion once, if they try to like it again it will remove the like from the promotion
+    //returns a boolean to say if they liked the promotion or not
+    public static boolean likePromotion(int promotionId, int userId) 
+    {
+        // Validate input parameters
+        if (promotionId <= 0) {
+            throw new IllegalArgumentException("Promotion ID cannot be null or empty");
+        }
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
+
+        // Check if the user has already liked the promotion
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String checkSql = "SELECT COUNT(*) FROM likePromotion WHERE promotion_id = ? AND user_id = ?";
+            try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+                checkStatement.setInt(1, promotionId);
+                checkStatement.setInt(2, userId);
+                try (ResultSet resultSet = checkStatement.executeQuery()) {
+                    if (resultSet.next() && resultSet.getInt(1) > 0) {
+                        // User has already liked the promotion, so remove the like
+                        System.out.println("User has already liked the promotion. Removing like.");
+                        String deleteSql = "DELETE FROM likePromotion WHERE promotion_id = ? AND user_id = ?";
+                        try (PreparedStatement deleteStatement = connection.prepareStatement(deleteSql)) {
+                            deleteStatement.setInt(1, promotionId);
+                            deleteStatement.setInt(2, userId);
+                            int rowsAffected = deleteStatement.executeUpdate();
+                            return rowsAffected > 0; // Return true if a row was deleted
+                        }
+                    } else {
+                        // User has not liked the promotion yet, so add the like
+                        System.out.println("User has not liked the promotion yet. Adding like.");
+                        String insertSql = "INSERT INTO likePromotion (promotion_id, user_id) VALUES (?, ?)";
+                        try (PreparedStatement insertStatement = connection.prepareStatement(insertSql)) {
+                            insertStatement.setInt(1, promotionId);
+                            insertStatement.setInt(2, userId);
+                            int rowsAffected = insertStatement.executeUpdate();
+                            return rowsAffected > 0; // Return true if a row was inserted
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Return false if there was an error
+        }
+    }
+
+    //this is to check to see if the given post is already liked by the user that is signed in
+    //returns a true or false based on it
+    public static boolean isPromotionLikedByUser(int promotionId, int userId) {
+        // Validate input parameters
+        if (promotionId <= 0) {
+            throw new IllegalArgumentException("Promotion ID cannot be null or empty");
+        }
+        if (userId <= 0) {
+            throw new IllegalArgumentException("User ID cannot be null or empty");
+        }
+
+        // Check if the user has liked the promotion
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+            String sql = "SELECT COUNT(*) FROM likePromotion WHERE promotion_id = ? AND user_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, promotionId);
+                statement.setInt(2, userId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        return resultSet.getInt(1) > 0; // Return true if the user has liked the promotion
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false; // Return false if there was an error
+    }
+
+    //this function is used when we want to display the total likes amount a given post has
+    //so that way we can display it on the screen
+    //returns the number of likes a post has
+    public static int getLikeAmount(int promotionId) throws SQLException
+    {
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "SELECT COUNT(like_id) FROM likePromotion WHERE promotion_id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, promotionId);
+                try (ResultSet resultSet = statement.executeQuery()) 
+                {
+                    if(resultSet.next())
+                        {
+                            return resultSet.getInt(1);
+                        }
+                }
+            }
+            return 0;
+        }
+    }
+
+
+    //created for the reason that we need a way to clear the likes from the promotion for a certain user. This can be
+    //used where we want to make sure that the user has absolutly no likes for the given promotion
+    //returns a true false if the deletion worked or not
+    public static boolean clearLikesForUser(int userId, int promotionId) throws SQLException
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "DELETE FROM likePromotion WHERE user_id = ? AND promotion_id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, userId);
+                statement.setInt(2, promotionId);
+                int deletedRows = statement.executeUpdate();
+
+                return deletedRows > 0;
+            }
+        }
     }
 
 }
