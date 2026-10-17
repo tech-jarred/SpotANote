@@ -1,6 +1,6 @@
 
 -- delete schema for debugging purposes
--- DROP SCHEMA SpotANote;
+DROP SCHEMA SpotANote;
 
 -- create statements
 CREATE SCHEMA SpotANote;
@@ -65,6 +65,26 @@ CREATE TABLE Song (
 -- Playlist
 -- Note: playlists are also albums so the playlist_name can also store the album name
 CREATE TABLE Playlist (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    playlist_name VARCHAR(150) NOT NULL,
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, 
+    FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+-- TestSong for unit tests
+CREATE TABLE TestSong (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    song_name VARCHAR(100) NOT NULL,
+    song_duration INT, -- will be in seconds
+    file_path VARCHAR(300) NOT NULL UNIQUE,
+    record_member_id INT NOT NULL, -- encompasses artist_id and record_id
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, -- will always default to false
+    FOREIGN KEY (record_member_id) REFERENCES RecordMember(id)
+);
+
+-- TestPlaylist for unit tests
+CREATE TABLE TestPlaylist (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     playlist_name VARCHAR(150) NOT NULL,
