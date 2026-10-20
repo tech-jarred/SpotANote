@@ -1,0 +1,41 @@
+<main>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <html>
+    
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+            <a href="/records" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Records</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+  <head>
+    <h2>Current Records</h2>
+  </head>
+
+{% for record in records %}
+    <div>
+        <h2>
+            <a href="/specific-record/{{ record.getRecordId(record.recordName) }}">
+                {{ record.recordName }}
+            </a>
+        </h2>
+    </div>
+{% else %}
+    <p>No record found.</p>
+{% endfor %}

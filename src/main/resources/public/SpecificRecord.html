@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+        <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+            <a href="/records" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Records</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+        <div style="text-align: center;">
+            <h2>Record Id: {{recordId}}</h2>
+            <h2>Record Name: {{ recordName }}</h2>
+            <h2>Record Manager Id: {{ managerId }}</h2>
+            <!--creating a button to like the promotion-->
+            <form action="/followRecord" method="POST">
+                <input type="hidden" name="recordId" value="{{ recordId }}">
+                <button type="submit">{{isUserFollowing}}</button>
+            </form>
+        </div>
+       </body>

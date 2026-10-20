@@ -1,17 +1,22 @@
 <main>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
 
   <html>
-
-  <head>
-    <h2>Available Promotions</h2>
-  </head>
-
 
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
             <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
             <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+            <a href="/records" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Records</a>
             <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-logout">Logout</button>
@@ -19,6 +24,10 @@
         </div>
     </nav>
 
+
+      <head>
+    <h2>Available Promotions</h2>
+  </head>
 
 
     <!--Now this is a loop where we will display each promotion by name-->
@@ -35,10 +44,5 @@
 {% endfor %}
 
 
-  <!--This is just a placeholder for the background-->
-
-  <body
-    style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
-</main>
 
 </main>

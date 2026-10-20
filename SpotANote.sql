@@ -129,6 +129,12 @@ CREATE TABLE LikePromotion (
     FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
 );
 
+CREATE TABLE UserFollowers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_Id INT,
+    record_Id INT
+);
+
 -- insert statements
 
 -- Role inserts
