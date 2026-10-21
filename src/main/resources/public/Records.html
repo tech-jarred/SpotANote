@@ -18,6 +18,7 @@
             <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
             <a href="/records" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Records</a>
             <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <a href="/profile" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Profile</a>
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
@@ -29,13 +30,19 @@
   </head>
 
 {% for record in records %}
-    <div>
-        <h2>
-            <a href="/specific-record/{{ record.getRecordId(record.recordName) }}">
-                {{ record.recordName }}
+  <div>
+    <h2>
+      <div style="text-align: center;">
+        <div class="welcome-banner" style="display: inline-block; width: fit-content;">
+          <div style="color: aliceblue;">
+            <a href="/specific-record/{{ record.getRecordId(record.recordName) }}" style="color: aliceblue;">
+              {{ record.recordName }}
             </a>
-        </h2>
-    </div>
+          </div>
+        </div>
+      </div>
+    </h2>
+  </div>
 {% else %}
-    <p>No record found.</p>
+  <p>No records found.</p>
 {% endfor %}
