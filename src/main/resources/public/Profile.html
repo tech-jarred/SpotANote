@@ -34,50 +34,58 @@
 
 
 <head>
-    <div style ="text-align: center;color: #ffffff;">
-<h2>Liked Promotions</h2>
-    </div>
-  </head>
-{% for promotion in promotionArray %}
-  <div>
-    <h2>
+    <div style="margin-bottom: 16px;"></div>
+      <head>
       <div style="text-align: center;">
-      <div class="welcome-banner"style="display: inline-block; width: fit-content">
-        <div style="color: aliceblue;">
-      <a href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"style="color:aliceblue;">
-        {{ promotion.promotionName }}
-        </div>
-        </div>
-        </div>
-      </a>
-    </h2>
+    <div class="welcome-banner" style="display: inline-block; width: fit-content;">
+    <h2>Liked Promotions</h2>
+    </div></div>
+  </head>
+  <div style="margin-bottom: 16px;"></div>
+
+{% for promotion in promotionArray %}
+  <div style="text-align: center; margin-bottom: 16px;">
+    <a
+      href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"
+      style="color: #2d1466; text-decoration: none;"
+    >
+      <div class="card song-card"
+           style="display: inline-block; width: fit-content; margin-bottom: 0;">
+        <h2 style="color: #2d1466; margin: 0;">
+          {{ promotion.promotionName }}
+        </h2>
+      </div>
+    </a>
   </div>
 {% else %}
   <p>No promotions found.</p>
 {% endfor %}
 
 
-<head>
-    <div style="text-align: center; color: #ffffff;">
-        <h2>Followed Records</h2>
-    </div>
-</head>
+
+    <div style="margin-bottom: 16px;"></div>
+      <head>
+      <div style="text-align: center;">
+    <div class="welcome-banner" style="display: inline-block; width: fit-content;">
+    <h2>Followed Records</h2>
+    </div></div>
+  </head>
+  <div style="margin-bottom: 16px;"></div>
 
 {% for record in recordArray %}
-    <div>
-        <h2>
-            <div style="text-align: center;">
-                <div class="welcome-banner" style="display: inline-block; width: fit-content;">
-                    <div style="color: aliceblue;">
-                        <a href="/specific-record/{{ record.getRecordId(record.recordName) }}"
-                           style="color: aliceblue;">
-                            {{ record.recordName }}
-                        </a>
-                    </div>
-                </div>
-            </div>
+  <div style="text-align: center; margin-bottom: 16px;">
+    <a
+      href="/specific-record/{{ record.getRecordId(record.recordName) }}"
+      style="color: #2d1466; text-decoration: none;"
+    >
+      <div class="card song-card"
+           style="display: inline-block; width: fit-content; margin-bottom: 0;">
+        <h2 style="color: #2d1466; margin: 0;">
+          {{ record.recordName }}
         </h2>
-    </div>
+      </div>
+    </a>
+  </div>
 {% else %}
-    <p style="text-align: center; color: aliceblue;">No records found.</p>
+  <p>No records found.</p>
 {% endfor %}

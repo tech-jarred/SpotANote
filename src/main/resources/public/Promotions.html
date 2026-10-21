@@ -25,28 +25,30 @@
         </div>
     </nav>
 
-
+    <div style="margin-bottom: 16px;"></div>
       <head>
-    <div style ="text-align: center;color: #ffffff;">
+      <div style="text-align: center;">
+    <div class="welcome-banner" style="display: inline-block; width: fit-content;">
     <h2>Available Promotions</h2>
-    </div>
+    </div></div>
   </head>
+  <div style="margin-bottom: 16px;"></div>
 
 
     <!--Now this is a loop where we will display each promotion by name-->
 {% for promotion in promotions %}
-  <div>
-    <h2>
-      <div style="text-align: center;">
-      <div class="welcome-banner"style="display: inline-block; width: fit-content">
-        <div style="color: aliceblue;">
-      <a href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"style="color:aliceblue;">
-        {{ promotion.promotionName }}
-        </div>
-        </div>
-        </div>
-      </a>
-    </h2>
+  <div style="text-align: center; margin-bottom: 16px;">
+    <a
+      href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"
+      style="color: #2d1466; text-decoration: none;"
+    >
+      <div class="card song-card"
+           style="display: inline-block; width: fit-content; margin-bottom: 0;">
+        <h2 style="color: #2d1466; margin: 0;">
+          {{ promotion.promotionName }}
+        </h2>
+      </div>
+    </a>
   </div>
 {% else %}
   <p>No promotions found.</p>
