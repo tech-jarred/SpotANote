@@ -162,6 +162,39 @@ public static int getRecordManagerId(int id) throws SQLException {
         return false;
     }
 
+    //getting all records followed by the given userId
+    public static RecordInfo[] allFollowedRecords(int userId) throws SQLException
+    {
+        RecordInfo[] recordArray = new RecordInfo[100];
+        if(userId <= 0)
+        {
+            return null;
+        }
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "SELECT * FROM UserFollowers uf JOIN Record r ON uf.record_Id = r.id WHERE uf.user_Id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, userId);
+                try (ResultSet resultSet = statement.executeQuery())
+                {
+                    int index = 0;
+                    while (resultSet.next())
+                    {
+                        RecordInfo record = new RecordInfo();
+                        record.recordName = resultSet.getString("record_name");
+                        record.recordManagerId = resultSet.getInt("record_manager_id");
+                        recordArray[index++] = record;
+                    }
+                    return recordArray;
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
 
 /// comment

@@ -36,11 +36,14 @@
        <body>
         
         <div style="text-align: center;">
-            <h2>Promotion Id: {{ promotion_id }}</h2>
-            <h2>Promotion Name: {{ promotionName }}</h2>
+            <!--<h2>Promotion Id: {{ promotion_id }}</h2>-->
+            <div class="welcome-banner"style="display: inline-block; width: fit-content">
+            <h2>{{ promotionName }}</h2>
+            </div>
             <p>Promotion Description: {{ promotionDescription }}</p>
             <p>Promotion Song: {{ promotionSong }}</p>
             <p>Like Amount: {{likeAmount}}</p>
+            
             <!--creating a button to like the promotion-->
             <form action="/likePromotion" method="POST">
                 <input type="hidden" name="promotionId" value="{{ promotion_id }}">

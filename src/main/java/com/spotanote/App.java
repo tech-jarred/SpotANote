@@ -377,6 +377,30 @@ public class App {
                 ctx.redirect("/specific-record/" + recordId);
             });
 
+            config.routes.get("/profile", ctx->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int userId = currentUser.getId();
+                String username = currentUser.getName();
+                String role = currentUser.getRole();
+                RecordInfo[] recordArray = RecordInfo.allFollowedRecords(userId);
+                CreatePromotion[] promotionArray = CreatePromotion.getAllLikedPromotions(userId);
+                promotionArray = java.util.Arrays.stream(promotionArray)
+                        .filter(java.util.Objects::nonNull)
+                        .toArray(CreatePromotion[]::new);
+                        
+                recordArray = java.util.Arrays.stream(recordArray)
+                        .filter(java.util.Objects::nonNull)
+                        .toArray(RecordInfo[]::new);
+                
+                ctx.render("public/Profile.html", 
+                    Map.of("recordArray", recordArray,
+                           "promotionArray", promotionArray,
+                           "username", username,
+                           "userRole", role)
+                    );
+            });
+
 
 
 
