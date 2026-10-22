@@ -92,6 +92,27 @@ CREATE TABLE TestPlaylist (
     FOREIGN KEY (user_id) REFERENCES User(id)
 );
 
+-- TestArtist for unit tests
+CREATE TABLE TestUser (
+    id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(20) NOT NULL,
+    name VARCHAR(50) NULL,
+    is_name_public BOOLEAN NOT NULL DEFAULT FALSE,
+    roleid1 INT NOT NULL,
+    roleid2 INT NULL,
+    FOREIGN KEY (roleid1) REFERENCES Role(id),
+    FOREIGN KEY (roleid2) REFERENCES Role(id)
+);
+
+-- TestRecord for unit tests
+CREATE TABLE TestRecord (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_name VARCHAR(100) NOT NULL UNIQUE,
+    record_manager_id INT NOT NULL,
+    FOREIGN KEY (record_manager_id) REFERENCES Role(id)
+);
+
 -- Playlist Song
 CREATE TABLE PlaylistSong (
 	id INT AUTO_INCREMENT PRIMARY KEY,
