@@ -58,6 +58,7 @@ CREATE TABLE Song (
     song_duration INT, -- will be in seconds
     file_path VARCHAR(300) NOT NULL UNIQUE,
     record_member_id INT NOT NULL, -- encompasses artist_id and record_id
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, -- will always default to false
     FOREIGN KEY (record_member_id) REFERENCES RecordMember(id)
 );
 
@@ -69,6 +70,47 @@ CREATE TABLE Playlist (
     playlist_name VARCHAR(150) NOT NULL,
     is_public BOOLEAN NOT NULL DEFAULT FALSE, 
     FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+-- TestSong for unit tests
+CREATE TABLE TestSong (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    song_name VARCHAR(100) NOT NULL,
+    song_duration INT, -- will be in seconds
+    file_path VARCHAR(300) NOT NULL UNIQUE,
+    record_member_id INT NOT NULL, -- encompasses artist_id and record_id
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, -- will always default to false
+    FOREIGN KEY (record_member_id) REFERENCES RecordMember(id)
+);
+
+-- TestPlaylist for unit tests
+CREATE TABLE TestPlaylist (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    playlist_name VARCHAR(150) NOT NULL,
+    is_public BOOLEAN NOT NULL DEFAULT FALSE, 
+    FOREIGN KEY (user_id) REFERENCES User(id)
+);
+
+-- TestArtist for unit tests
+CREATE TABLE TestUser (
+    id INT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(20) NOT NULL,
+    name VARCHAR(50) NULL,
+    is_name_public BOOLEAN NOT NULL DEFAULT FALSE,
+    roleid1 INT NOT NULL,
+    roleid2 INT NULL,
+    FOREIGN KEY (roleid1) REFERENCES Role(id),
+    FOREIGN KEY (roleid2) REFERENCES Role(id)
+);
+
+-- TestRecord for unit tests
+CREATE TABLE TestRecord (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    record_name VARCHAR(100) NOT NULL UNIQUE,
+    record_manager_id INT NOT NULL,
+    FOREIGN KEY (record_manager_id) REFERENCES Role(id)
 );
 
 -- Playlist Song
@@ -91,6 +133,23 @@ CREATE TABLE CurrentQueue (
     FOREIGN KEY (song_id) REFERENCES Song(id)
 );
 
+CREATE TABLE Promotion (
+    promotion_id INT AUTO_INCREMENT PRIMARY KEY,
+    promotion_name VARCHAR(100) NOT NULL,
+    promotion_description TEXT NOT NULL,
+    promotion_song VARCHAR(300) NOT NULL,
+    record_id INT NOT NULL,
+    FOREIGN KEY (record_id) REFERENCES Record(id)
+);
+
+CREATE TABLE LikePromotion (
+    like_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    promotion_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id),
+    FOREIGN KEY (promotion_id) REFERENCES Promotion(promotion_id)
+);
+
 -- insert statements
 
 -- Role inserts
@@ -105,15 +164,27 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 (3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, NULL),
 (5150515, "connors", "connorpswd3", "Connor", TRUE, 3, NULL), -- record holders should also have public names
 (1, "test", "testpswd", "Test", FALSE, 1, 2),
-(2, "recordtest", "recordpswd", "Record", TRUE, 3, NULL);
+(2, "testAccount2", "recordpswd", "Record", TRUE, 3, NULL),
+(3, "testAccount3", "testpswd", "Bot", TRUE, 3, NULL),
+(4, "testAccount4", "testpswd", "Bot2", TRUE, 3, NULL);
 
 -- Record inserts
 INSERT INTO Record (record_name, record_manager_id) VALUES
-("Test Record", 2);
+("Test Record", 3),
+("Second Record", 3),
+("Third Record", 3),
+("Fourth Record", 3);
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES
 (1, 1);
+
+
+INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
+("Summer Hits", "A collection of the hottest tracks for the summer season.", "Soaking Sets", 1),
+("Chill Vibes", "Relax and unwind with these chill tunes.", "Frosty Frills", 1),
+("Top 40", "The most popular songs right now.", "Crazy Crew", 1),
+("Autumn Hits", "A song of the from the hottest tracks for the autumn season.", "Crimson Cloak", 1);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
@@ -142,5 +213,8 @@ FROM Playlist;
 
 SELECT *
 FROM User;
+
+SELECT *
+FROM Song;
 
 -- DELETE FROM Song WHERE file_path LIKE '/songs/%';

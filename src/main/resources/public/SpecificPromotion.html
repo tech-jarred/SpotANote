@@ -1,0 +1,51 @@
+
+<main>  
+    
+  <html>
+
+    <head>  
+      <h2>Selected Promotion Details</h2>
+    </head>
+
+
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+            <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+
+
+       <div style="text-align: center;"><h1>Promotion Details</h1></div>
+
+       <!--Now we just need to display the promotion name and its information-->
+
+       <body>
+        
+        <div style="text-align: center;">
+            <h2>Promotion Id: {{ promotion_id }}</h2>
+            <h2>Promotion Name: {{ promotionName }}</h2>
+            <p>Promotion Description: {{ promotionDescription }}</p>
+            <p>Promotion Song: {{ promotionSong }}</p>
+            <p>Like Amount: {{likeAmount}}</p>
+            <!--creating a button to like the promotion-->
+            <form action="/likePromotion" method="POST">
+                <input type="hidden" name="promotionId" value="{{ promotion_id }}">
+                <button type="submit">{{hasLiked}}</button>
+            </form>
+        </div>
+       </body>
+        
+
+
+<!--This is just a placeholder for the background-->
+<body style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
+</main>
+
+</main>

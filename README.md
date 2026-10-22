@@ -12,4 +12,4 @@ In the terminal, run: ./mvnw exec:java -Dexec.mainClass="com.spotanote.App" -- t
 *Note: For both of the above, this works on MacOS/Linux. For Windows, replace ./mvnw with .\mvnw*
 
 
-mvn compile --% exec:java -Dexec.mainClass=com.spotanote.App
+.\mvnw compile --% exec:java -Dexec.mainClass=com.spotanote.App
