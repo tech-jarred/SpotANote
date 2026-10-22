@@ -1,5 +1,10 @@
 package com.spotanote;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayDeque;
+import java.time.Duration;
 
 public class SongQueue {
 
@@ -8,21 +13,58 @@ public class SongQueue {
     private ArrayDeque<Song> priorSongs = new ArrayDeque<>(); // to be treated as a stack UNTIL we reach a max size of prior songs to track (). At this point we treat it as a deque, add new previous song to tail end, remove oldest previous song from head.
     private final int MAX_PREVIOUS_SONGS = 10;
 
-    public SongQueue(){
-    }
-
-    // ... more methods to come
+    public SongQueue(){}
 
     /**
      * queue -- add a song to the tail end of the upcomingSongs deque
      * 
-     * @param songToQueue -- the song which will be added into the song queue (upcomingSongs) at the tail end
+     * @param songToQueue -- a Song, the song which will be added into the song queue (upcomingSongs) at the tail end
      */
     public void queue(Song songToQueue){
         // Attempt to add the song to tail end of upcomingSongs. (Think FIFO)
         try {
             upcomingSongs.addLast(songToQueue);
         } catch (Exception e) {
+            System.out.println("Error queing song: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * queue -- add a song to the tail end of the upcomingSongs deque
+     * 
+     * @param songIDToQueue -- an int, the id of the song which will be added into the song queue (upcomingSongs) at the tail end
+     */
+    public void queue(int songIDToQueue){
+        // Initialize songToQueue object.
+        Song songToQueue = null;
+
+        // Obtain the song from database, create new song object.
+        String sqlQuery = "select song_name, song_duration, file_path from Song where id = ?"; // preparing the string this way "sanitizes" user input, preventing an SQL injection attack.
+        try (Connection conn = DBExplorer.getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlQuery)){ // this attempts to connect to database
+            stmt.setInt(1, songIDToQueue);
+            
+            // Attempt executing the query once connected to database
+            try (ResultSet rs = stmt.executeQuery()){
+                if (rs.next()){ // if a song is present in database...
+                    // get information about the song...
+                    String songName = rs.getString("song_name");
+                    int numOfSeconds = rs.getInt("song_duration");
+                    String filePath = rs.getString("file_path");
+
+                    // and create song object.
+                    songToQueue = new Song(songIDToQueue, songName, Duration.ofSeconds(numOfSeconds), filePath);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Attempt to add the song to tail end of upcomingSongs. (Think FIFO)
+        try {
+            upcomingSongs.addLast(songToQueue);
+        } catch (Exception e) {
+            System.out.println("Error queing song: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -36,6 +78,7 @@ public class SongQueue {
         try {
             priorSongs.addLast(newPriorSong);
         } catch (Exception e) {
+            System.out.println("Error moving last played song to prior list: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -54,5 +97,18 @@ public class SongQueue {
      */
     public boolean isPriorSongsEmpty(){
         return priorSongs.size() == 0;
+    }
+
+    /**
+     * EQN -- a function to determine if two SongQueue objects are observationally equivalent to each other
+     *        these two objects are considered to be observationally equivalent WHEN
+     *              1) the upcomingSongs attribute of each SongQueue object has the same songs in the same order AND
+     *              2) the priorSongs attribute of each SongQueue object has the same songs in the same order
+     * 
+     * @param otherSQ -- the other SongQueue object we are comparing this one against.
+     * @return a boolean literal -- true if the SongQueue objects are observationally equivalent to each other, false otherwise.
+     */
+    public boolean EQN(SongQueue otherSQ){
+        return false;
     }
 }
