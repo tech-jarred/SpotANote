@@ -1,5 +1,6 @@
 package com.spotanote;
 import java.time.Duration;
+import java.util.Objects;
 
 public class Song {
     private final int ID;
@@ -74,5 +75,15 @@ public class Song {
         // If neither if clause evalutates to true, we know obj is a different instance of the Song object. Cast obj to Song and compare.
         Song other = (Song) obj;
         return this.ID == other.getId() && this.NAME.equals(other.getName()) && this.DURATION.equals(other.getDuration()) && this.FILE_PATH.equals(other.getFilePath());
+    }
+
+    /**
+     * Updating the hashing method since we overrode the .equals() method.
+     * 
+     * @return an integer corresponding to the new hashcode, based on the attributes of a Song object.
+     */
+    @Override
+    public int hashCode(){
+        return Objects.hash(this.ID, this.NAME, this.DURATION, this.FILE_PATH);
     }
 }
