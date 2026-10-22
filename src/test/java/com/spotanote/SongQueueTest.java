@@ -41,4 +41,24 @@ public class SongQueueTest {
         // Check if methods return false on non-empty upcoming and prior song queues.
         assertFalse(sq.isQueuedSongsEmpty() && sq.isPriorSongsEmpty(), "SongQueue was expected to be not empty, but it was.");
     }
+
+    /**
+     * Determines is the SongQueue is able to add a new song to queue when just given an id number.
+     * 
+     * Let the song id be 1 (Please Please Please)
+     */
+    @Test
+    void testQueueingSongFromId(){
+        // Create instance of SongQueue
+        SongQueue sq = new SongQueue();
+        
+        // pass song id 1 into queue method
+        sq.queue(1);
+
+        // Check if the SongQueue is observationally equivalent to what we expect it to be (i.e., there is a song object for please please please at the head of the upcomingSongs)
+        Song s1 = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
+        SongQueue sqExpected = new SongQueue(); sqExpected.queue(s1);
+
+        assertTrue(sq.EQN(sqExpected));
+    }
 }

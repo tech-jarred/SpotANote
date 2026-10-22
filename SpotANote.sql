@@ -145,7 +145,12 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 (1, "test", "testpswd", "Test", FALSE, 1, 2),
 (2, "testAccount2", "recordpswd", "Record", TRUE, 3, NULL),
 (3, "testAccount3", "testpswd", "Bot", TRUE, 3, NULL),
-(4, "testAccount4", "testpswd", "Bot2", TRUE, 3, NULL);
+(4, "testAccount4", "testpswd", "Bot2", TRUE, 3, NULL),
+(5, "jvalentine", "stars4life", "Jill", TRUE, 1, 2),
+(6, "leonkennedy", "RCPD1996", "Leon S. Kennedy", TRUE, 1, NULL),
+(7, "aripley", "WhereIsNostromo", "Amanda Ripley", TRUE, 1, NULL),
+(8, "Dutch", "tahiti", "Van Der Linde", TRUE, 1, NULL),
+(9, "reddeadshooterguy", "rdr2", "Arthur", TRUE, 1, NULL);
 
 -- Record inserts
 INSERT INTO Record (record_name, record_manager_id) VALUES
@@ -156,7 +161,8 @@ INSERT INTO Record (record_name, record_manager_id) VALUES
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES
-(1, 1);
+(1, 1),
+(2, 2);
 
 
 INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
@@ -164,6 +170,38 @@ INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, re
 ("Chill Vibes", "Relax and unwind with these chill tunes.", "Frosty Frills", 1),
 ("Top 40", "The most popular songs right now.", "Crazy Crew", 1),
 ("Autumn Hits", "A song of the from the hottest tracks for the autumn season.", "Crimson Cloak", 1);
+
+-- TestSong Inserts
+INSERT INTO TestSong (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES 
+(1, 'Please Please Please', 187, '/music/please_please_please.mp3', 2, TRUE), 
+(2, 'Revenge', 219, '/music/revenge.mp3', 2, TRUE), 
+(3, 'Bailando', 254, '/music/bailando.mp3', 2, TRUE), 
+(4, 'Danza Kuduro', 235, '/music/danza_kuduro.mp3', 2, TRUE), 
+(5, 'Don''t Mine At Night', 214, '/music/dont_mine_at_night.mp3', 2, TRUE), 
+(6, 'Drive By', 197, '/music/drive_by.mp3', 2, TRUE), 
+(7, 'Fallen Kingdom', 252, '/music/fallen_kingdom.mp3', 2, TRUE), 
+(8, 'Hips Don''t Lie', 218, '/music/hips_dont_lie.mp3', 2, TRUE), 
+(9, 'Lao a Lao', 184, '/music/lao_a_lao.mp3', 2, TRUE), 
+(10, 'Ocean Man', 126, '/music/ocean_man.mp3', 2, TRUE), 
+(11, 'Pa''lla Voy', 263, '/music/palla_voy.mp3', 2, TRUE), 
+(12, 'Triforce Medley', 242, '/music/tloz_triforce_medley_40.mp3', 2, TRUE), 
+(13, 'Vivir Mi Vida', 252, '/music/vivir_mi_vida.mp3', 2, TRUE);
+
+-- Song Inserts
+INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES 
+(1, 'Please Please Please', 187, '/music/please_please_please.mp3', 2, TRUE), 
+(2, 'Revenge', 219, '/music/revenge.mp3', 2, TRUE), 
+(3, 'Bailando', 254, '/music/bailando.mp3', 2, TRUE), 
+(4, 'Danza Kuduro', 235, '/music/danza_kuduro.mp3', 2, TRUE), 
+(5, 'Don''t Mine At Night', 214, '/music/dont_mine_at_night.mp3', 2, TRUE), 
+(6, 'Drive By', 197, '/music/drive_by.mp3', 2, TRUE), 
+(7, 'Fallen Kingdom', 252, '/music/fallen_kingdom.mp3', 2, TRUE), 
+(8, 'Hips Don''t Lie', 218, '/music/hips_dont_lie.mp3', 2, TRUE), 
+(9, 'Lao a Lao', 184, '/music/lao_a_lao.mp3', 2, TRUE), 
+(10, 'Ocean Man', 126, '/music/ocean_man.mp3', 2, TRUE), 
+(11, 'Pa''lla Voy', 263, '/music/palla_voy.mp3', 2, TRUE), 
+(12, 'Triforce Medley', 242, '/music/tloz_triforce_medley_40.mp3', 2, TRUE), 
+(13, 'Vivir Mi Vida', 252, '/music/vivir_mi_vida.mp3', 2, TRUE);
 
 -- Song inserts, read more about audio below
 -- INSERT INTO Song (song_name, song_duration, file_path, artist_id) VALUES
