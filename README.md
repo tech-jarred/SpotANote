@@ -13,3 +13,5 @@ In the terminal, run: ./mvnw exec:java -Dexec.mainClass="com.spotanote.App" -- t
 
 
 .\mvnw compile --% exec:java -Dexec.mainClass=com.spotanote.App
+
+.\mvnw.cmd -Dtest=CreatePromotionTest test

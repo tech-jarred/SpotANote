@@ -1,4 +1,5 @@
 package com.spotanote;
+import java.sql.SQLException;
 import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,12 +44,13 @@ void testRecordInsideDatabase() {
        
     }
 
-
     @Test
-    void testUnfollowRecord(){
+    void testUnfollowRecord() throws SQLException{
         //testing to see if the user can unfollow a record
+        RecordInfo.followRecord(1, 1);
+        assertTrue(RecordInfo.isRecordFollowedByUser(1, 1));
         RecordInfo.unfollowRecord(1, 1);
-        assertTrue(true, "User should be able to unfollow a record.");
+        assertFalse(RecordInfo.isRecordFollowedByUser(1, 1));
     }
 
     @Test
@@ -57,6 +59,73 @@ void testRecordInsideDatabase() {
         int recordId = RecordInfo.getRecordId("Test Record");
         assertTrue(recordId > 0,"Record ID should be a valid positive ID.");
     }
-    
+
+    @Test
+    void testGetRecordManagerId() throws Exception {
+        RecordInfo.addRecord("Manager ID Test Record", 1);
+        int recordId = RecordInfo.getRecordId("Manager ID Test Record");
+        assertTrue(recordId > 0);
+        assertEquals(1, RecordInfo.getRecordManagerId(recordId));
+    }
+
+    @Test
+    void testIsRecordFollowedByUser() throws Exception {
+        RecordInfo.followRecord(1, 1);
+        assertTrue(RecordInfo.isRecordFollowedByUser(1, 1));
+    }
+
+    @Test
+    void testIsRecordFollowedByUserWithInvalidIds() {
+        assertThrows(IllegalArgumentException.class, () -> RecordInfo.isRecordFollowedByUser(0, 1));
+
+    assertThrows(IllegalArgumentException.class, () -> RecordInfo.isRecordFollowedByUser(1, 0));
+    }
+
+    @Test
+    void testGetRecordIdForUnknownName() {
+        assertEquals(-1, RecordInfo.getRecordId("Nonexistent Record 999999"));
+    }
+
+    @Test
+    void testAllFollowedRecordsWithInvalidUserId() throws Exception {
+        assertNull(RecordInfo.allFollowedRecords(0));
+        assertNull(RecordInfo.allFollowedRecords(-1));
+    }
+
+    @Test
+    void testInvalidManagerId()
+    {
+
+    }
+    @Test
+    void testGetAllRecords()
+    {
+
+    }
+    @Test
+    void testGetAllFollowedWhenNotFollowing()
+    {
+
+    }
+    @Test
+    void testGetAllLikedWhenNoLiked()
+    {
+
+    }
+    @Test 
+    void testValidRecordNameFromId()
+    {
+
+    }
+    @Test 
+    void testInvalidRecordId()
+    {
+
+    }
+    @Test 
+    void testGetManagerIdForInvalidRecord()
+    {
+
+    }
 }
 
