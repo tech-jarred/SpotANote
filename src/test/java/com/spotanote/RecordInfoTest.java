@@ -1,6 +1,8 @@
 package com.spotanote;
 import java.sql.SQLException;
 import java.util.Objects;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -9,14 +11,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RecordInfoTest {
+int recordId;
+@BeforeEach
+void setUp()
+{
+    RecordInfo.addRecord("Database Test Record", 1);
+    recordId = RecordInfo.getRecordId("Database Test Record");
+}
+
+@AfterEach
+void tearDown() throws SQLException
+{
+    RecordInfo.removeRecordFollowers(recordId);
+    RecordInfo.removeRecord(recordId);
+}
 
 
 @Test
 void testRecordInsideDatabase() {
-    RecordInfo.addRecord("Database Test Record", 1);
-
-    int recordId = RecordInfo.getRecordId("Database Test Record");
-
     System.out.println("Record ID = " + recordId);
 
     assertTrue(recordId > 0, "Record was not inserted into the database.");
@@ -39,7 +51,7 @@ void testRecordInsideDatabase() {
     @Test
     void testFollowRecord(){
         //testing to see if the user can follow a record
-        RecordInfo.followRecord(1, 1);
+        RecordInfo.followRecord(1, recordId);
         assertTrue(true, "User should be able to follow a record.");
        
     }
@@ -47,38 +59,34 @@ void testRecordInsideDatabase() {
     @Test
     void testUnfollowRecord() throws SQLException{
         //testing to see if the user can unfollow a record
-        RecordInfo.followRecord(1, 1);
-        assertTrue(RecordInfo.isRecordFollowedByUser(1, 1));
-        RecordInfo.unfollowRecord(1, 1);
-        assertFalse(RecordInfo.isRecordFollowedByUser(1, 1));
+        RecordInfo.followRecord(1, recordId);
+        assertTrue(RecordInfo.isRecordFollowedByUser(recordId, 1));
+        RecordInfo.unfollowRecord(1, recordId);
+        assertFalse(RecordInfo.isRecordFollowedByUser(recordId, 1));
     }
 
     @Test
     void testGetID() {
-        RecordInfo.addRecord("Test Record", 1);
-        int recordId = RecordInfo.getRecordId("Test Record");
+        int recordId = RecordInfo.getRecordId("Database Test Record");
         assertTrue(recordId > 0,"Record ID should be a valid positive ID.");
     }
 
     @Test
     void testGetRecordManagerId() throws Exception {
-        RecordInfo.addRecord("Manager ID Test Record", 1);
-        int recordId = RecordInfo.getRecordId("Manager ID Test Record");
         assertTrue(recordId > 0);
         assertEquals(1, RecordInfo.getRecordManagerId(recordId));
     }
 
     @Test
     void testIsRecordFollowedByUser() throws Exception {
-        RecordInfo.followRecord(1, 1);
-        assertTrue(RecordInfo.isRecordFollowedByUser(1, 1));
+        RecordInfo.followRecord(1, recordId);
+        assertTrue(RecordInfo.isRecordFollowedByUser(recordId, 1));
     }
 
     @Test
     void testIsRecordFollowedByUserWithInvalidIds() {
         assertThrows(IllegalArgumentException.class, () -> RecordInfo.isRecordFollowedByUser(0, 1));
-
-    assertThrows(IllegalArgumentException.class, () -> RecordInfo.isRecordFollowedByUser(1, 0));
+        assertThrows(IllegalArgumentException.class, () -> RecordInfo.isRecordFollowedByUser(1, 0));
     }
 
     @Test
@@ -93,27 +101,24 @@ void testRecordInsideDatabase() {
     }
 
     @Test
-    void testInvalidManagerId()
+    void testGetAllFollowedRecords()
     {
-        //here we try to get a a manager id that doesnt exist
 
     }
+
     @Test
     void testGetAllRecords()
     {
         //here we are testing to get all records to see if it works
-        
-    }
-    @Test
-    void testGetAllFollowedWhenNotFollowing()
-    {
 
     }
     @Test
-    void testGetAllLikedWhenNoLiked()
+    void testGetAllFollowedWhenNotFollowing() throws SQLException
     {
-
+        int amountFollowed = RecordInfo.getFollowedAmount(recordId);
+        assertEquals(0, amountFollowed);
     }
+
     @Test 
     void testValidRecordNameFromId()
     {
@@ -125,9 +130,9 @@ void testRecordInsideDatabase() {
 
     }
     @Test 
-    void testGetManagerIdForInvalidRecord()
+    void testGetManagerIdForInvalidRecord() throws SQLException
     {
-
+        assertEquals(RecordInfo.getRecordManagerId(-1), -1);
     }
 }
 

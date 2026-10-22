@@ -247,5 +247,65 @@ public class RecordInfo {
         return null;
     }
 
+    /**
+     * 
+     * @param recordId - the id of the record we want to remove all followers from
+     * @return boolean - returns true or false based on if we removed them or not
+     * @throws SQLException
+     */
+    public static boolean removeRecordFollowers(int recordId) throws SQLException
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "DELETE FROM UserFollowers WHERE record_Id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, recordId);
+                int deletedRows = statement.executeUpdate();
+                return deletedRows > 0;
+            }
+        }
+    }
+    /**
+     * 
+     * @param recordId - the id of the record that we want to remove from the database
+     * @return boolean - returns true or false based if we successfully removed it or not
+     * @throws SQLException
+     */
+    public static boolean removeRecord(int recordId) throws SQLException
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "DELETE FROM record WHERE id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, recordId);
+                int deletedRows = statement.executeUpdate();
+                return deletedRows > 0;
+            }
+        }
+    }
+
+    public static int getFollowedAmount(int recordId) throws SQLException
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "SELECT COUNT(*) FROM userFollowers WHERE record_Id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, recordId);
+                try (ResultSet resultSet = statement.executeQuery())
+                {
+                    if(resultSet.next())
+                    {
+                        int count = resultSet.getInt(1);
+                        return count;
+                    }
+                }
+            }
+            
+        }
+        return -1;
+    }
 }
 
