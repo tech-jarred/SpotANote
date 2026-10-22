@@ -95,12 +95,14 @@ void testRecordInsideDatabase() {
     @Test
     void testInvalidManagerId()
     {
+        //here we try to get a a manager id that doesnt exist
 
     }
     @Test
     void testGetAllRecords()
     {
-
+        //here we are testing to get all records to see if it works
+        
     }
     @Test
     void testGetAllFollowedWhenNotFollowing()

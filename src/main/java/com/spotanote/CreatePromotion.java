@@ -31,6 +31,15 @@ public class CreatePromotion {
 
     //here we are returning the promotionId of the newly created promotion
     //and takes in the name, description, song name as strings and also  takes in the recordId as an int
+
+    /**
+     * 
+     * @param promotionName - the name in which a promotion has
+     * @param promotionDescription - the description in which a promotion will have
+     * @param promotionSong - the name of the song a promotion will have
+     * @param recordId - the int id of the record this promotion is connected to
+     * @return int - the promotionId of the created promotion or -1 if something went wrong
+     * **/
     public static int createPromotion(String promotionName, String promotionDescription, String promotionSong, int recordId) 
     {
         // Validate input parameters
@@ -77,6 +86,11 @@ public class CreatePromotion {
 
     //here we check to make sure that the promotion exists in the database
     //and returns either true or false based on it
+    /**
+     * 
+     * @param promotionId - the id we are using to check the database to see if the promotion exists
+     * @return boolean - a true false statement checking to see if the function worked properly or not
+     */
     public static boolean promotionExists(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT COUNT(*) FROM promotion WHERE promotion_id = ?";
@@ -98,6 +112,11 @@ public class CreatePromotion {
 
 
     //first we have to search the database to make sure the promotion exists, if it does we can delete it, if not we will return an error message
+    /**
+     * 
+     * @param promotionId - the id of the promotion we want to remove
+     * @return boolean - true or false based if it removed the promotion or not from the database
+     */
     public static boolean removePromotion(int promotionId) 
     {
         // Validate input parameters
@@ -119,6 +138,11 @@ public class CreatePromotion {
     }
 
     //here we are returning the promotion name based on the promotion id
+    /**
+     * 
+     * @param promotionId - the id of the promotion we are using to get the name of
+     * @return string - returns the name of the promotion or null if an error occured
+     */
     public static String getPromotionName(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_name FROM Promotion WHERE promotion_id = ?";
@@ -137,6 +161,11 @@ public class CreatePromotion {
     }
 
     //here we are returning the promotion description based on the promotion id
+    /**
+     * 
+     * @param promotionId - the id of the promotion we are using to get the description of
+     * @return string - returns the description of the given promotion or null if an error occured
+     */
     public static String getPromotionDescription(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_description FROM Promotion WHERE promotion_id = ?";
@@ -155,6 +184,11 @@ public class CreatePromotion {
     }
 
     //here we return a string of what the promotion song name is based on the promotionId
+    /**
+     * 
+     * @param promotionId - the id of the promotion we want to get the name of the song from
+     * @return string - returns the name of the song or null if an error occured
+     */
     public static String getPromotionSong(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_song FROM Promotion WHERE promotion_id = ?";
@@ -174,6 +208,11 @@ public class CreatePromotion {
 
     //here we are getting the record id associated with the given promotion
     //takes in a promotionId and returns the id of the record
+    /**
+     * 
+     * @param promotionId - the id of the promotion we want to get the recordId from
+     * @return int - returns the int id of the record from the promotion or -1 if an error occured
+     */
     public static int getPromotionRecordId(int promotionId) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT record_Id FROM Promotion WHERE promotion_id = ?";
@@ -192,6 +231,11 @@ public class CreatePromotion {
     }
 
     //returns the id of the promotion name that was given and returns -1 if there was any errors or if it doesn't exist
+    /**
+     * 
+     * @param promotionName - takes in a string of the promotion name to get the id back from (only works if names are unique in database)
+     * @return int - returns the id of the promotion with the same name or -1 if the names do not match anything
+     */
     public static int getPromotionIdByName(String promotionName) {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             String sql = "SELECT promotion_id FROM Promotion WHERE promotion_name = ?";
@@ -212,6 +256,10 @@ public class CreatePromotion {
 
     //this takes all of the promotions that are stored in the database
     //this returns an array of all promotions and their attributes using the CreatePromotion datatype
+    /**
+     * @param - takes in no parameters
+     * @return CreatePromotion array - returns an array of all promotions with their information
+     */
     public static CreatePromotion[] getAllPromotions()
     {
         try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
@@ -242,6 +290,12 @@ public class CreatePromotion {
     //here I am going to create the function that will like the current promotion
     //based on the promotionId and userId making sure that someone can only like a promotion once, if they try to like it again it will remove the like from the promotion
     //returns a boolean to say if they liked the promotion or not
+    /**
+     * 
+     * @param promotionId - the id of the promotion we want to use
+     * @param userId - the current user who is logged into the system
+     * @return boolean - true or false based on if the function worked or not
+     */
     public static boolean likePromotion(int promotionId, int userId) 
     {
         // Validate input parameters
@@ -290,6 +344,12 @@ public class CreatePromotion {
 
     //this is to check to see if the given post is already liked by the user that is signed in
     //returns a true or false based on it
+    /**
+     * 
+     * @param promotionId - the promotion we want to check
+     * @param userId - the user that is currently logged in
+     * @return boolean - true false based on if the user liked or hasn't liked the given promotion
+     */
     public static boolean isPromotionLikedByUser(int promotionId, int userId) {
         // Validate input parameters
         if (promotionId <= 0) {
@@ -320,6 +380,12 @@ public class CreatePromotion {
     //this function is used when we want to display the total likes amount a given post has
     //so that way we can display it on the screen
     //returns the number of likes a post has
+    /**
+     * 
+     * @param promotionId - the id of the promotion that we want to get the amount of likes
+     * @return int - returns the amount of likes the current promotion has or -1 if anything unexpected happened
+     * @throws SQLException
+     */
     public static int getLikeAmount(int promotionId) throws SQLException
     {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
@@ -344,6 +410,13 @@ public class CreatePromotion {
     //created for the reason that we need a way to clear the likes from the promotion for a certain user. This can be
     //used where we want to make sure that the user has absolutly no likes for the given promotion
     //returns a true false if the deletion worked or not
+    /**
+     * 
+     * @param userId - the id of the user who is currently logged in or the user we want to clear likes from
+     * @param promotionId - the promotion that we want to clear the likes from
+     * @return boolean - returns true false based on if the function worked correctly or not
+     * @throws SQLException
+     */
     public static boolean clearLikesForUser(int userId, int promotionId) throws SQLException
     {
         try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
@@ -360,6 +433,12 @@ public class CreatePromotion {
         }
     }
 
+    /**
+     * 
+     * @param userId - the id of the user who is currently logged in
+     * @return CreatePromotion array - returns an array of all the promotions the specific user has ever liked
+     * @throws SQLException
+     */
     public static CreatePromotion[] getAllLikedPromotions(int userId) throws SQLException
     {
         CreatePromotion[] promotions = new CreatePromotion[100];
