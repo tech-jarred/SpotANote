@@ -31,7 +31,7 @@ class ArtistRecordSearchTest
     void setUp() throws SQLException
     {
         String sqlUser = "INSERT INTO TestUser (id, username, password, name, is_name_public, roleid1, roleid2) VALUES (?, ?, ?, ?, TRUE, ?, ?)";
-        String sqlRecord = "INSERT INTO TestRecord (record_name, record_manager_id) VALUES ('Test Record', ?)";
+        String sqlRecord = "INSERT INTO TestRecord (record_name, record_manager_id) VALUES ('Island Records', ?)";
 
         try (Connection connect = DBExplorer.getConnection())
         {
@@ -75,7 +75,7 @@ class ArtistRecordSearchTest
                 stmt.executeUpdate();
                 try (ResultSet keys = stmt.getGeneratedKeys()) {
                     if (keys.next()) {
-                        recordID = keys.getInt(1); // Assuming recordID is defined at the class level
+                        recordID = keys.getInt(1);
                     } else {
                         throw new SQLException("Failed to retrieve generated key for record.");
                     }
@@ -125,72 +125,120 @@ class ArtistRecordSearchTest
     /**
      * Tests to see what happens when the alleged full artist name is seatched for but doesn't show up
      */
+    @Test
     void testUnsuccessfulArtistSearch() throws SQLException
     {
-        //
+        //searching a misspelled artist
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Sabs Car", "TestUser");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when full artist name is not found");
     }
 
     /**
      * Tests to see if an artist is correctly searched for using some of their name
      */
+    @Test
     void testSuccessfulPartialArtistSearch() throws SQLException
     {
-        //
+        //searching using part of the artist name
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Rina Car", "TestUser");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.contains(artistID), "Partial search should find the artist ID");
     }
 
     /**
      * Tests to see what happens when part of the artist name is searched for but doesn't show up
      */
+    @Test
     void testUnsuccessfulPartialArtistSearch() throws SQLException
     {
-        //
+        //searching a misspelled artist name
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Sabs Car", "TestUser");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when partial artist name is not found");
     }
 
     /**
      * Tests to see what happens when searching for an artist that doesn't exist in the database
      */
+    @Test
     void testArtistDoesNotExist() throws SQLException
     {
-        //
+        //searching for an artist that doesn't exist
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("ArtistDoesNotExist", "TestUser");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when full artist name is not found");
     }
 
     /**
      * Tests to see if a record is correctly searched for using its full record name
      */
-    void testSuccessfulRecordSearch() throws SQLException
+    @Test
+     void testSuccessfulRecordSearch() throws SQLException
     {
-        //
+        //searching through the specified table
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Island Records", "TestRecord");
+
+        //verifying record list is returned and contains the correct record ID
+        assertNotNull(ids, "Returned list of ids should not be null");
+        System.out.println(ids);
+        assertTrue(ids.contains(recordID), "List of ids should contain record ID: " + recordID);
     }
 
     /**
      * Tests to see what happens when the full record name is searched for but doesn't show up
      */
+    @Test
     void testUnsuccessfulRecordSearch() throws SQLException
     {
-        //
+        //searching a misspelled record
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Iceland Record", "TestRecord");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when full record title is not found");
     }
 
     /**
      * Tests to see if a record is correctly searched for using some of its name
      */
+    @Test
     void testSuccessfulPartialRecordSearch() throws SQLException
     {
         //
+        //searching using part of the record name
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Island", "TestRecord");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.contains(recordID), "Partial search should find the record ID");
     }
 
     /**
      * Tests to see what happens when part of the record name is searched for but doesn't show up
      */
+    @Test
     void testUnsuccessfulPartialRecordSearch() throws SQLException
     {
-        //
+        //searching a misspelled artist name
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("Iceland", "TestRecord");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when partial record name is not found");
     }
 
     /**
      * Tests to see what happens when searching for a record that doesn't exist in the database
      */
+    @Test
     void testSearchRecordDoesNotExist() throws SQLException
     {
-        //
+        //searching for a record that doesn't exist
+        List<Integer> ids = ArtistRecordSearch.discoverySearch("RecordDoesNotExist", "TestRecord");
+
+        assertNotNull(ids, "Returned list of ids should not be null");
+        assertTrue(ids.isEmpty(), "List of ids should be empty when full record name is not found");
     }
 }
