@@ -38,13 +38,13 @@ public class MusicSearch {
                 stmt.setString(1, "%" + searchedString + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
-                // Loosp through all matching rows
+                //loops through all matching rows
                 while (rs.next()) {
                     musicIds.add(rs.getInt("id"));
                 }
             }
         }
-        return musicIds; // Returns an empty list [] if no matches are found
+        return musicIds; //returns an empty list [] if no matches are found
     }
 
     /**
@@ -78,6 +78,7 @@ public class MusicSearch {
 
     /**
      * playlistLookup() - display helper method that looks up a single Playlist name by its primary key id
+     * 
      * @param lookupID - the id of the playlist being looked up
      * @return string playlist name or null if not found
      *  Note: assumtpion is the front end will make the outputted playlist name look nice
@@ -96,6 +97,6 @@ public class MusicSearch {
                 }
 
             }
-        return null; //return null if no macting playlist was found for that ID
+        return null; //return null if no matching playlist was found for that ID
     }
 }
