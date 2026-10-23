@@ -101,6 +101,26 @@ public class SongQueue {
     }
 
     /**
+     * getNext -- a function which will get the next upcoming song from the SongQueue.
+     * 
+     * @return song object, the head song of upcomingSongs deque. (i.e., next song in queue).
+     *                      If no song object is present, it will return null instead.
+     */
+    public Song getNext(){
+        return upcomingSongs.pollFirst();
+    }
+
+    /**
+     * getPrevious -- a function which will get the last played song from the SongQueue.
+     *
+     * @return song object, the tail end of priorSongs deque (i.e., the last song played)
+     *                      If no song object is present, it will return null instead.
+     */
+    public Song getPrevious(){
+        return priorSongs.pollLast();
+    }
+
+    /**
      * EQN -- a function to determine if two SongQueue objects are observationally equivalent to each other
      *        these two objects are considered to be observationally equivalent WHEN
      *              1) the upcomingSongs attribute of each SongQueue object has the same songs in the same order AND

@@ -59,6 +59,6 @@ public class SongQueueTest {
         Song s1 = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
         SongQueue sqExpected = new SongQueue(); sqExpected.queue(s1);
 
-        assertTrue(sq.EQN(sqExpected));
+        assertTrue(SongQueue.EQN(sq, sqExpected));
     }
 }
