@@ -90,17 +90,19 @@ public class SongQueue {
     }
 
     /**
-     * addToPriorSongs -- adds a song to the tail end of the priorSongs deque
+     * Adds a song to the tail end of the priorSongs deque (playback history).
      * 
-     * @param newPriorSong -- the song which we want to add to the tail end of priorSongs.
+     * @param newPriorSong the {@link Song} to be added to the prior songs history
+     * @throws IllegalArgumentException if {@code newPriorSong} is null
      */
-    public void addToPriorSongs(Song newPriorSong){
-        try {
-            priorSongs.addLast(newPriorSong);
-        } catch (Exception e) {
-            System.out.println("Error moving last played song to prior list: " + e.getMessage());
-            e.printStackTrace();
+    public void addToPriorSongs(Song newPriorSong) {
+        // Validate newPriorSong is not null
+        if (newPriorSong == null) {
+            throw new IllegalArgumentException("Cannot add a null song to playback history.");
         }
+
+        // Add to the tail end of the history deque
+        priorSongs.addLast(newPriorSong);
     }
 
     /**
