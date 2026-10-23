@@ -286,6 +286,12 @@ public class RecordInfo {
         }
     }
 
+    /**
+     * 
+     * @param recordId - the id of the record that we want to get the amount of people that are following
+     * @return - returns the number of followers for the specific record
+     * @throws SQLException
+     */
     public static int getFollowedAmount(int recordId) throws SQLException
     {
         try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))

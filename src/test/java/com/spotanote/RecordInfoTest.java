@@ -101,17 +101,54 @@ void testRecordInsideDatabase() {
     }
 
     @Test
-    void testGetAllFollowedRecords()
+    void testGetAllFollowedRecords() throws SQLException
     {
+        RecordInfo.addRecord("record2", 1);
+        RecordInfo.addRecord("record3", 1);
+        RecordInfo.addRecord("record4", 1);
+        RecordInfo.addRecord("record5", 1);
+        RecordInfo.addRecord("record6", 1);
 
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record2"));
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record3"));
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record4"));
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record5"));
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record6"));
+
+        RecordInfo[] followedRecords = RecordInfo.allFollowedRecords(1);
+        assertNotNull(followedRecords);
+        for(RecordInfo record : followedRecords)
+        {
+            if(record != null)
+            {
+                assertTrue(record.recordName.matches("record[2-6]"));
+            }
+        }
+
+        RecordInfo.removeRecord(RecordInfo.getRecordId("record2"));
+        RecordInfo.removeRecord(RecordInfo.getRecordId("record3"));
+        RecordInfo.removeRecord(RecordInfo.getRecordId("record4"));
+        RecordInfo.removeRecord(RecordInfo.getRecordId("record5"));
+        RecordInfo.removeRecord(RecordInfo.getRecordId("record6"));
     }
 
-    @Test
-    void testGetAllRecords()
+    @Test 
+    void testFollowAmount() throws SQLException
     {
-        //here we are testing to get all records to see if it works
+        RecordInfo.addRecord("record2", 1);
 
+        RecordInfo.followRecord(1, RecordInfo.getRecordId("record2"));
+        RecordInfo.followRecord(2, RecordInfo.getRecordId("record2"));
+        RecordInfo.followRecord(3, RecordInfo.getRecordId("record2"));
+        RecordInfo.followRecord(4, RecordInfo.getRecordId("record2"));
+        int currentRecordId = RecordInfo.getRecordId("record2");
+        int follwedAmount = RecordInfo.getFollowedAmount(currentRecordId);
+        assertEquals(4, follwedAmount);
+
+        RecordInfo.removeRecordFollowers(currentRecordId);
+        RecordInfo.removeRecord(currentRecordId);
     }
+
     @Test
     void testGetAllFollowedWhenNotFollowing() throws SQLException
     {
@@ -122,17 +159,28 @@ void testRecordInsideDatabase() {
     @Test 
     void testValidRecordNameFromId()
     {
-
+        String expectedName = "Database Test Record";
+        String givenName = RecordInfo.getRecordName(recordId);
+        assertEquals(expectedName, givenName);
     }
     @Test 
     void testInvalidRecordId()
     {
-
+        String name = RecordInfo.getRecordName(-1);
+        assertNull(name);
     }
     @Test 
     void testGetManagerIdForInvalidRecord() throws SQLException
     {
         assertEquals(RecordInfo.getRecordManagerId(-1), -1);
+    }
+    @Test 
+    void testRemoveRecord() throws SQLException
+    {
+        RecordInfo.addRecord("TestingRemoving", 1);
+        int id = RecordInfo.getRecordId("TestingRemoving");
+        RecordInfo.removeRecord(id);
+        assertEquals(-1, RecordInfo.getRecordId("TestingRemoving"));
     }
 }
 
