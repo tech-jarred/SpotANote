@@ -36,21 +36,24 @@ public class SongQueue {
      * queue -- add a song to the tail end of the upcomingSongs deque
      * 
      * @param songToQueue -- a Song, the song which will be added into the song queue (upcomingSongs) at the tail end
+     * @throws IllegalArgumentException when songToQueue is null.
      */
     public void queue(Song songToQueue){
-        // Attempt to add the song to tail end of upcomingSongs. (Think FIFO)
-        try {
-            upcomingSongs.addLast(songToQueue);
-        } catch (Exception e) {
-            System.out.println("Error queing song: " + e.getMessage());
-            e.printStackTrace();
+        // Validate songToQueue is not null. If it is, throw error.
+        if (songToQueue == null){
+            throw new IllegalArgumentException("Song was not able to be queued due to being null.");
         }
+
+        // Add the song to tail end of upcomingSongs. (Think FIFO)
+        upcomingSongs.addLast(songToQueue);
     }
 
     /**
      * queue -- add a song to the tail end of the upcomingSongs deque
      * 
      * @param songIDToQueue -- an int, the id of the song which will be added into the song queue (upcomingSongs) at the tail end
+     * @throws IllegalArgumentException if no song with the given ID exists in the database
+     * @throws RuntimeException if a database access error occurs
      */
     public void queue(int songIDToQueue){
         // Initialize songToQueue object.
@@ -74,16 +77,16 @@ public class SongQueue {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Database error while fetching song ID: " + songIDToQueue, e); // passes database error to driver class to handle as needed.
         }
 
-        // Attempt to add the song to tail end of upcomingSongs. (Think FIFO)
-        try {
-            upcomingSongs.addLast(songToQueue);
-        } catch (Exception e) {
-            System.out.println("Error queing song: " + e.getMessage());
-            e.printStackTrace();
+        // Validate songToQueue is not null. If it is, throw error.
+        if (songToQueue == null){
+            throw new IllegalArgumentException("Song with ID " + songIDToQueue + " could not be found.");
         }
+
+        // Add the song to tail end of upcomingSongs. (Think FIFO)
+        queue(songToQueue);
     }
 
     /**
