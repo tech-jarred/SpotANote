@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
+import java.util.Objects;
 import java.time.Duration;
 
 public class SongQueue {
@@ -14,6 +15,22 @@ public class SongQueue {
     private final int MAX_PREVIOUS_SONGS = 10;
 
     public SongQueue(){}
+
+    /**
+     * 
+     * @return a boolean literal -- true if there are no songs queued to be play next (i.e.  upcomingSongs is empty)
+     */
+    public boolean isQueuedSongsEmpty(){
+        return upcomingSongs.size() == 0;
+    }
+
+    /**
+     * 
+     * @return a boolean literal -- true if there are no songs had been previously played from queue (i.e. priorSongs is empty)
+     */
+    public boolean isPriorSongsEmpty(){
+        return priorSongs.size() == 0;
+    }
 
     /**
      * queue -- add a song to the tail end of the upcomingSongs deque
@@ -84,31 +101,41 @@ public class SongQueue {
     }
 
     /**
-     * 
-     * @return a boolean literal -- true if there are no songs queued to be play next (i.e.  upcomingSongs is empty)
-     */
-    public boolean isQueuedSongsEmpty(){
-        return upcomingSongs.size() == 0;
-    }
-
-    /**
-     * 
-     * @return a boolean literal -- true if there are no songs had been previously played from queue (i.e. priorSongs is empty)
-     */
-    public boolean isPriorSongsEmpty(){
-        return priorSongs.size() == 0;
-    }
-
-    /**
      * EQN -- a function to determine if two SongQueue objects are observationally equivalent to each other
      *        these two objects are considered to be observationally equivalent WHEN
      *              1) the upcomingSongs attribute of each SongQueue object has the same songs in the same order AND
      *              2) the priorSongs attribute of each SongQueue object has the same songs in the same order
      * 
-     * @param otherSQ -- the other SongQueue object we are comparing this one against.
+     * @param sq1 -- the first SongQueue object we are comparing
+     * @param sq2 -- the second SongQueue object we are comparing
      * @return a boolean literal -- true if the SongQueue objects are observationally equivalent to each other, false otherwise.
      */
-    public boolean EQN(SongQueue otherSQ){
+    public static boolean EQN(SongQueue sq1, SongQueue sq2){
+        // First check if both song queues have no upcoming or prior songs. This is the base case.
+        if (sq1.isPriorSongsEmpty() && sq1.isQueuedSongsEmpty() && sq2.isPriorSongsEmpty() && sq2.isQueuedSongsEmpty()) { return true; }
+
+        // First check if the priorSongs are roughly equal in state (i.e., one is not full while another is empty.)
+        if (sq1.isPriorSongsEmpty() != sq2.isPriorSongsEmpty()){ return false; }
+
+        // Then, check if the upcomingSongs are rougly equal in state (i.e., one is not full while another is empty.)
+        if (sq1.isQueuedSongsEmpty() != sq2.isQueuedSongsEmpty()){ return false; }
+
+        // If both the priorSongs and upcomingSongs are roughly equal, get last played song and next upcoming song.
+        Song priorSong1 = sq1.getPrevious();
+        Song priorSong2 = sq2.getPrevious();
+
+        Song nextSong1 = sq1.getNext();
+        Song nextSong2 = sq2.getNext();
+
+        // After getting prior song and next song for each respective queue, compare them to see if they are the same.
+        boolean priorCheck = Objects.equals(priorSong1, priorSong2); // Objects.equals(a, b) does the following: return (a == b) || (a != null && a.equals(b));
+        boolean nextCheck = Objects.equals(nextSong1, nextSong2); // it protects against null pointer exceptions, and calls the .equals() method of the objects passed in.
+
+        if (priorCheck && nextCheck){
+            // If the songs are the same, recursively call EQN. Repeat until both SongQueues have no more upcoming or prior songs.
+            return EQN(sq1, sq2);
+        }
+
         return false;
     }
 }
