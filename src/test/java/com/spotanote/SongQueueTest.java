@@ -264,4 +264,32 @@ public class SongQueueTest {
         // Compare the two. Note this test has a 1/3628800 = 0.00002% chance of failing due to the nature of permutations.
         assertFalse(SongQueue.EQN(sq, sqOrdered));
     }
+
+    /**
+     * Tests if empty method successfully removes all songs from the upcomingSongs.
+     */
+    @Test
+    void testEmptySongs(){
+        // Initialize a queue with no songs, one with songs ids 1, 2, 3, and one which has songs in prior and current.
+        SongQueue sqOriginallyEmpty = new SongQueue();
+        SongQueue sqOriginallyFull = new SongQueue();
+        SongQueue sqPriorAndCurrent = new SongQueue();
+        for (int i = 1; i <= 3; i++){ sqOriginallyFull.enqueue(i); }
+        for (int i = 2; i <= 4; i++){ sqPriorAndCurrent.enqueue(i); sqPriorAndCurrent.getNext(); }
+
+        Song s2 = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
+        Song s3 = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
+        Song s4 = new Song(4, "Danza Kuduro", Duration.ofSeconds(235), "/music/danza_kuduro.mp3");
+
+        // Invoke empty method on each.
+        sqOriginallyEmpty.empty();
+        sqOriginallyFull.empty();
+
+        // Initialize expected song queue and compare.
+        SongQueue sqExpected = new SongQueue();
+        SongQueue sqExpected2 = new SongQueue(); sqExpected2.addToPriorSongs(s2); sqExpected2.addToPriorSongs(s3); sqExpected2.setCurrentSong(s4);
+        assertTrue(SongQueue.EQN(sqOriginallyEmpty, sqExpected));
+        assertTrue(SongQueue.EQN(sqOriginallyFull, sqExpected));
+        assertTrue(SongQueue.EQN(sqPriorAndCurrent, sqExpected2));
+    }
 }

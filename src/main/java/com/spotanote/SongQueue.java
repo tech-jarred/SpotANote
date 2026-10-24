@@ -230,6 +230,16 @@ public class SongQueue {
             enqueue(song);
         }
     }
+
+    /**
+     * empty -- a method which removes all songs from the upcomingSongs deque ONLY. currentSong and priorSongs remain.
+     * 
+     */
+    public void empty(){
+        upcomingSongs.clear();
+    }
+
+    
     
     /**
      * EQN -- a function to determine if two SongQueue objects are observationally equivalent to each other
