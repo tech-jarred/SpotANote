@@ -13,9 +13,11 @@ public class SongQueue {
     private ArrayDeque<Song> upcomingSongs = new ArrayDeque<>(); // to be treated as a normal queue (FIFO)
     private ArrayDeque<Song> priorSongs = new ArrayDeque<>(); // to be treated as a stack UNTIL we reach a max size of prior songs to track (). At this point we treat it as a deque, add new previous song to tail end, remove oldest previous song from head.
     private Song currentSong = null; 
-    private final int MAX_PREVIOUS_SONGS = 10;
+    private final int MAX_PREVIOUS_SONGS;
 
-    public SongQueue(){}
+    public SongQueue(){ this.MAX_PREVIOUS_SONGS = 10; }
+
+    public SongQueue(int MAX_PREVIOUS_SONGS){ this.MAX_PREVIOUS_SONGS = MAX_PREVIOUS_SONGS; }
 
     /**
      * 
@@ -151,6 +153,8 @@ public class SongQueue {
 
     /**
      * Adds a song to the tail end of the priorSongs deque (playback history).
+     * If the size of priorSongs exceeds that of the MAX_PRIOR_SONGS,
+     * it will remove the song at the head before adding another song to the tail.
      * 
      * @param newPriorSong the {@link Song} to be added to the prior songs history
      * @throws IllegalArgumentException if {@code newPriorSong} is null
@@ -159,6 +163,11 @@ public class SongQueue {
         // Validate newPriorSong is not null
         if (newPriorSong == null) {
             throw new IllegalArgumentException("Cannot add a null song to playback history.");
+        }
+
+        // Check if priorSongs exceeds max size.
+        if (priorSongs.size() >= MAX_PREVIOUS_SONGS){
+            priorSongs.removeFirst(); // remove head of priorSongs if beyond MAX_PREVIOUS_SONGS
         }
 
         // Add to the tail end of the history deque
@@ -201,7 +210,7 @@ public class SongQueue {
         // Update the current song.
         setCurrentSong(newCurrentSong);
     }
-
+    
     /**
      * EQN -- a function to determine if two SongQueue objects are observationally equivalent to each other
      *        these two objects are considered to be observationally equivalent WHEN
@@ -217,7 +226,10 @@ public class SongQueue {
         // First check if both song queues have no upcoming, prior songs, or current songs. This is the base case.
         if (sq1.isPriorSongsEmpty() && sq1.isQueuedSongsEmpty()
             && sq2.isPriorSongsEmpty() && sq2.isQueuedSongsEmpty()
-            && sq1.getCurrentSong() == null && sq2.getCurrentSong() == null) { return true; }
+            && Objects.equals(sq1.getCurrentSong(), sq2.getCurrentSong())) { return true; }
+
+        // Instant fail if song queues have different max previous songs attributes.
+        if (SongQueue.getMaxPreviousSongs(sq1) != SongQueue.getMaxPreviousSongs(sq2)) { return false; }
 
         // First check if the priorSongs are roughly equal in state (i.e., one is not full while another is empty.)
         if (sq1.isPriorSongsEmpty() != sq2.isPriorSongsEmpty()){ return false; }
@@ -257,5 +269,9 @@ public class SongQueue {
 
     private static Song popUpcomingRaw(SongQueue sq) {
         return sq.upcomingSongs.pollFirst();
+    }
+
+    private static int getMaxPreviousSongs(SongQueue sq){
+        return sq.MAX_PREVIOUS_SONGS;
     }
 }

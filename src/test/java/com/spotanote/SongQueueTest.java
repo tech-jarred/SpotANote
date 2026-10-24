@@ -129,6 +129,64 @@ public class SongQueueTest {
                 sq.enqueue(1); sq.enqueue(3); sq.enqueue(2); // Any ID will trigger the SQLException and re-throw RuntimeException
             });
         }
+    }
 
+    /**
+     * Checks to see if the SongQueue only keeps track of last MAX_PREVIOUS_SONGS songs played.
+     * MAX_PREVIOUS_SONGS defaults to 10, but a overloaded constructor allows for this to be changed.
+     * 
+     * Enqueue songs with id's 1...13 (which exist in database), invoke getNext() 12 times.
+     * Expected state is... {priorSongs: 2, 3, 4, 5, 6, 7, 8, 9, 10, 11} {currentSong: 12} {upcomingSongs: 13}
+     * 
+     * Do second SongQueue with MAX value of 3
+     * Enqueue songs with id's 4, 5, 9, 2, 3, 6, in that order. Invoke getNext() 6 times
+     * Expected state is... {priorSongs: 9, 2, 3} {currentSong: 6} {upcomingSongs: }
+     * 
+     */
+    @Test
+    void testMaxPreviousSongsTracking(){
+        // Initialize song queues.
+        SongQueue sq1 = new SongQueue();
+        SongQueue sq2 = new SongQueue(3);
+
+        // Perform enqueing and getNext() operations
+        for (int i = 1; i <= 13; i++){
+            sq1.enqueue(i);            
+        }
+
+        for (int i = 0; i < 12; i++){
+            sq1.getNext();
+        }
+
+        sq2.enqueue(4); sq2.enqueue(5); sq2.enqueue(9); sq2.enqueue(2); sq2.enqueue(3); sq2.enqueue(6);
+        for (int i = 1; i <= 6; i++){
+            sq2.getNext();
+        }
+
+        // Build expected song queues.
+        SongQueue expectedSq1 = new SongQueue();
+        SongQueue expectedSq2 = new SongQueue(3);
+
+        Song s2 = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
+        Song s3 = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
+        Song s4 = new Song(4, "Danza Kuduro", Duration.ofSeconds(235), "/music/danza_kuduro.mp3");
+        Song s5 = new Song(5, "Don't Mine At Night", Duration.ofSeconds(214),"/music/dont_mine_at_night.mp3");
+        Song s6 = new Song(6, "Drive By", Duration.ofSeconds(197), "/music/drive_by.mp3");
+        Song s7 = new Song(7, "Fallen Kingdom", Duration.ofSeconds(252), "/music/fallen_kingdom.mp3");
+        Song s8 = new Song(8, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
+        Song s9 = new Song(9, "Lao a Lao", Duration.ofSeconds(184), "/music/lao_a_lao.mp3");
+        Song s10 = new Song(10, "Ocean Man", Duration.ofSeconds(126), "/music/ocean_man.mp3");
+        Song s11 = new Song(11, "Pa'lla Voy", Duration.ofSeconds(263), "/music/palla_voy.mp3");
+        Song s12 = new Song(12, "Triforce Medley", Duration.ofSeconds(242), "/music/tloz_triforce_medley_40.mp3");
+        Song s13 = new Song(13, "Vivir Mi Vida", Duration.ofSeconds(252), "/music/vivir_mi_vida.mp3");
+
+        expectedSq1.addToPriorSongs(s2); expectedSq1.addToPriorSongs(s3); expectedSq1.addToPriorSongs(s4); expectedSq1.addToPriorSongs(s5); expectedSq1.addToPriorSongs(s6); expectedSq1.addToPriorSongs(s7); expectedSq1.addToPriorSongs(s8); expectedSq1.addToPriorSongs(s9); expectedSq1.addToPriorSongs(s10); expectedSq1.addToPriorSongs(s11);
+        expectedSq1.setCurrentSong(s12); expectedSq1.enqueue(s13);
+
+        expectedSq2.addToPriorSongs(s9); expectedSq2.addToPriorSongs(s2); expectedSq2.addToPriorSongs(s3);
+        expectedSq2.setCurrentSong(s6);
+
+        assertTrue(SongQueue.EQN(expectedSq1, sq1));
+        assertTrue(SongQueue.EQN(expectedSq2, sq2));
     }
 }
