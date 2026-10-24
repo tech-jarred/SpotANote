@@ -69,7 +69,7 @@ public class SongQueueTest {
         Song expectedS3 = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
 
         // Get prior song and next song from SongQueue.
-        Song priorSong = sq.getPrevious();
+        Song priorSong = sq.getPrior();
         Song nextSong = sq.getNext();
 
         // Check if songs obtained were ones expected.

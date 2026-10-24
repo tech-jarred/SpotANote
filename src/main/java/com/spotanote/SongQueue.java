@@ -121,7 +121,7 @@ public class SongQueue {
      * @return song object, the tail end of priorSongs deque (i.e., the last song played)
      *                      If no song object is present, it will return null instead.
      */
-    public Song getPrevious(){
+    public Song getPrior(){
         return priorSongs.pollLast(); // can safely assume next song is not null since ArrayDeque does not allow null
     }
 
