@@ -189,4 +189,66 @@ public class SongQueueTest {
         assertTrue(SongQueue.EQN(expectedSq1, sq1));
         assertTrue(SongQueue.EQN(expectedSq2, sq2));
     }
+
+    @Test
+    void testEQN() {
+        // 1. Setup sample Song objects
+        Song song1 = new Song(1, "Please Please Please", Duration.ofSeconds(187), "/music/please_please_please.mp3");
+        Song song2 = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
+        Song song3 = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
+
+        // Initialize two empty queues
+        SongQueue sq1 = new SongQueue();
+        SongQueue sq2 = new SongQueue();
+
+        // Case 1: Both queues are completely empty (Base Case -> True)
+        assertTrue(SongQueue.EQN(sq1, sq2), "Two empty queues should be observationally equivalent.");
+
+        // Case 2: One queue has a current song, the other is null (-> False)
+        sq1.setCurrentSong(song1);
+        assertFalse(SongQueue.EQN(sq1, sq2), "Queues with different currentSong values should not be equivalent.");
+
+        // Case 3: Both queues have identical currentSong (-> True)
+        sq2.setCurrentSong(song1);
+        assertTrue(SongQueue.EQN(sq1, sq2), "Queues with matching currentSong should be equivalent.");
+
+        // Case 4: Populating upcomingSongs - mismatched queue contents (-> False)
+        sq1.enqueue(song2);
+        sq1.enqueue(song3);
+        sq2.enqueue(song2);
+        assertFalse(SongQueue.EQN(sq1, sq2), "Queues with different numbers of upcoming songs should not be equivalent.");
+
+        // Case 5: Matching upcomingSongs (-> True)
+        sq2.enqueue(song3);
+        assertTrue(SongQueue.EQN(sq1, sq2), "Queues with identical currentSong and upcomingSongs should be equivalent.");
+
+        // Case 6: Mismatched order in upcomingSongs (-> False)
+        SongQueue sq3 = new SongQueue();
+        SongQueue sq4 = new SongQueue();
+        sq3.enqueue(song2);
+        sq3.enqueue(song3);
+        sq4.enqueue(song3); // Reversed order
+        sq4.enqueue(song2);
+        assertFalse(SongQueue.EQN(sq3, sq4), "Queues with different upcoming song order should not be equivalent.");
+
+        // Case 7: Matching priorSongs history (-> True)
+        sq1.addToPriorSongs(song1);
+        sq2.addToPriorSongs(song1);
+        assertTrue(SongQueue.EQN(sq1, sq2), "Queues with matching prior history, current song, and upcoming queue should be equivalent.");
+
+        // Case 8: Mismatched priorSongs history (-> False)
+        SongQueue sq5 = new SongQueue();
+        SongQueue sq6 = new SongQueue();
+        sq5.addToPriorSongs(song1);
+        sq6.addToPriorSongs(song2);
+        assertFalse(SongQueue.EQN(sq5, sq6), "Queues with different prior song history should not be equivalent.");
+    }
+
+    /**
+     * Checks to see if the shuffle method works.
+     */
+    @Test
+    void testShuffle(){
+        assertTrue(false);
+    }
 }

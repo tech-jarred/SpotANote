@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 import java.time.Duration;
 
@@ -209,6 +211,24 @@ public class SongQueue {
 
         // Update the current song.
         setCurrentSong(newCurrentSong);
+    }
+
+    /**
+     * shuffle -- a method which randomizes the order of songs in the upcomingSongs deque (songs which were played previously do not get shuffled)
+     * 
+     */
+    public void shuffle(){
+        // Put contents of upcomingSongs into an ArrayList. Then clear the upcomingSongs deque.
+        ArrayList<Song> songs = new ArrayList<>(upcomingSongs);
+        upcomingSongs.clear();
+
+        // Randomize order of songs.
+        Collections.shuffle(songs);
+
+        // Convert ArrayList back into upcomingSongs deque.
+        for (Song song : songs){
+            enqueue(song);
+        }
     }
     
     /**
