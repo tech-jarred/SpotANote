@@ -38,7 +38,7 @@ public class SongQueue {
      * @param songToQueue -- a Song, the song which will be added into the song queue (upcomingSongs) at the tail end
      * @throws IllegalArgumentException when songToQueue is null.
      */
-    public void queue(Song songToQueue){
+    public void enqueue(Song songToQueue){
         // Validate songToQueue is not null. If it is, throw error.
         if (songToQueue == null){
             throw new IllegalArgumentException("Song was not able to be queued due to being null.");
@@ -55,7 +55,7 @@ public class SongQueue {
      * @throws IllegalArgumentException if no song with the given ID exists in the database
      * @throws RuntimeException if a database access error occurs
      */
-    public void queue(int songIDToQueue){
+    public void enqueue(int songIDToQueue){
         // Initialize songToQueue object.
         Song songToQueue = null;
 
@@ -86,7 +86,7 @@ public class SongQueue {
         }
 
         // Add the song to tail end of upcomingSongs. (Think FIFO)
-        queue(songToQueue);
+        enqueue(songToQueue);
     }
 
     /**
@@ -112,7 +112,7 @@ public class SongQueue {
      *                      If no song object is present, it will return null instead.
      */
     public Song getNext(){
-        return upcomingSongs.pollFirst();
+        return upcomingSongs.pollFirst(); // can safely assume next song is not null since ArrayDeque does not allow null
     }
 
     /**
@@ -122,7 +122,7 @@ public class SongQueue {
      *                      If no song object is present, it will return null instead.
      */
     public Song getPrevious(){
-        return priorSongs.pollLast();
+        return priorSongs.pollLast(); // can safely assume next song is not null since ArrayDeque does not allow null
     }
 
     /**
