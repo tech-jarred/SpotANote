@@ -62,6 +62,15 @@ CREATE TABLE Song (
     FOREIGN KEY (record_member_id) REFERENCES RecordMember(id)
 );
 
+CREATE TABLE UsersLikedSongs (
+    user_id INT NOT NULL,
+    song_id INT NOT NULL,
+    dateLiked DATE NOT NULL DEFAULT (CURRENT_DATE),
+    PRIMARY KEY (user_id, song_id),
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
+    FOREIGN KEY (song_id) REFERENCES Song(id) ON DELETE CASCADE
+);
+
 -- Playlist
 -- Note: playlists are also albums so the playlist_name can also store the album name
 CREATE TABLE Playlist (
