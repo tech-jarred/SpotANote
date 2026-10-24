@@ -246,9 +246,22 @@ public class SongQueueTest {
 
     /**
      * Checks to see if the shuffle method works.
+     * 
+     * Create a queue with song ids 1...10 in increasing numerical order based on id.
      */
     @Test
     void testShuffle(){
-        assertTrue(false);
+        SongQueue sq = new SongQueue();
+        SongQueue sqOrdered = new SongQueue();
+        for (int i = 1; i <= 10; i++){
+            sq.enqueue(i);
+            sqOrdered.enqueue(i);
+        }
+
+        // Shuffle SongQueue sq.
+        sq.shuffle();
+
+        // Compare the two. Note this test has a 1/3628800 = 0.00002% chance of failing due to the nature of permutations.
+        assertFalse(SongQueue.EQN(sq, sqOrdered));
     }
 }
