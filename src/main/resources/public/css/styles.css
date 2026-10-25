@@ -264,3 +264,71 @@ body {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
+
+/* ==========================================
+   Custom Album Component Styles
+   ========================================== */
+
+.album-details {
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+}
+
+.album-details[open] {
+    border-color: #6d28d9;
+}
+
+.album-summary {
+    font-weight: 600;
+    color: #2e1065;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Default state when album is collapsed */
+.album-expand-badge::after {
+    content: "Expand ▼";
+}
+
+.album-expand-badge {
+    font-size: 0.8rem;
+    color: #6c42f5;
+    font-weight: 700;
+    background: rgba(108, 66, 245, 0.1);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+}
+
+/* State when album is open/expanded */
+.album-details[open] .album-expand-badge::after {
+    content: "Collapse ▲";
+}
+
+.album-tracklist-container {
+    margin-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.5rem;
+}
+
+.album-track-item {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+}
+
+.album-track-item:last-child {
+    border-bottom: none;
+}
+
+.album-track-duration {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+}

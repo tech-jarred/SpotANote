@@ -110,7 +110,7 @@
             <div class="decision-list">
 
                 <div class="card decision-card">
-                    <div class="decision-info">
+                    <div class="decision-info" style="width: 100%;">
                         <h4>Upload New Music</h4>
 
                         <!-- Pebble Template Logic Placement -->
@@ -148,34 +148,34 @@
                         <h4>Uploaded Albums</h4>
 
                         {% if uploadedAlbums is empty %}
-                            <p style="opacity: 0.7; font-style: italic; margin-top: 0.5rem;">No uploaded albums found.</p>
+                            <p class="subtitle" style="font-style: italic;">No uploaded albums found.</p>
                         {% else %}
-                            <div style="margin-top: 0.75rem; width: 100%;">
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
                                 {% for album in uploadedAlbums %}
-                                    <details style="background-color: #1a1a1a; border: 1px solid #333; border-radius: 6px; margin-bottom: 0.5rem; padding: 0.5rem 0.75rem; cursor: pointer;">
+                                    <details class="album-details">
                                         
-                                        <!-- Dropdown Header: Album Title -->
-                                        <summary style="font-weight: bold; color: #fff; font-size: 1rem; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center;">
-                                            <span>📁 {{ album.name }}</span>
-                                            <span style="font-size: 0.8rem; color: #1db954;">▼ Expand</span>
+                                        <!-- Accordion Header -->
+                                        <summary class="album-summary">
+                                            <span>{{ album.name }}</span>
+                                            <span class="album-expand-badge"></span>
                                         </summary>
-                
-                                        <!-- Dropdown Content: Tracklist -->
-                                        <div style="margin-top: 0.75rem; border-top: 1px solid #333; padding-top: 0.5rem;">
+
+                                        <!-- Accordion Tracklist -->
+                                        <div class="album-tracklist-container">
                                             {% if album.songs is empty %}
-                                                <p style="font-size: 0.85rem; color: #888; margin: 0.25rem 0;">No tracks added to this album yet.</p>
+                                                <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks added to this album yet.</p>
                                             {% else %}
-                                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                                <ul style="list-style: none;">
                                                     {% for song in album.songs %}
-                                                        <li style="padding: 0.4rem 0; font-size: 0.9rem; color: #ccc; border-bottom: 1px solid #282828; display: flex; justify-content: space-between;">
-                                                            <span>🎵 {{ song.name }}</span>
-                                                            <span style="color: #888; font-size: 0.8rem;">{{ song.duration }}s</span>
+                                                        <li class="album-track-item">
+                                                            <span>{{ song.name }}</span>
+                                                            <span class="album-track-duration">{{ song.formattedDuration }}</span>
                                                         </li>
                                                     {% endfor %}
                                                 </ul>
                                             {% endif %}
                                         </div>
-                
+
                                     </details>
                                 {% endfor %}
                             </div>
