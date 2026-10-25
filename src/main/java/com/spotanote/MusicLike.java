@@ -1,8 +1,10 @@
 package com.spotanote;
 
-import java.lang.reflect.Array;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.sql.Connection;
 
 
@@ -81,9 +83,36 @@ public class MusicLike {
      * 
      * @param userID an int, the id of the user who's liked songs we need to get.
      * @throws RuntimeException if the database connection fails or isn't established
-     * @return a Song[] array, which contains all of the songs a user has liked.
+     * a {@link List} of {@link SongSummary} objects (empty list if the user has no liked songs)
      */
-    public Song[] getUsersLikedSongs(){
-        return null;
+    public List<SongSummary> getUsersLikedSongs(int userID) {
+        List<SongSummary> likedSongs = new ArrayList<>();
+
+        // Build query.
+        String query = "SELECT s.id, s.song_name " +
+                    "FROM UsersLikedSongs uls " +
+                    "JOIN Song s ON uls.song_id = s.id " +
+                    "WHERE uls.user_id = ? " +
+                    "ORDER BY uls.dateLiked DESC";
+
+        try (Connection conn = DBExplorer.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, userID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int songId = rs.getInt("id");
+                    String songName = rs.getString("song_name");
+
+                    likedSongs.add(new SongSummary(songId, songName));
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Database error while fetching liked songs for user ID: " + userID, e);
+        }
+
+        return likedSongs;
     }
 }
