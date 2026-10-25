@@ -20,7 +20,7 @@ public class LoginManager {
         }
 
         // If both fields are provided, attempt authentication.
-        String sqlQuery = "SELECT user.id, username, name, role_name as role, password FROM user JOIN role on roleid1 = role.id WHERE username = ?"; // preparing the string this way "sanitizes" user input, preventing an SQL injection attack.
+        String sqlQuery = "SELECT user.id, username, name, role_name as role, password FROM user JOIN role on COALESCE(roleid2, roleid1) = role.id WHERE username = ?"; // preparing the string this way "sanitizes" user input, preventing an SQL injection attack.
         try (Connection conn = DBExplorer.getConnection(); PreparedStatement stmt = conn.prepareStatement(sqlQuery)){ // this attempts to connect to database
             stmt.setString(1, username);
             
