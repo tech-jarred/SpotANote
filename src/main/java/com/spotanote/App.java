@@ -202,7 +202,10 @@ public class App {
 
                 //fetching public albums created by this artist/user
                 List<Playlist> uploadedAlbums = PlaylistVisibility.getArtistUploadedAlbums(currentUser.getId());
+                List<Playlist> draftedAlbums = PlaylistVisibility.getArtistDraftedAlbums(currentUser.getId());
+
                 model.put("uploadedAlbums", uploadedAlbums);
+                model.put("draftedAlbums", draftedAlbums);
 
                 ctx.render("public/managepublications.html", model);
             });

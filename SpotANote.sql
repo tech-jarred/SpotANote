@@ -255,3 +255,19 @@ INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
 INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
 (11, 104, 1),
 (11, 105, 2);
+
+-- Extra adds
+
+-- Draft Songs (is_public = FALSE)
+INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES
+(201, 'Unreleased Demo 1', 185, '/music/demo1.mp3', 1, FALSE),
+(202, 'Unreleased Demo 2', 215, '/music/demo2.mp3', 1, FALSE);
+
+-- Draft Album (is_public = FALSE)
+INSERT INTO Playlist (id, user_id, playlist_name, is_public) VALUES
+(20, 7071707, 'Work In Progress (Draft)', FALSE);
+
+-- Link Draft Songs to Draft Album
+INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
+(20, 201, 1),
+(20, 202, 2);

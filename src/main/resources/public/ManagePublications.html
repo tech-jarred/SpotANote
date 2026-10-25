@@ -185,8 +185,43 @@
                 </div>
 
                 <div class="card decision-card">
-                    <div class="decision-info">
+                    <div class="decision-info" style="width: 100%">
                         <h4>Drafted Albums</h4>
+
+                        {% if draftedAlbums is empty %}
+                            <p class="subtitle" style="font-style: italic;">No drafted albums found.</p>
+                        {% else %}
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                                {% for album in draftedAlbums %}
+                                    <details class="album-details">
+                                        
+                                        <!-- Accordion Header -->
+                                        <summary class="album-summary">
+                                            <span>{{ album.name }}</span>
+                                            <span class="album-expand-badge"></span>
+                                        </summary>
+
+                                        <!-- Accordion Tracklist -->
+                                        <div class="album-tracklist-container">
+                                            {% if album.songs is empty %}
+                                                <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks in this draft yet.</p>
+                                            {% else %}
+                                                <ul style="list-style: none;">
+                                                    {% for song in album.songs %}
+                                                        <li class="album-track-item">
+                                                            <span>{{ song.name }}</span>
+                                                            <span class="album-track-duration">{{ song.formattedDuration }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </div>
+
+                                    </details>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                     </div>
                 </div>
 

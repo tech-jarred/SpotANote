@@ -100,49 +100,105 @@ public class PlaylistVisibility {
      * @return List of public Playlist objects
      */
     public static List<Playlist> getArtistUploadedAlbums(int userId) {
-    List<Playlist> albums = new ArrayList<>();
-    String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = TRUE";
-    String songSql = "SELECT s.id, s.song_name, s.song_duration, s.file_path " +
-                      "FROM Song s JOIN PlaylistSong ps ON s.id = ps.song_id " +
-                      "WHERE ps.playlist_id = ? ORDER BY ps.song_order ASC";
+        List<Playlist> albums = new ArrayList<>();
+        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = TRUE";
+        String songSql = "SELECT s.id, s.song_name, s.song_duration, s.file_path " +
+                        "FROM Song s JOIN PlaylistSong ps ON s.id = ps.song_id " +
+                        "WHERE ps.playlist_id = ? ORDER BY ps.song_order ASC";
 
-    try (Connection conn = DBExplorer.getConnection();
-         PreparedStatement albumStmt = conn.prepareStatement(albumSql)) {
+        try (Connection conn = DBExplorer.getConnection();
+            PreparedStatement albumStmt = conn.prepareStatement(albumSql)) {
 
-        albumStmt.setInt(1, userId);
-        try (ResultSet rs = albumStmt.executeQuery()) {
-            while (rs.next()) {
-                Playlist playlist = new Playlist(
-                    rs.getInt("id"),
-                    rs.getString("playlist_name"),
-                    rs.getBoolean("is_public")
-                );
+            albumStmt.setInt(1, userId);
+            try (ResultSet rs = albumStmt.executeQuery()) {
+                while (rs.next()) {
+                    Playlist playlist = new Playlist(
+                        rs.getInt("id"),
+                        rs.getString("playlist_name"),
+                        rs.getBoolean("is_public")
+                    );
 
-                // Fetch tracks for this playlist
-                try (PreparedStatement songStmt = conn.prepareStatement(songSql)) {
-                    songStmt.setInt(1, playlist.getId());
-                    try (ResultSet songRs = songStmt.executeQuery()) {
-                        List<Song> songs = new ArrayList<>();
-                        while (songRs.next()) {
-                            songs.add(new Song(
-                                songRs.getInt("id"),
-                                songRs.getString("song_name"),
-                                java.time.Duration.ofSeconds(songRs.getInt("song_duration")),
-                                songRs.getString("file_path")
-                            ));
+                    // Fetch tracks for this playlist
+                    try (PreparedStatement songStmt = conn.prepareStatement(songSql)) {
+                        songStmt.setInt(1, playlist.getId());
+                        try (ResultSet songRs = songStmt.executeQuery()) {
+                            List<Song> songs = new ArrayList<>();
+                            while (songRs.next()) {
+                                songs.add(new Song(
+                                    songRs.getInt("id"),
+                                    songRs.getString("song_name"),
+                                    java.time.Duration.ofSeconds(songRs.getInt("song_duration")),
+                                    songRs.getString("file_path")
+                                ));
+                            }
+                            playlist.setSongs(songs);
                         }
-                        playlist.setSongs(songs);
                     }
-                }
 
-                albums.add(playlist);
+                    albums.add(playlist);
+                }
             }
+        } catch (SQLException e) {
+            System.err.println("Error fetching artist albums with songs: " + e.getMessage());
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        System.err.println("Error fetching artist albums with songs: " + e.getMessage());
-        e.printStackTrace();
+
+        return albums;
     }
 
-    return albums;
-}
+    /**
+     * Frontend Helper Method - retrieves all drafted (private) albums uploaded by a specific artist/user,
+     * including both public and draft songs inside each album.
+     * 
+     * @param userId The ID of the logged-in artist
+     * @return List of drafted Playlist objects
+     */
+    public static List<Playlist> getArtistDraftedAlbums(int userId) {
+        List<Playlist> draftAlbums = new ArrayList<>();
+        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = FALSE";
+        String songSql = "SELECT s.id, s.song_name, s.song_duration, s.file_path, s.is_public " +
+                        "FROM Song s JOIN PlaylistSong ps ON s.id = ps.song_id " +
+                        "WHERE ps.playlist_id = ? ORDER BY ps.song_order ASC";
+
+        try (Connection conn = DBExplorer.getConnection();
+            PreparedStatement albumStmt = conn.prepareStatement(albumSql)) {
+
+            albumStmt.setInt(1, userId);
+            try (ResultSet rs = albumStmt.executeQuery()) {
+                while (rs.next()) {
+                    Playlist playlist = new Playlist(
+                        rs.getInt("id"),
+                        rs.getString("playlist_name"),
+                        rs.getBoolean("is_public")
+                    );
+
+                    // Fetch songs linked to this drafted album
+                    try (PreparedStatement songStmt = conn.prepareStatement(songSql)) {
+                        songStmt.setInt(1, playlist.getId());
+                        try (ResultSet songRs = songStmt.executeQuery()) {
+                            List<Song> songs = new ArrayList<>();
+                            while (songRs.next()) {
+                                Song song = new Song(
+                                    songRs.getInt("id"),
+                                    songRs.getString("song_name"),
+                                    java.time.Duration.ofSeconds(songRs.getInt("song_duration")),
+                                    songRs.getString("file_path")
+                                );
+                                // We can use or track songRs.getBoolean("is_public") here if needed later
+                                songs.add(song);
+                            }
+                            playlist.setSongs(songs);
+                        }
+                    }
+
+                    draftAlbums.add(playlist);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching drafted albums: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return draftAlbums;
+    }
 }
