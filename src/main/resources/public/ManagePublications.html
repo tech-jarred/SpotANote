@@ -150,16 +150,35 @@
                         {% if uploadedAlbums is empty %}
                             <p style="opacity: 0.7; font-style: italic; margin-top: 0.5rem;">No uploaded albums found.</p>
                         {% else %}
-                            <ul style="list-style: none; padding: 0; margin-top: 0.75rem; width: 100%;">
+                            <div style="margin-top: 0.75rem; width: 100%;">
                                 {% for album in uploadedAlbums %}
-                                    <li style="padding: 0.6rem 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
-                                        <div>
-                                            <strong style="color: #fff;">{{ album.name }}</strong>
+                                    <details style="background-color: #1a1a1a; border: 1px solid #333; border-radius: 6px; margin-bottom: 0.5rem; padding: 0.5rem 0.75rem; cursor: pointer;">
+                                        
+                                        <!-- Dropdown Header: Album Title -->
+                                        <summary style="font-weight: bold; color: #fff; font-size: 1rem; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                                            <span>📁 {{ album.name }}</span>
+                                            <span style="font-size: 0.8rem; color: #1db954;">▼ Expand</span>
+                                        </summary>
+                
+                                        <!-- Dropdown Content: Tracklist -->
+                                        <div style="margin-top: 0.75rem; border-top: 1px solid #333; padding-top: 0.5rem;">
+                                            {% if album.songs is empty %}
+                                                <p style="font-size: 0.85rem; color: #888; margin: 0.25rem 0;">No tracks added to this album yet.</p>
+                                            {% else %}
+                                                <ul style="list-style: none; padding: 0; margin: 0;">
+                                                    {% for song in album.songs %}
+                                                        <li style="padding: 0.4rem 0; font-size: 0.9rem; color: #ccc; border-bottom: 1px solid #282828; display: flex; justify-content: space-between;">
+                                                            <span>🎵 {{ song.name }}</span>
+                                                            <span style="color: #888; font-size: 0.8rem;">{{ song.duration }}s</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
                                         </div>
-                                        <a href="/music?albumId={{ album.id }}" class="btn-submit" style="text-decoration: none; padding: 0.3rem 0.8rem; font-size: 0.8rem;">View Tracks</a>
-                                    </li>
+                
+                                    </details>
                                 {% endfor %}
-                            </ul>
+                            </div>
                         {% endif %}
 
                     </div>
