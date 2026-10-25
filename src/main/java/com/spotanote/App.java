@@ -2,6 +2,7 @@ package com.spotanote;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.javalin.Javalin;
@@ -198,6 +199,10 @@ public class App {
                 String status = ctx.queryParam("status");
                 Map<String, Object> model = new HashMap<>();
                 model.put("status", status);
+
+                //fetching public albums created by this artist/user
+                List<Playlist> uploadedAlbums = PlaylistVisibility.getArtistUploadedAlbums(currentUser.getId());
+                model.put("uploadedAlbums", uploadedAlbums);
 
                 ctx.render("public/managepublications.html", model);
             });

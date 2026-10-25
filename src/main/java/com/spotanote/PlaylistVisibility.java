@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * PlaylistVisibility class
@@ -14,7 +16,7 @@ import java.sql.SQLException;
  */
 public class PlaylistVisibility {
 
-    /*
+    /**
      * Private Playlist function
      * 
      * @param playlist's id which is the int id associated to a playlist
@@ -25,7 +27,7 @@ public class PlaylistVisibility {
         setVisibility(playlistID, false);
     }
 
-    /*
+    /**
     * Public Playlist function
     * 
     * @param playlist's id which is the int id associated to a playlist
@@ -36,7 +38,7 @@ public class PlaylistVisibility {
         setVisibility(playlistID, true);
     }
 
-    /*
+    /**
      * Set Visibility function - helper function for privatePlaylist() and publicPlaylist()
      * 
      *  @param int playlist id as its stored in the database
@@ -89,5 +91,37 @@ public class PlaylistVisibility {
             System.err.println("Error updating playlist visibility: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Frontend Helper Method - retrieves all public albums/playlists uploaded by a specific artist/user.
+     * 
+     * @param userId The ID of the logged-in artist
+     * @return List of public Playlist objects
+     */
+    public static List<Playlist> getArtistUploadedAlbums(int userId) {
+        List<Playlist> albums = new ArrayList<>();
+        String sql = "SELECT id, playlist_name, is_public FROM Playlist " +
+                     "WHERE user_id = ? AND is_public = TRUE";
+
+        try (Connection conn = DBExplorer.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    albums.add(new Playlist(
+                        rs.getInt("id"),
+                        rs.getString("playlist_name"),
+                        rs.getBoolean("is_public")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching artist albums: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return albums;
     }
 }

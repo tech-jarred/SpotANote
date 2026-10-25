@@ -48,7 +48,7 @@ CREATE TABLE RecordMember (
     record_id INT NOT NULL,
     artist_id INT NOT NULL UNIQUE,
     FOREIGN KEY (record_id) REFERENCES Record(id),
-    FOREIGN KEY (artist_id) REFERENCES Role(id)
+    FOREIGN KEY (artist_id) REFERENCES User(id)
 );
 
 -- Song
@@ -177,8 +177,7 @@ INSERT INTO Record (record_name, record_manager_id) VALUES
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES
-(1, 1);
-
+(1, 7071707);
 
 INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
 ("Summer Hits", "A collection of the hottest tracks for the summer season.", "Soaking Sets", 1),
@@ -218,3 +217,41 @@ SELECT *
 FROM Song;
 
 -- DELETE FROM Song WHERE file_path LIKE '/songs/%';
+-- DELETE FROM Song WHERE id > 50;
+-- INSERT INTO Playlist (user_id, playlist_name, is_public) VALUES (7071707, "Does this Work?", TRUE);
+-- INSERT INTO Song (song_name, song_duration, file_path, record_member_id, is_public) VALUES ("Yo-Yo", 100, "/music/test.mp3", 1, TRUE);
+-- INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES (1, 1, 1);
+
+SELECT *
+FROM Record;
+
+-- TO BE DELETED SHORTLY AFTER
+-- 2. Ensure RecordMember mapping exists for this Artist
+-- (Connects artist_id 7071707 to Record ID 1)
+INSERT IGNORE INTO RecordMember (id, record_id, artist_id) 
+VALUES (1, 1, 7071707);
+
+-- 3. Insert Tracks for the Albums
+INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES
+(101, 'Midnight Horizon', 210, '/music/midnight_horizon.mp3', 1, TRUE),
+(102, 'Neon Lights', 195, '/music/neon_lights.mp3', 1, TRUE),
+(103, 'Starlight Echoes', 240, '/music/starlight_echoes.mp3', 1, TRUE),
+(104, 'Coastal Breeze', 180, '/music/coastal_breeze.mp3', 1, TRUE),
+(105, 'Golden Hour', 225, '/music/golden_hour.mp3', 1, TRUE);
+
+-- 4. Insert Published Albums/Playlists owned by the Artist
+INSERT INTO Playlist (id, user_id, playlist_name, is_public) VALUES
+(10, 7071707, 'Synthwave Dreams (Album)', TRUE),
+(11, 7071707, 'Summer Acoustic Sessions', TRUE);
+
+-- 5. Link Songs to Albums in PlaylistSong table
+-- Album 1: Synthwave Dreams
+INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
+(10, 101, 1),
+(10, 102, 2),
+(10, 103, 3);
+
+-- Album 2: Summer Acoustic Sessions
+INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
+(11, 104, 1),
+(11, 105, 2);

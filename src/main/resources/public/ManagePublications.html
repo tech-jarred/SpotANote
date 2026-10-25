@@ -144,8 +144,24 @@
                 </div>
 
                 <div class="card decision-card">
-                    <div class="decision-info">
+                    <div class="decision-info" style="width: 100%;">
                         <h4>Uploaded Albums</h4>
+
+                        {% if uploadedAlbums is empty %}
+                            <p style="opacity: 0.7; font-style: italic; margin-top: 0.5rem;">No uploaded albums found.</p>
+                        {% else %}
+                            <ul style="list-style: none; padding: 0; margin-top: 0.75rem; width: 100%;">
+                                {% for album in uploadedAlbums %}
+                                    <li style="padding: 0.6rem 0; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                                        <div>
+                                            <strong style="color: #fff;">{{ album.name }}</strong>
+                                        </div>
+                                        <a href="/music?albumId={{ album.id }}" class="btn-submit" style="text-decoration: none; padding: 0.3rem 0.8rem; font-size: 0.8rem;">View Tracks</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
                     </div>
                 </div>
 
