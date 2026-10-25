@@ -194,13 +194,29 @@
                             <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
                                 {% for album in draftedAlbums %}
                                     <details class="album-details">
-                                        
+        
                                         <!-- Accordion Header -->
-                                        <summary class="album-summary">
-                                            <span>{{ album.name }}</span>
-                                            <span class="album-expand-badge"></span>
+                                        <summary class="album-summary" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                                            
+                                            <!-- Publish Button (Fixed Left) -->
+                                            <form action="/publish-album" method="POST" style="margin: 0; flex-shrink: 0;"
+                                                onclick="event.stopPropagation();"
+                                                onsubmit="return confirm('Are you sure you want to publish {{ album.name }}?');">
+                                                <input type="hidden" name="playlistId" value="{{ album.id }}">
+                                                <button type="submit" class="btn-action-publish">Publish</button>
+                                            </form>
+                                    
+                                            <!-- Album Title (Wraps Naturally across lines) -->
+                                            <div style="flex: 1; min-width: 0;">
+                                                <span style="font-weight: 600; color: #2e1065; white-space: normal; word-break: break-word; display: block;">
+                                                    {{ album.name }}
+                                                </span>
+                                            </div>
+                                    
+                                            <!-- Expand / Collapse Badge (Fixed Right) -->
+                                            <span class="album-expand-badge" style="flex-shrink: 0;"></span>
                                         </summary>
-
+                                    
                                         <!-- Accordion Tracklist -->
                                         <div class="album-tracklist-container">
                                             {% if album.songs is empty %}
@@ -216,7 +232,7 @@
                                                 </ul>
                                             {% endif %}
                                         </div>
-
+                                    
                                     </details>
                                 {% endfor %}
                             </div>

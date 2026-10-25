@@ -332,3 +332,19 @@ body {
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+.btn-action-publish {
+    background: #6c42f5;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap; /* Prevents text wrapping onto 2 lines */
+}
+
+.btn-action-publish:hover {
+    background: #7c55f8;
+}

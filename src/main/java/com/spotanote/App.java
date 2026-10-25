@@ -267,6 +267,35 @@ public class App {
             });
 
             /**
+             * /publish-album route
+             * 
+             * Publishes a drafted playlist by setting its visibility to true
+             */
+            config.routes.post("/publish-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+                if (playlistIdStr != null) {
+                    try {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+                        
+                        // Using your publicPlaylist function
+                        PlaylistVisibility.publicPlaylist(playlistId);
+
+                        ctx.redirect("/managepublications?status=album_published");
+                    } catch (NumberFormatException e) {
+                        ctx.redirect("/managepublications?status=error");
+                    }
+                } else {
+                    ctx.redirect("/managepublications");
+                }
+            });
+
+            /**
              * /logout route
              * 
              * This route will be responsible for clearing session variables, and
