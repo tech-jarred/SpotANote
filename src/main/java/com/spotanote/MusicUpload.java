@@ -91,6 +91,32 @@ public class MusicUpload {
 
         return -1; //insertion failed
     }
+
+    /**
+     * Frontend helper method to find the RecordMember ID associated with a given User ID
+     */
+    public static int getRecordMemberIdByUserId(int userId) {
+        //String sql = "SELECT id FROM RecordMember WHERE artist_id = ?";
+        String sql = "SELECT rm.id FROM RecordMember rm " +
+                 "JOIN User u ON rm.artist_id = u.roleid1 OR rm.artist_id = u.roleid2 " +
+                 "WHERE u.id = ?";
+
+        try (Connection connect = DBExplorer.getConnection();
+             PreparedStatement stmt = connect.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id"); //returns RecordMember.id
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching RecordMember ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return -1; //id not found
+    }
 }
 /*
 For reference:

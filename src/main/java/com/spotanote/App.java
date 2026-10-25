@@ -1,9 +1,11 @@
 package com.spotanote;
 
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinPebble;
-import java.time.Duration;
-import java.util.Map;
 
 public class App {
     public static Javalin createApp() {
@@ -180,6 +182,83 @@ public class App {
             });
 
             /**
+             * /managepublications route
+             * 
+             * This route will be responsible for managing publications as an artist
+             */
+            config.routes.get("/managepublications", ctx -> {
+                //verify user is logged in
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                //passing the status parameter to Pebble
+                String status = ctx.queryParam("status");
+                Map<String, Object> model = new HashMap<>();
+                model.put("status", status);
+
+                ctx.render("public/managepublications.html", model);
+            });
+
+            /**
+             * /upload-music route
+             * 
+             * This will handle uploading whatever song a listener wants to upload
+             */
+            config.routes.post("/upload-music", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                //extracting form fields from html
+                String songName = ctx.formParam("songName");
+                String songLengthStr = ctx.formParam("songLength");
+                String filePath = ctx.formParam("filePath");
+
+                //checks to see if fields are empty
+                if (songLengthStr == null || songLengthStr.trim().isEmpty()) {
+                    ctx.redirect("/managepublications?status=missing_fields");
+                    return;
+                }
+
+                try {
+                    int songLength = Integer.parseInt(songLengthStr);
+
+                    //call the static helper method from MusicUpload
+                    int recordMemberId = MusicUpload.getRecordMemberIdByUserId(currentUser.getId());
+
+                    if (recordMemberId <= 0) {
+                        System.err.println("User ID " + currentUser.getId() + " is not registered in RecordMember table.");
+                        ctx.redirect("/managepublications?status=not_a_record_member");
+                        return;
+                    }
+
+                    //passing values into MusicUpload method
+                    int songId = MusicUpload.musicUpload(songName, songLength, filePath, recordMemberId);
+
+                    if (songId > 0) {
+                        //success: redirect back to manage publications
+                        ctx.redirect("/managepublications?status=success");
+                    } else {
+                        ctx.redirect("/managepublications?status=failed");
+                    }
+
+                } catch (NumberFormatException e) {
+                    ctx.redirect("/managepublications?status=invalid_length");
+                } catch (IllegalArgumentException e) {
+                    //catches duplicate file paths or blank input errors thrown by MusicUpload
+                    ctx.redirect("/managepublications?status=error");
+                }
+
+                //render music selection page
+                //ctx.render("public/managepublications.html");
+            });
+
+            /**
              * /logout route
              * 
              * This route will be responsible for clearing session variables, and
@@ -317,7 +396,7 @@ public class App {
     public static void main(String[] args) {
         // Create Javalin instance.
         Javalin app = createApp();
-        int port = 7000;
+        int port = 8080;
 
         // Start the application.
         app.start(port); // use port 8080 if something is running on port 7000

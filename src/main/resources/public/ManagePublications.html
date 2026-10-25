@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Spotanote - Music Library</title>
+        <link rel="stylesheet" href="/css/styles.css">
+        <style>
+            /* CSS rules to guarantee centered scrolling alignment */
+            .main-wrapper {
+                max-width: 750px;
+                margin: 0 auto;
+                padding: 2rem 1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .card {
+                width: 100%;
+                box-sizing: border-box;
+                margin-bottom: 1.5rem;
+            }
+
+            .decision-list {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .decision-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                margin-bottom: 0;
+            }
+
+            .decision-info h4 {
+                margin: 0 0 0.25rem 0;
+                font-size: 1.1rem;
+            }
+
+            .decision-info p {
+                margin: 0;
+                font-size: 0.85rem;
+                opacity: 0.8;
+            }
+
+            .form-group {
+                display: flex;
+                flex-direction: column;
+                margin-top: 0.75rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.25rem;
+                opacity: 0.9;
+            }
+
+            .form-group input {
+                padding: 0.5rem;
+                border-radius: 4px;
+                border: 1px solid #444;
+                color: #2a2a2a;
+            }
+
+            .btn-submit {
+                margin-top: 1rem;
+                padding: 0.6rem 1.2rem;
+                background-color: #1db954;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            .btn-submit:hover {
+                background-color: #1ed760;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="nav-brand">Spotanote</div>
+            <div class="nav-user-controls">
+                <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
+                <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
+                <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+                <a href="/managepublications" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Manage Publications</a>
+                <a href="/search" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Search</a>
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            </div>
+        </nav>
+
+        <div class="main-wrapper">
+            <div class="card">
+                <h2 class=""page-title>Manage Publications</h2>
+                <p class="subtitle">Manage your publications here.</p>
+            </div>
+
+            <div class="decision-list">
+
+                <div class="card decision-card">
+                    <div class="decision-info">
+                        <h4>Upload New Music</h4>
+
+                        <!-- Pebble Template Logic Placement -->
+                        {% if status == "success" %}
+                        <p style="color: #1db954; font-weight: bold; margin-bottom: 1rem;">Music uploaded successfully!</p>
+                        {% elseif status == "not_a_record_member" %}
+                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Account is not linked to a Record Member profile.</p>
+                        {% elseif status == "invalid_length" %}
+                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Duration must be a valid number of seconds.</p>
+                        {% elseif status == "error" or status == "failed" %}
+                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Failed to upload music. Please try again.</p>
+                        {% endif %}
+
+                        <form action="/upload-music" method="POST">
+                            <div class="form-group">
+                                <label for="songName">Song Title</label>
+                                <input type="text" id="songName" name="songName" placeholder="e.g., Summer Vibes" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="songLength">Duration (Seconds)</label>
+                                <input type="number" id="songLength" name="songLength" min="1" placeholder="e.g., 210" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="filePath">File Path or URL</label>
+                                <input type="text" id="filePath" name="filePath" placeholder="e.g. /music/song.mp3" required>
+                            </div>
+                            <button type="submit" class="btn-submit">Upload Track</button>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="card decision-card">
+                    <div class="decision-info">
+                        <h4>Uploaded Albums</h4>
+                    </div>
+                </div>
+
+                <div class="card decision-card">
+                    <div class="decision-info">
+                        <h4>Drafted Albums</h4>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body>
+</html>
+
+<!--
+Notes:
+- Upload new music
+- Uploaded albums
+    - albums
+    - singles
+- Drafted albums
+    - album drafts
+    - single drafts
+-->
