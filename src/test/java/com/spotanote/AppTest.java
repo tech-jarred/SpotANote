@@ -57,7 +57,14 @@ public class AppTest {
             // Simulate user logging in.
             loginTestUser(client);; 
 
-            // Similate user being redirected to home screen.
+            // Similate user being redirected to home screen, then navigating to /music.
+            client.get("/home");
+            client.get("/music");
+
+            // Simulate user selecting a song with id 1.
+            client.post("/select-song", "songId=1");
+
+            // Redirect user to home page.
             client.get("/home");
 
             // Simulate JavaScript fetch request when user pauses at 75 seconds
