@@ -62,6 +62,7 @@ public class App {
 
                 if (user != null) {
                     ctx.sessionAttribute("currentUser", user);
+                    ctx.sessionAttribute("SongQueue", new SongQueue());
                     password = null;
                     ctx.redirect("/home");
                 } else {
@@ -79,27 +80,31 @@ public class App {
              */
             config.routes.get("/home", ctx -> {
                 User currentUser = ctx.sessionAttribute("currentUser");
-                Song currentSong = ctx.sessionAttribute("currentSong");
-                if (currentSong == null) { // have a fall back default song/sound in case there is no current song in
-                                           // session.
-                    currentSong = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
-                    currentSong.setTimeStampFromSeconds(60);
-                    ctx.sessionAttribute("currentSong", currentSong);
-                }
 
                 // Verify user is actually logged in (prevents person from typing /home in URL
                 // to bypass login page)
                 if (currentUser == null) {
                     ctx.redirect("/login");
+                    return;
+                }
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+                Song currentSong = sq.getCurrentSong();
+                //System.out.println(sq.getCurrentSong().getName());
+                if (currentSong == null && !sq.isQueuedSongsEmpty()) {
+                    // If the currentSong is empty and there are songs waaiting in queue, get the first song.
+                    sq.getNext();
+                    currentSong = sq.getCurrentSong(); System.out.println("I'm inside the if" + currentSong.getName());
+                }
+                else if (currentSong == null) {
+                    currentSong = new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"); System.out.println("lolfuku");
                 }
 
-                else {
-                    // Render Home.html file, passing username through for Pebble formatting.
-                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
-                            "current_song_file_path", currentSong.getFilePath(),
-                            "timeStamp", currentSong.getTimeStamp().toSeconds(),
-                            "songName", currentSong.getName()));
-                }
+                // Render Home.html file, passing username through for Pebble formatting.
+                System.out.println("Before render, values are {filePath, timeStamp, name} " + currentSong.getFilePath() + currentSong.getFormattedDuration() + currentSong.getName());
+                ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
+                        "current_song_file_path", currentSong.getFilePath(),
+                        "timeStamp", currentSong.getTimeStamp().toSeconds(),
+                        "songName", currentSong.getName()));
             });
 
             /**
@@ -129,57 +134,32 @@ public class App {
             config.routes.post("/select-song", ctx -> {
                 // Verify user is logged in, if not redirect to login page.
                 User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
                 if (currentUser == null) {
                     ctx.redirect("/login");
                     return;
                 }
 
-                // Read songId from song user selected from the msuic page
+                // Read songId from song user selected from the music page
                 String songIdParam = ctx.formParam("songId");
 
                 if (songIdParam != null) {
                     int songId = Integer.parseInt(songIdParam);
-                    Song selectedSong = null;
 
-                    // Map the ID to the appropriate Song instance
-                    if (songId == 1) {
-                        selectedSong = new Song(1, "Please Please Please", Duration.ofSeconds(187),
-                                "/music/please_please_please.mp3");
-                    } else if (songId == 2) {
-                        selectedSong = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
-                    } else if (songId == 3) {
-                        selectedSong = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
-                    } else if (songId == 4) {
-                        selectedSong = new Song(4, "Danza Kuduro", Duration.ofSeconds(235), "/music/danza_kuduro.mp3");
-                    } else if (songId == 5) {
-                        selectedSong = new Song(5, "Don't Mine At Night", Duration.ofSeconds(214),
-                                "/music/dont_mine_at_night.mp3");
-                    } else if (songId == 6) {
-                        selectedSong = new Song(6, "Drive By", Duration.ofSeconds(197), "/music/drive_by.mp3");
-                    } else if (songId == 7) {
-                        selectedSong = new Song(7, "Fallen Kingdom", Duration.ofSeconds(252),
-                                "/music/fallen_kingdom.mp3");
-                    } else if (songId == 8) {
-                        selectedSong = new Song(8, "Hips Don't Lie", Duration.ofSeconds(218),
-                                "/music/hips_dont_lie.mp3");
-                    } else if (songId == 9) {
-                        selectedSong = new Song(9, "Lao a Lao", Duration.ofSeconds(184), "/music/lao_a_lao.mp3");
-                    } else if (songId == 10) {
-                        selectedSong = new Song(10, "Ocean Man", Duration.ofSeconds(126), "/music/ocean_man.mp3");
-                    } else if (songId == 11) {
-                        selectedSong = new Song(11, "Pa'lla Voy", Duration.ofSeconds(263), "/music/palla_voy.mp3");
-                    } else if (songId == 12) {
-                        selectedSong = new Song(12, "Triforce Medley", Duration.ofSeconds(242),
-                                "/music/tloz_triforce_medley_40.mp3");
-                    } else if (songId == 13) {
-                        selectedSong = new Song(13, "Vivir Mi Vida", Duration.ofSeconds(252),
-                                "/music/vivir_mi_vida.mp3");
+                    // Update the current song in song queue.
+                    try {
+                        sq.setCurrentSong(songId); 
+                    } catch (IllegalArgumentException e) {
+                        sq.setCurrentSong(new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"));
+                        ctx.status(400).result("Unrecognized argument");      
+                    } catch (RuntimeException e){
+                        sq.setCurrentSong(new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"));
+                        ctx.status(500).result("Internal Server Error");
                     }
+                    // Store updated song queue in session attribute if valid
+                    ctx.sessionAttribute("SongQueue", sq);
 
-                    // Store selected song in session attribute if valid
-                    if (selectedSong != null) {
-                        ctx.sessionAttribute("currentSong", selectedSong);
-                    }
+                    SongQueue help = ctx.sessionAttribute("SongQueue"); System.out.println("The current song of song queue inside of select-song is " + help.getCurrentSong().getName());
                 }
 
                 // Redirect back to home route
@@ -196,6 +176,12 @@ public class App {
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null) {
                     ctx.redirect("/login");
+                    return;
+                }
+
+                // Verify user is an artist. If not, they are not allowed to access this page.
+                if (!currentUser.getRole().equals("Artist")){
+                    ctx.redirect("/home");
                     return;
                 }
 
@@ -601,6 +587,31 @@ public class App {
                 }
                 
                 ctx.status(200).result("Success");
+            });
+
+            /**
+             * This is responsible for adding a song to the song queue.
+             */
+            config.routes.post("/api/queue/add", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users to access this route.
+                    return;
+                }
+
+                try {
+                    int songId = Integer.parseInt(ctx.queryParam("songId"));
+
+                    sq.enqueue(songId); // add song to the queue.
+                    ctx.sessionAttribute("SongQueue", sq); // update the value of session's song queue.
+                    ctx.status(200).result("Song added to queue");
+                } catch (IllegalArgumentException e) {
+                    ctx.status(400).result("Invalid song ID");
+                } catch (RuntimeException e) {
+                    ctx.status(500).result("Internal Server Error");
+                }
             });
 
             //This route will be responsible for displaying all promotions to the user.
