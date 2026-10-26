@@ -5,56 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotanote - Music Library</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        /* CSS rules to guarantee centered scrolling alignment */
-        .main-wrapper {
-            max-width: 750px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .card {
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 1.5rem;
-        }
-
-        .song-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .song-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 0;
-        }
-
-        .song-info h4 {
-            margin: 0 0 0.25rem 0;
-            font-size: 1.1rem;
-        }
-
-        .song-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-    </style>
 </head>
 <body>
 
-    
+    <!-- Original Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
@@ -67,174 +21,171 @@
         </div>
     </nav>
 
-    
+    <!-- Main Music Library Layout -->
     <div class="main-wrapper">
-        <div class="card">
-            <h2 class="page-title">Music Choices</h2>
-            <p class="subtitle">Select a song to set it as your current track.</p>
-        </div>
+        <div class="library-container">
 
-        
-        <div class="song-list">
-            
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Please Please Please</h4>
-                    <p>Sabrina Carpenter • 3:07</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="1">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
+            <!-- Liked Songs Playlist Pill Header -->
+            <div class="playlist-card" id="liked-playlist-header" onclick="togglePlaylist('liked-songs-wrapper', this)">
+                <span class="playlist-title">
+                    <span class="playlist-arrow">▼</span>
+                    Liked Songs
+                    <span class="playlist-arrow">▼</span>
+                </span>
             </div>
 
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Revenge</h4>
-                    <p>CaptainSparklez • 3:39</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="2">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
+            <!-- Dynamic Liked Songs Dropdown Wrapper -->
+            <div class="playlist-songs-wrapper" id="liked-songs-wrapper">
+                <!-- JS populates liked songs dynamically -->
             </div>
 
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Bailando</h4>
-                    <p>Enrique Iglesias • 4:14</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="3">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Danza Kuduro</h4>
-                    <p>Don Omar ft. Lucenzo • 3:55</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="4">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Don't Mine At Night</h4>
-                    <p>BebopVox • 3:34</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="5">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Drive By</h4>
-                    <p>Train • 3:17</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="6">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Fallen Kingdom</h4>
-                    <p>CaptainSparklez • 4:12</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="7">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Hips Don't Lie</h4>
-                    <p>Shakira ft. Wyclef Jean • 3:38</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="8">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Lao a Lao</h4>
-                    <p>Prince Royce • 3:04</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="9">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Ocean Man</h4>
-                    <p>Ween • 2:06</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="10">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Pa'lla Voy</h4>
-                    <p>Marc Anthony • 4:23</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="11">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Triforce Medley</h4>
-                    <p>The Legend of Zelda • 4:02</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="12">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Vivir Mi Vida</h4>
-                    <p>Marc Anthony • 4:12</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="13">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
+            <!-- Placeholder for User Created Playlists -->
+            <div id="user-playlists-container" class="library-container">
+                <!-- Additional user created playlists will render here -->
             </div>
 
         </div>
     </div>
 
+    <!-- Frontend Dynamic Script -->
+    <script>
+        // State store for currently liked songs
+        let likedSongs = [];
+
+        // Fetch user's liked songs from the REST API on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLikedSongs();
+        });
+
+        // 1. Fetch liked songs from backend
+        async function fetchLikedSongs() {
+            try {
+                const response = await fetch('/api/liked-songs');
+                if (response.ok) {
+                    likedSongs = await response.json();
+                } else {
+                    likedSongs = [];
+                }
+            } catch (err) {
+                console.error("Error fetching liked songs:", err);
+                likedSongs = [];
+            }
+            renderLikedSongs();
+        }
+
+        // 2. Render Liked Songs inside the dropdown container
+        function renderLikedSongs() {
+            const wrapper = document.getElementById('liked-songs-wrapper');
+            wrapper.innerHTML = '';
+
+            if (!likedSongs || likedSongs.length === 0) {
+                wrapper.innerHTML = '<div class="empty-playlist-msg">No liked songs yet. Click the heart icon on any song to add it!</div>';
+                return;
+            }
+
+            likedSongs.forEach(song => {
+                const songPill = createSongPill(song, true);
+                wrapper.appendChild(songPill);
+            });
+        }
+
+        // 3. Helper to build a song pill element with icon buttons & tooltips
+        function createSongPill(song, isLiked) {
+            const pill = document.createElement('div');
+            pill.className = 'song-pill';
+            pill.id = `song-pill-${song.songId}`;
+
+            pill.innerHTML = `
+                <button class="icon-btn heart-btn ${isLiked ? '' : 'unliked'}" 
+                        data-tooltip="${isLiked ? 'Dislike' : 'Like'}" 
+                        onclick="toggleLikeSong(${song.songId}, '${escapeJsString(song.songName)}', ${isLiked})">
+                    ${isLiked ? '❤️' : '♡'}
+                </button>
+                <span class="song-name">${escapeHtml(song.songName)}</span>
+                <div class="song-actions">
+                    <button class="icon-btn" data-tooltip="Add to Playlist" onclick="addToPlaylist(${song.songId})">
+                        ⊕
+                    </button>
+                    <button class="icon-btn" data-tooltip="Add to Queue" onclick="addToQueue(${song.songId})">
+                        ♫
+                    </button>
+                    <button class="icon-btn" data-tooltip="Play Song" onclick="selectSong(${song.songId})">
+                        ▶
+                    </button>
+                </div>
+            `;
+            return pill;
+        }
+
+        // 4. Toggle Playlist Accordion Open/Closed
+        function togglePlaylist(wrapperId, headerElement) {
+            const wrapper = document.getElementById(wrapperId);
+            wrapper.classList.toggle('open');
+            headerElement.classList.toggle('open');
+        }
+
+        // 5. Handle Like / Dislike Toggle API Call
+        async function toggleLikeSong(songId, songName, currentlyLiked) {
+            try {
+                const endpoint = currentlyLiked 
+                    ? `/api/dislike/song?songId=${songId}` 
+                    : `/api/like/song?songId=${songId}`;
+
+                const response = await fetch(endpoint, { method: 'POST' });
+
+                if (response.ok) {
+                    if (currentlyLiked) {
+                        // Remove song from local array
+                        likedSongs = likedSongs.filter(s => s.songId !== songId);
+                    } else {
+                        // Add song to local array
+                        likedSongs.push({ songId: songId, songName: songName });
+                    }
+                    renderLikedSongs();
+                } else {
+                    alert("Could not update song status. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error toggling like status:", err);
+            }
+        }
+
+        // 6. Action Handlers
+        function selectSong(songId) {
+            // Post selection to current select-song route
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/select-song';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'songId';
+            input.value = songId;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        function addToQueue(songId) {
+            console.log(`Add song ${songId} to queue`);
+            // Place backend call for queue insertion here when ready
+        }
+
+        function addToPlaylist(songId) {
+            console.log(`Open playlist modal for song ${songId}`);
+            // Place playlist creation/assignment flow here when ready
+        }
+
+        // Utility sanitation helpers
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+
+        function escapeJsString(str) {
+            return str.replace(/'/g, "\\'");
+        }
+    </script>
 </body>
 </html>

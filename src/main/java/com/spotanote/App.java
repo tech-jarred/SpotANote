@@ -103,7 +103,7 @@ public class App {
             });
 
             /**
-             * /music
+             * /music route
              * 
              * This route is the landing page for all music on the platform. Users can
              * select either an individual song OR playlist from this page.
@@ -500,6 +500,87 @@ public class App {
 
             });
 
+            /**
+             * /api/liked-songs
+             * 
+             * This route handles obtaining all liked songs a user has. It returns the result to the frontend
+             * as a JSON.
+             */
+            config.routes.get("/api/liked-songs", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                MusicLike musicLike = new MusicLike();
+
+                // Only allow users who have logged in access to this api.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                // Call DAO method using current user's ID
+                List<SongSummary> likedSongs = null;
+                try {
+                    likedSongs = musicLike.getUsersLikedSongs(currentUser.getId());
+                } catch (Exception e) {
+                    ctx.status(500); // internal server error status code if exception thrown.
+                    return;
+                }
+                
+                // Automatically serializes List<SongSummary> into JSON text
+                ctx.json(likedSongs);
+            });
+
+            /**
+             * /api/like/song
+             * 
+             * Handles a user liking a song.
+             */
+            config.routes.post("/api/like/song", ctx -> {
+                MusicLike musicLike = new MusicLike();
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Only allow auhtenticated users access to this api.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                int songId = Integer.parseInt(ctx.queryParam("songId"));
+                try {
+                    musicLike.likeSong(currentUser.getId(), songId);
+                } catch (Exception e) {
+                    ctx.status(500); // status internal server error if exception thrown.
+                    return;
+                }
+
+                ctx.status(200).result("Success");
+            });
+
+            /**
+             * /api/dislike/song
+             * 
+             * Responsible for handling user disliking song.
+             */
+            config.routes.post("/api/dislike/song", ctx -> {
+                MusicLike musicLike = new MusicLike();
+                User currentUser = ctx.sessionAttribute("currentUser");
+                
+                // Only allow authenticated users access to this route.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                int songId = Integer.parseInt(ctx.queryParam("songId"));
+
+                try {
+                    musicLike.dislikeSong(currentUser.getId(), songId);                
+                } catch (Exception e) {
+                    ctx.status(500); // internal server error status if exception thrown.
+                    return;
+                }
+                
+                ctx.status(200).result("Success");
+            });
 
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
