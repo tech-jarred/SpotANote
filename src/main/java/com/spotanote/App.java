@@ -158,8 +158,6 @@ public class App {
                     }
                     // Store updated song queue in session attribute if valid
                     ctx.sessionAttribute("SongQueue", sq);
-
-                    SongQueue help = ctx.sessionAttribute("SongQueue");
                 }
 
                 // Redirect back to home route
