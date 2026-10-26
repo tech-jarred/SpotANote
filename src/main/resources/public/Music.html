@@ -5,236 +5,369 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotanote - Music Library</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <style>
-        /* CSS rules to guarantee centered scrolling alignment */
-        .main-wrapper {
-            max-width: 750px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .card {
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 1.5rem;
-        }
-
-        .song-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .song-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 0;
-        }
-
-        .song-info h4 {
-            margin: 0 0 0.25rem 0;
-            font-size: 1.1rem;
-        }
-
-        .song-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            opacity: 0.8;
-        }
-    </style>
 </head>
 <body>
-
-    
+    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
-            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
-            <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
-            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/promotions" class="nav-link">Promotion</a>
+            <a href="/music-library" class="nav-link">Music Library</a>
+            
+            {% if isArtist %}
+                <a href="/managepublications" class="nav-link">Manage Publications</a>
+            {% endif %}
+
+            <a href="/search" class="nav-link">Search</a>
+            
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
         </div>
     </nav>
 
-    
     <div class="main-wrapper">
-        <div class="card">
-            <h2 class="page-title">Music Choices</h2>
-            <p class="subtitle">Select a song to set it as your current track.</p>
-        </div>
+        <div class="library-container">
 
-        
-        <div class="song-list">
-            
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Please Please Please</h4>
-                    <p>Sabrina Carpenter • 3:07</p>
+            <!-- Liked Songs Playlist Group -->
+            <div class="playlist-group" id="liked-playlist-group">
+                <div class="playlist-card" id="liked-playlist-header" onclick="togglePlaylist('liked-songs-wrapper', this)">
+                    <span class="playlist-title">
+                        <span class="playlist-arrow">▼</span>
+                        Liked Songs
+                        <span class="playlist-arrow">▼</span>
+                    </span>
                 </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="1">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
+
+                <div class="playlist-songs-wrapper" id="liked-songs-wrapper">
+                    <!-- JS populates songs -->
+                </div>
             </div>
 
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Revenge</h4>
-                    <p>CaptainSparklez • 3:39</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="2">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Bailando</h4>
-                    <p>Enrique Iglesias • 4:14</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="3">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Danza Kuduro</h4>
-                    <p>Don Omar ft. Lucenzo • 3:55</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="4">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Don't Mine At Night</h4>
-                    <p>BebopVox • 3:34</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="5">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Drive By</h4>
-                    <p>Train • 3:17</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="6">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Fallen Kingdom</h4>
-                    <p>CaptainSparklez • 4:12</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="7">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Hips Don't Lie</h4>
-                    <p>Shakira ft. Wyclef Jean • 3:38</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="8">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Lao a Lao</h4>
-                    <p>Prince Royce • 3:04</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="9">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Ocean Man</h4>
-                    <p>Ween • 2:06</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="10">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Pa'lla Voy</h4>
-                    <p>Marc Anthony • 4:23</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="11">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Triforce Medley</h4>
-                    <p>The Legend of Zelda • 4:02</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="12">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
-            </div>
-
-            
-            <div class="card song-card">
-                <div class="song-info">
-                    <h4>Vivir Mi Vida</h4>
-                    <p>Marc Anthony • 4:12</p>
-                </div>
-                <form action="/select-song" method="POST">
-                    <input type="hidden" name="songId" value="13">
-                    <button type="submit" class="btn-select">Select</button>
-                </form>
+            <!-- Dynamic User Created Playlists -->
+            <div id="user-playlists-container" class="library-container">
+                <!-- Additional user created playlists render here -->
             </div>
 
         </div>
     </div>
 
+    <script>
+        let likedSongs = [];
+        let userPlaylists = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLikedSongs().then(() => {
+                fetchUserPlaylists();
+            });
+        });
+
+        // 1. Fetch Liked Songs
+        async function fetchLikedSongs() {
+            try {
+                const response = await fetch('/api/liked-songs');
+                if (response.ok) {
+                    likedSongs = await response.json();
+                } else {
+                    likedSongs = [];
+                }
+            } catch (err) {
+                console.error("Error fetching liked songs:", err);
+                likedSongs = [];
+            }
+            renderLikedSongs();
+        }
+
+        // 2. Fetch User Playlists
+        async function fetchUserPlaylists() {
+            try {
+                const response = await fetch('/api/user-playlists');
+                if (response.ok) {
+                    userPlaylists = await response.json();
+                } else {
+                    userPlaylists = [];
+                }
+            } catch (err) {
+                console.error("Error fetching user playlists:", err);
+                userPlaylists = [];
+            }
+            renderUserPlaylists();
+        }
+
+        // 3. Initial Render of Liked Songs
+        function renderLikedSongs() {
+            const wrapper = document.getElementById('liked-songs-wrapper');
+            wrapper.innerHTML = '';
+
+            if (!likedSongs || likedSongs.length === 0) {
+                wrapper.innerHTML = '<div class="empty-playlist-msg">No liked songs yet. Click the heart icon on any song to add it!</div>';
+                return;
+            }
+
+            likedSongs.forEach(song => {
+                const songPill = createSongPill(song, true);
+                songPill.id = `liked-pill-${song.songId}`;
+                wrapper.appendChild(songPill);
+            });
+        }
+
+        // 4. Initial Render of User Playlists
+        function renderUserPlaylists() {
+            const container = document.getElementById('user-playlists-container');
+            container.innerHTML = '';
+
+            if (!userPlaylists || userPlaylists.length === 0) {
+                return;
+            }
+
+            userPlaylists.forEach(playlist => {
+                const wrapperId = `playlist-wrapper-${playlist.playlistId}`;
+                const groupId = `playlist-group-${playlist.playlistId}`;
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'playlist-group';
+                groupDiv.id = groupId;
+
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'playlist-card';
+                cardHeader.onclick = function () { togglePlaylist(wrapperId, this); };
+                cardHeader.innerHTML = `
+                    <span class="playlist-title">
+                        <span class="playlist-arrow">▼</span>
+                        ${escapeHtml(playlist.playlistName)}
+                        <span class="playlist-arrow">▼</span>
+                    </span>
+                `;
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'playlist-songs-wrapper';
+                wrapper.id = wrapperId;
+
+                if (!playlist.songs || playlist.songs.length === 0) {
+                    wrapper.innerHTML = '<div class="empty-playlist-msg">This playlist has no songs yet.</div>';
+                } else {
+                    playlist.songs.forEach(song => {
+                        const isLiked = likedSongs.some(ls => ls.songId === song.songId);
+                        const songPill = createSongPill(song, isLiked);
+                        wrapper.appendChild(songPill);
+                    });
+                }
+
+                groupDiv.appendChild(cardHeader);
+                groupDiv.appendChild(wrapper);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        // 5. Create Song Pill
+        function createSongPill(song, isLiked) {
+            const pill = document.createElement('div');
+            pill.className = 'song-pill';
+
+            pill.innerHTML = `
+                <button class="icon-btn heart-btn ${isLiked ? '' : 'unliked'}" 
+                        data-song-id="${song.songId}"
+                        data-tooltip="${isLiked ? 'Dislike' : 'Like'}" 
+                        onclick="toggleLikeSong(${song.songId}, '${escapeJsString(song.songName)}', ${isLiked})">
+                    ${isLiked ? '❤️' : '♡'}
+                </button>
+                <span class="song-name">${escapeHtml(song.songName)}</span>
+                <div class="song-actions">
+                    <button class="icon-btn" data-tooltip="Add to Playlist" onclick="addToPlaylist(${song.songId})">
+                        ⊕
+                    </button>
+                    <button class="icon-btn" data-tooltip="Add to Queue" onclick="addToQueue(${song.songId}, '${escapeJsString(song.songName)}')">
+                        ♫
+                    </button>
+                    <button class="icon-btn" data-tooltip="Play Song" onclick="selectSong(${song.songId})">
+                        ▶
+                    </button>
+                </div>
+            `;
+            return pill;
+        }
+
+        // 6. Single-Open Accordion Toggle
+        function togglePlaylist(wrapperId, headerElement) {
+            const targetWrapper = document.getElementById(wrapperId);
+            const targetGroup = headerElement.closest('.playlist-group');
+            const isTargetOpen = targetWrapper.classList.contains('open');
+
+            // Close any currently open playlist accordion
+            document.querySelectorAll('.playlist-songs-wrapper.open').forEach(openWrapper => {
+                if (openWrapper.id !== wrapperId) {
+                    closeWrapper(openWrapper);
+                }
+            });
+
+            // Toggle target playlist
+            if (isTargetOpen) {
+                closeWrapper(targetWrapper);
+            } else {
+                openWrapper(targetWrapper, headerElement, targetGroup);
+            }
+        }
+
+        function closeWrapper(wrapper) {
+            const header = wrapper.previousElementSibling || document.getElementById('liked-playlist-header');
+            const group = wrapper.closest('.playlist-group');
+
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+            wrapper.offsetHeight; // Force reflow
+            wrapper.style.maxHeight = '0px';
+            wrapper.classList.remove('open');
+            if (header) header.classList.remove('open');
+            if (group) group.classList.remove('open');
+        }
+
+        function openWrapper(wrapper, header, group) {
+            if (group) group.classList.add('open');
+            if (header) header.classList.add('open');
+            wrapper.classList.add('open');
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+        }
+
+        // 7. In-Place Like / Dislike Toggle (Zero Scroll Jumps or Page Reloads)
+        async function toggleLikeSong(songId, songName, currentlyLiked) {
+            try {
+                const endpoint = currentlyLiked 
+                    ? `/api/dislike/song?songId=${songId}` 
+                    : `/api/like/song?songId=${songId}`;
+
+                const response = await fetch(endpoint, { method: 'POST' });
+
+                if (response.ok) {
+                    const isNowLiked = !currentlyLiked;
+
+                    // Update state array
+                    if (currentlyLiked) {
+                        likedSongs = likedSongs.filter(s => s.songId !== songId);
+                    } else {
+                        likedSongs.push({ songId: songId, songName: songName });
+                    }
+
+                    // 1. Update ALL heart buttons in place across all playlists
+                    document.querySelectorAll(`.heart-btn[data-song-id="${songId}"]`).forEach(btn => {
+                        btn.innerHTML = isNowLiked ? '❤️' : '♡';
+                        btn.setAttribute('data-tooltip', isNowLiked ? 'Dislike' : 'Like');
+                        btn.onclick = () => toggleLikeSong(songId, songName, isNowLiked);
+                        if (isNowLiked) {
+                            btn.classList.remove('unliked');
+                        } else {
+                            btn.classList.add('unliked');
+                        }
+                    });
+
+                    // 2. Update Liked Songs list dynamically without wiping DOM
+                    updateLikedSongsContainer(songId, songName, isNowLiked);
+
+                } else {
+                    alert("Could not update song status. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error toggling like status:", err);
+            }
+        }
+
+        // Helper to update the Liked Songs playlist container dynamically
+        function updateLikedSongsContainer(songId, songName, isNowLiked) {
+            const likedWrapper = document.getElementById('liked-songs-wrapper');
+            
+            if (isNowLiked) {
+                const emptyMsg = likedWrapper.querySelector('.empty-playlist-msg');
+                if (emptyMsg) emptyMsg.remove();
+
+                if (!likedWrapper.querySelector(`#liked-pill-${songId}`)) {
+                    const newPill = createSongPill({ songId: songId, songName: songName }, true);
+                    newPill.id = `liked-pill-${songId}`;
+                    likedWrapper.appendChild(newPill);
+                }
+            } else {
+                const existingPill = likedWrapper.querySelector(`#liked-pill-${songId}`);
+                if (existingPill) {
+                    existingPill.remove();
+                }
+
+                if (likedWrapper.children.length === 0) {
+                    likedWrapper.innerHTML = '<div class="empty-playlist-msg">No liked songs yet. Click the heart icon on any song to add it!</div>';
+                }
+            }
+
+            // Adjust height if Liked Songs playlist is currently open
+            if (likedWrapper.classList.contains('open')) {
+                likedWrapper.style.maxHeight = likedWrapper.scrollHeight + 'px';
+            }
+        }
+
+        // Utility Handlers
+        function selectSong(songId) {
+            // Flag autoplay in session storage prior to navigating/submitting. This will trigger music to autoplay on return to /home.
+            sessionStorage.setItem('shouldAutoplay', 'true');
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/select-song';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'songId';
+            input.value = songId;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        async function addToQueue(songId, songName) {
+            try {
+                const response = await fetch(`/api/queue/add?songId=${songId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    // Set autoplay flag so returning to /home automatically starts playback
+                    sessionStorage.setItem('shouldAutoplay', 'true');
+                    showToast(`Added "${songName}" to queue`);
+                } else {
+                    showToast(`Failed to queue "${songName}"`);
+                }
+            } catch (err) {
+                console.error("Error adding song to queue:", err);
+                showToast("Error connecting to server");
+            }
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            // Auto-hide after 2.5 seconds
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        function addToPlaylist(songId) {
+            console.log(`Open playlist modal for song ${songId}`);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+
+        function escapeJsString(str) {
+            return str.replace(/'/g, "\\'");
+        }
+    </script>
 </body>
 </html>

@@ -62,6 +62,7 @@ public class App {
 
                 if (user != null) {
                     ctx.sessionAttribute("currentUser", user);
+                    ctx.sessionAttribute("SongQueue", new SongQueue());
                     password = null;
                     ctx.redirect("/home");
                 } else {
@@ -79,36 +80,40 @@ public class App {
              */
             config.routes.get("/home", ctx -> {
                 User currentUser = ctx.sessionAttribute("currentUser");
-                Song currentSong = ctx.sessionAttribute("currentSong");
-                if (currentSong == null) { // have a fall back default song/sound in case there is no current song in
-                                           // session.
-                    currentSong = new Song(3, "Hips Don't Lie", Duration.ofSeconds(218), "/music/hips_dont_lie.mp3");
-                    currentSong.setTimeStampFromSeconds(60);
-                    ctx.sessionAttribute("currentSong", currentSong);
-                }
 
                 // Verify user is actually logged in (prevents person from typing /home in URL
                 // to bypass login page)
                 if (currentUser == null) {
                     ctx.redirect("/login");
+                    return;
+                }
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+                Song currentSong = sq.getCurrentSong();
+
+                if (currentSong == null && !sq.isQueuedSongsEmpty()) {
+                    // If the currentSong is empty and there are songs waaiting in queue, get the first song.
+                    sq.getNext();
+                    currentSong = sq.getCurrentSong();
+                }
+                else if (currentSong == null) {
+                    currentSong = new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/");
                 }
 
-                else {
-                    // Render Home.html file, passing username through for Pebble formatting.
-                    ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
-                            "current_song_file_path", currentSong.getFilePath(),
-                            "timeStamp", currentSong.getTimeStamp().toSeconds(),
-                            "songName", currentSong.getName()));
-                }
+                // Render Home.html file, passing username through for Pebble formatting.
+                ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
+                        "current_song_file_path", currentSong.getFilePath(),
+                        "timeStamp", currentSong.getTimeStamp().toSeconds(),
+                        "songName", currentSong.getName(),
+                        "isArtist", currentUser.getRole().equals("Artist")));
             });
 
             /**
-             * /music
+             * /music-library route
              * 
              * This route is the landing page for all music on the platform. Users can
              * select either an individual song OR playlist from this page.
              */
-            config.routes.get("/music", ctx -> {
+            config.routes.get("/music-library", ctx -> {
                 // Verify user is logged in
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null) {
@@ -117,7 +122,7 @@ public class App {
                 }
 
                 // Render music selection page
-                ctx.render("public/music.html");
+                ctx.render("public/music.html", java.util.Map.of("isArtist", currentUser.getRole().equals("Artist")));
             });
 
             /**
@@ -129,57 +134,30 @@ public class App {
             config.routes.post("/select-song", ctx -> {
                 // Verify user is logged in, if not redirect to login page.
                 User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
                 if (currentUser == null) {
                     ctx.redirect("/login");
                     return;
                 }
 
-                // Read songId from song user selected from the msuic page
+                // Read songId from song user selected from the music page
                 String songIdParam = ctx.formParam("songId");
 
                 if (songIdParam != null) {
                     int songId = Integer.parseInt(songIdParam);
-                    Song selectedSong = null;
 
-                    // Map the ID to the appropriate Song instance
-                    if (songId == 1) {
-                        selectedSong = new Song(1, "Please Please Please", Duration.ofSeconds(187),
-                                "/music/please_please_please.mp3");
-                    } else if (songId == 2) {
-                        selectedSong = new Song(2, "Revenge", Duration.ofSeconds(219), "/music/revenge.mp3");
-                    } else if (songId == 3) {
-                        selectedSong = new Song(3, "Bailando", Duration.ofSeconds(254), "/music/bailando.mp3");
-                    } else if (songId == 4) {
-                        selectedSong = new Song(4, "Danza Kuduro", Duration.ofSeconds(235), "/music/danza_kuduro.mp3");
-                    } else if (songId == 5) {
-                        selectedSong = new Song(5, "Don't Mine At Night", Duration.ofSeconds(214),
-                                "/music/dont_mine_at_night.mp3");
-                    } else if (songId == 6) {
-                        selectedSong = new Song(6, "Drive By", Duration.ofSeconds(197), "/music/drive_by.mp3");
-                    } else if (songId == 7) {
-                        selectedSong = new Song(7, "Fallen Kingdom", Duration.ofSeconds(252),
-                                "/music/fallen_kingdom.mp3");
-                    } else if (songId == 8) {
-                        selectedSong = new Song(8, "Hips Don't Lie", Duration.ofSeconds(218),
-                                "/music/hips_dont_lie.mp3");
-                    } else if (songId == 9) {
-                        selectedSong = new Song(9, "Lao a Lao", Duration.ofSeconds(184), "/music/lao_a_lao.mp3");
-                    } else if (songId == 10) {
-                        selectedSong = new Song(10, "Ocean Man", Duration.ofSeconds(126), "/music/ocean_man.mp3");
-                    } else if (songId == 11) {
-                        selectedSong = new Song(11, "Pa'lla Voy", Duration.ofSeconds(263), "/music/palla_voy.mp3");
-                    } else if (songId == 12) {
-                        selectedSong = new Song(12, "Triforce Medley", Duration.ofSeconds(242),
-                                "/music/tloz_triforce_medley_40.mp3");
-                    } else if (songId == 13) {
-                        selectedSong = new Song(13, "Vivir Mi Vida", Duration.ofSeconds(252),
-                                "/music/vivir_mi_vida.mp3");
+                    // Update the current song in song queue.
+                    try {
+                        sq.setCurrentSong(songId); 
+                    } catch (IllegalArgumentException e) {
+                        sq.setCurrentSong(new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"));
+                        ctx.status(400).result("Unrecognized argument");      
+                    } catch (RuntimeException e){
+                        sq.setCurrentSong(new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"));
+                        ctx.status(500).result("Internal Server Error");
                     }
-
-                    // Store selected song in session attribute if valid
-                    if (selectedSong != null) {
-                        ctx.sessionAttribute("currentSong", selectedSong);
-                    }
+                    // Store updated song queue in session attribute if valid
+                    ctx.sessionAttribute("SongQueue", sq);
                 }
 
                 // Redirect back to home route
@@ -199,6 +177,12 @@ public class App {
                     return;
                 }
 
+                // Verify user is an artist. If not, they are not allowed to access this page.
+                if (!currentUser.getRole().equals("Artist")){
+                    ctx.redirect("/home");
+                    return;
+                }
+
                 //passing the status parameter to Pebble
                 String status = ctx.queryParam("status");
                 Map<String, Object> model = new HashMap<>();
@@ -211,6 +195,7 @@ public class App {
 
                 model.put("uploadedAlbums", uploadedAlbums);
                 model.put("draftedAlbums", draftedAlbums);
+                model.put("isArtist", currentUser.getRole().equals("Artist"));
 
                 ctx.render("public/managepublications.html", model);
             });
@@ -483,15 +468,15 @@ public class App {
              */
             config.routes.post("/api/song/timeStamp", ctx -> {
                 // Initialize needed values for this route.
-                Song currentSong = ctx.sessionAttribute("currentSong");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
                 String timeStampInSeconds = ctx.formParam("seconds");
 
                 // As long as there is a currentSong and a timeStamp from the forum, update the
                 // time stamp of the current song.
-                if (currentSong != null && timeStampInSeconds != null) {
+                if (sq.getCurrentSong() != null && timeStampInSeconds != null) {
                     double seconds = Double.parseDouble(timeStampInSeconds);
-                    currentSong.setTimeStampFromSeconds(seconds);
-                    ctx.sessionAttribute("currentSong", currentSong);
+                    sq.updateCurrentSongTimeStamp(seconds);//currentSong.setTimeStampFromSeconds(seconds);
+                    ctx.sessionAttribute("SongQueue", sq);
                     ctx.status(200); // tells the client the server successfully processed request.
                 } else {
                     ctx.status(500); // tells frontend the request came through but wasn't able to finished to due an
@@ -500,10 +485,235 @@ public class App {
 
             });
 
+            /**
+             * /api/liked-songs
+             * 
+             * This route handles obtaining all liked songs a user has. It returns the result to the frontend
+             * as a JSON.
+             */
+            config.routes.get("/api/liked-songs", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                MusicLike musicLike = new MusicLike();
+
+                // Only allow users who have logged in access to this api.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                // Call DAO method using current user's ID
+                List<SongSummary> likedSongs = null;
+                try {
+                    likedSongs = musicLike.getUsersLikedSongs(currentUser.getId());
+                } catch (Exception e) {
+                    ctx.status(500); // internal server error status code if exception thrown.
+                    return;
+                }
+                
+                // Automatically serializes List<SongSummary> into JSON text
+                ctx.json(likedSongs);
+            });
+
+            /**
+             * /api/user-playlists
+             * 
+             * Obtain information to display about a user's playlists.
+             */
+            config.routes.get("/api/user-playlists", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                try {
+                    List<PlaylistSummary> userPlaylists = PowerfulPlaylist.getUserPlaylists(currentUser.getId());
+                    ctx.json(userPlaylists);
+                } catch (Exception e) {
+                    ctx.status(500).result("Error fetching user playlists");
+                }
+            });
+
+            /**
+             * /api/like/song
+             * 
+             * Handles a user liking a song.
+             */
+            config.routes.post("/api/like/song", ctx -> {
+                MusicLike musicLike = new MusicLike();
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Only allow auhtenticated users access to this api.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                int songId = Integer.parseInt(ctx.queryParam("songId"));
+                try {
+                    musicLike.likeSong(currentUser.getId(), songId);
+                } catch (Exception e) {
+                    ctx.status(500); // status internal server error if exception thrown.
+                    return;
+                }
+
+                ctx.status(200).result("Success");
+            });
+
+            /**
+             * /api/dislike/song
+             * 
+             * Responsible for handling user disliking song.
+             */
+            config.routes.post("/api/dislike/song", ctx -> {
+                MusicLike musicLike = new MusicLike();
+                User currentUser = ctx.sessionAttribute("currentUser");
+                
+                // Only allow authenticated users access to this route.
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                int songId = Integer.parseInt(ctx.queryParam("songId"));
+
+                try {
+                    musicLike.dislikeSong(currentUser.getId(), songId);                
+                } catch (Exception e) {
+                    ctx.status(500); // internal server error status if exception thrown.
+                    return;
+                }
+                
+                ctx.status(200).result("Success");
+            });
+
+            /**
+             * /api/queue/add
+             * 
+             * This is responsible for adding a song to the song queue.
+             */
+            config.routes.post("/api/queue/add", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users to access this route.
+                    return;
+                }
+
+                try {
+                    int songId = Integer.parseInt(ctx.queryParam("songId"));
+
+                    sq.enqueue(songId); // add song to the queue.
+                    ctx.sessionAttribute("SongQueue", sq); // update the value of session's song queue.
+                    ctx.status(200).result("Song added to queue");
+                } catch (IllegalArgumentException e) {
+                    ctx.status(400).result("Invalid song ID");
+                } catch (RuntimeException e) {
+                    ctx.status(500).result("Internal Server Error");
+                }
+            });
+
+            /**
+             * /api/queue/skip
+             * 
+             * This route handles requests to move to the next song in a queue.
+             * In context, this could be either a song finishing or the user wanting to jump ahead.
+             */
+            config.routes.post("/api/queue/skip", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.getNext();
+                    ctx.sessionAttribute("SongQueue", sq); // make sure to update session state of the song queue.
+                    ctx.status(200).result("Moved to next song");
+                } catch (Exception e) {
+                    ctx.status(500).result("Error moving forward track: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/queue/back
+             * 
+             * This route handles requests to move back a song in the queue.
+             */
+            config.routes.post("/api/queue/back", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.getPrior();
+                    ctx.sessionAttribute("SongQueue", sq);
+                    ctx.status(200).result("Returned to previous song"); // make sure to update session state of the song queue.
+                } catch (Exception e) {
+                    ctx.status(500).result("Error moving to previous track: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/queue/shuffle
+             * 
+             * This route handles requests to shuffle the upcoming songs in a queue.
+             */
+            config.routes.post("/api/queue/shuffle", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.shuffle();
+                    ctx.sessionAttribute("SongQueue", sq); // make sure to update session state of the song queue.
+                    ctx.status(200).result("Queue shuffled");
+                } catch (Exception e) {
+                    ctx.status(500).result("Error shuffling queue: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/queue/clear
+             * 
+             * This route is responsible for clearing all upcoming songs from the queue.
+             */
+            config.routes.post("/api/queue/clear", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                // Empty queue, and then update session state.
+                sq.empty();
+                ctx.sessionAttribute("SongQueue", sq);
+
+                // Give good status message.
+                ctx.status(200);
+            });
 
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
             config.routes.get("/promotions", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Redirect to /login if user is not logged in.
+                if (currentUser == null){ ctx.redirect("/login"); }
+
                 //grabbing the list of all promotions from the CreatePromotion class
                 CreatePromotion[] promotionArray = CreatePromotion.getAllPromotions();
 
@@ -516,7 +726,7 @@ public class App {
                         .filter(java.util.Objects::nonNull)
                         .toArray(CreatePromotion[]::new);
                 //then rendering the promotions.html page and passing the list of promotions to it.
-                ctx.render("public/promotions.html", Map.of("promotions", promotionArray));
+                ctx.render("public/promotions.html", Map.of("promotions", promotionArray, "isArtist", currentUser.getRole().equals("Artist")));
             });
 
 
@@ -524,7 +734,7 @@ public class App {
             //once the user clicks on a promotion from the list, they will be redirected to this route, which will display the details of the promotion.
             config.routes.get("/specific-promotion/{id}", ctx -> {
                 int id = Integer.parseInt(ctx.pathParam("id"));
-                //System.out.println("\n\npromotion ID: " + id+"\n\n");
+
                 //grabbing the promotion details from the CreatePromotion class using the promotion ID.
                 String name = CreatePromotion.getPromotionName(id);
                 String description = CreatePromotion.getPromotionDescription(id);
@@ -538,7 +748,6 @@ public class App {
                     return;
                 }
 
-                System.out.println("Liked: " + hasLiked);
                 if(hasLiked == true)
                 {
                     ctx.render("public/SpecificPromotion.html", Map.of(
@@ -548,7 +757,8 @@ public class App {
                         "promotion_id", id,
                         "userId", currentUser.getId(),
                         "hasLiked", "Unlike",
-                        "likeAmount", likeAmount));
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
                 }
                 else
                 {
@@ -559,7 +769,8 @@ public class App {
                         "promotion_id", id,
                         "userId", currentUser.getId(),
                         "hasLiked", "Like",
-                        "likeAmount", likeAmount));
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
                 }
             });
 
