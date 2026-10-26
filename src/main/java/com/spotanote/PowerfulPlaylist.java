@@ -80,7 +80,7 @@ public class PowerfulPlaylist {
      */
     public static List<Playlist> getArtistDraftedAlbums(int userId) {
         List<Playlist> draftAlbums = new ArrayList<>();
-        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = FALSE";
+        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = FALSE AND is_personal = FALSE";
         String songSql = "SELECT s.id, s.song_name, s.song_duration, s.file_path, s.is_public " +
                         "FROM Song s JOIN PlaylistSong ps ON s.id = ps.song_id " +
                         "WHERE ps.playlist_id = ? ORDER BY ps.song_order ASC";
@@ -210,7 +210,7 @@ public class PowerfulPlaylist {
             FROM Playlist p
             LEFT JOIN PlaylistSong ps ON p.id = ps.playlist_id
             LEFT JOIN Song s ON ps.song_id = s.id
-            WHERE p.user_id = ?
+            WHERE p.user_id = ? AND p.is_personal = TRUE
             ORDER BY p.id, ps.song_order ASC
         """;
 
