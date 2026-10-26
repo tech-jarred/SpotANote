@@ -111,74 +111,92 @@
 
                 <div class="card decision-card">
                     <div class="decision-info" style="width: 100%;">
-                        <h4>Create New Playlist / Album</h4>
-
+                        <h4>Create New Album</h4>
                         {% if status == "playlist_created" %}
-                            <p style="color: #1db954; font-weight: bold; margin-bottom: 1rem;">Playlist created successfully as a draft!</p>
+                            <p class="status-msg" style="color: #1db954; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem; transition: opacity 0.5s ease;">
+                                Playlist created successfully as a draft!
+                            </p>
                         {% elseif status == "invalid_playlist_name" %}
-                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Playlist name cannot be empty.</p>
+                            <p class="status-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem; transition: opacity 0.5s ease;">
+                                Error: Playlist name cannot be empty.
+                            </p>
                         {% endif %}
-
-                        <form action="/create-playlist" method="POST">
-                            <div class="form-group">
-                                <label for="playlistName">Playlist / Album Name</label>
-                                <input type="text" id="playlistName" name="playlistName" placeholder="e.g., Summer Vibes 2026" required>
+                        <details class="toggle-section">
+                            <summary class="toggle-header">
+                                <span>Click Here to Create</span>
+                                <span class="toggle-arrow"></span>
+                            </summary>
+            
+                            <div class="toggle-body">
+                                <form action="/create-playlist" method="POST">
+                                    <div class="form-group">
+                                        <label for="playlistName">Playlist / Album Name</label>
+                                        <input type="text" id="playlistName" name="playlistName" placeholder="e.g., Summer Vibes 2026" required>
+                                    </div>
+            
+                                    <button type="submit" class="btn-submit">Create Draft Playlist</button>
+                                </form>
                             </div>
-
-                            <button type="submit" class="btn-submit">Create Draft Playlist</button>
-                        </form>
+                        </details>
                     </div>
                 </div>
 
                 <div class="card decision-card">
                     <div class="decision-info" style="width: 100%;">
                         <h4>Upload New Music</h4>
-
                         {% if status == "success" %}
-                            <p style="color: #1db954; font-weight: bold; margin-bottom: 1rem;">Music uploaded successfully!</p>
+                            <p class="status-msg" style="color: #1db954; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem;">Music uploaded successfully!</p>
                         {% elseif status == "not_a_record_member" %}
-                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Account is not linked to a Record Member profile.</p>
+                            <p class="status-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem;">Error: Account is not linked to a Record Member profile.</p>
                         {% elseif status == "invalid_length" %}
-                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Duration must be a valid number of seconds.</p>
+                            <p class="status-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem;">Error: Duration must be a valid number of seconds.</p>
                         {% elseif status == "missing_fields" %}
-                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Please select an album and fill out all fields.</p>
+                            <p class="status-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem;">Error: Please select an album and fill out all fields.</p>
                         {% elseif status == "error" or status == "failed" %}
-                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Failed to upload music. Please try again.</p>
+                            <p class="status-msg" style="color: #dc2626; font-size: 0.85rem; font-weight: bold; margin-bottom: 0.75rem;">Failed to upload music. Please try again.</p>
                         {% endif %}
+                        <details class="toggle-section">
+                            <summary class="toggle-header">
+                                <span>Click Here to Upload</span>
+                                <span class="toggle-arrow"></span>
+                            </summary>
+            
+                            <div class="toggle-body">
+                                <form action="/upload-music" method="POST">
+                                    <div class="form-group">
+                                        <label for="playlistId">Target Album / Playlist</label>
+                                        <select id="playlistId" name="playlistId" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #444; color: #2a2a2a;" required>
+                                            <option value="" disabled selected>-- Select a Draft Album --</option>
 
-                        <form action="/upload-music" method="POST">
-                            <div class="form-group">
-                                <label for="playlistId">Target Album / Playlist</label>
-                                <select id="playlistId" name="playlistId" style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #444; color: #2a2a2a;" required>
-                                    <option value="" disabled selected>-- Select a Draft Album --</option>
-                                    
-                                    {% if draftedAlbums is not empty %}
-                                        {% for album in draftedAlbums %}
-                                            <option value="{{ album.id }}">{{ album.name }}</option>
-                                        {% endfor %}
-                                    {% else %}
-                                        <option value="" disabled>No draft albums available</option>
-                                    {% endif %}
-                                </select>
+                                            {% if draftedAlbums is not empty %}
+                                                {% for album in draftedAlbums %}
+                                                    <option value="{{ album.id }}">{{ album.name }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="" disabled>No draft albums available</option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <label for="songName">Song Title</label>
+                                        <input type="text" id="songName" name="songName" placeholder="e.g., Summer Vibes" required>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <label for="songLength">Duration (Seconds)</label>
+                                        <input type="number" id="songLength" name="songLength" min="1" placeholder="e.g., 210" required>
+                                    </div>
+            
+                                    <div class="form-group">
+                                        <label for="filePath">File Path or URL</label>
+                                        <input type="text" id="filePath" name="filePath" placeholder="e.g. /music/song.mp3" required>
+                                    </div>
+            
+                                    <button type="submit" class="btn-submit">Upload Track</button>
+                                </form>
                             </div>
-
-                            <div class="form-group">
-                                <label for="songName">Song Title</label>
-                                <input type="text" id="songName" name="songName" placeholder="e.g., Summer Vibes" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="songLength">Duration (Seconds)</label>
-                                <input type="number" id="songLength" name="songLength" min="1" placeholder="e.g., 210" required>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="filePath">File Path or URL</label>
-                                <input type="text" id="filePath" name="filePath" placeholder="e.g. /music/song.mp3" required>
-                            </div>
-
-                            <button type="submit" class="btn-submit">Upload Track</button>
-                        </form>
+                        </details>
                     </div>
                 </div>
 
@@ -191,10 +209,10 @@
                         {% else %}
                             <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
                                 {% for album in draftedAlbums %}
-                                    <details class="album-details">
+                                    <details class="toggle-section">
         
                                         <!-- Accordion Header -->
-                                        <summary class="album-summary" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                                        <summary class="toggle-header" style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
                                             
                                             <!-- Publish Button (Fixed Left) -->
                                             <form action="/publish-album" method="POST" style="margin: 0; flex-shrink: 0;"
@@ -212,11 +230,11 @@
                                             </div>
                                     
                                             <!-- Expand / Collapse Badge (Fixed Right) -->
-                                            <span class="album-expand-badge" style="flex-shrink: 0;"></span>
+                                            <span class="toggle-arrow" style="flex-shrink: 0;"></span>
                                         </summary>
                                     
                                         <!-- Accordion Tracklist -->
-                                        <div class="album-tracklist-container">
+                                        <div class="toggle-body">
     
                                             <!-- Rename Form Header
                                             <div style="margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
@@ -266,16 +284,16 @@
                         {% else %}
                             <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
                                 {% for album in uploadedAlbums %}
-                                    <details class="album-details">
+                                    <details class="toggle-section">
                                         
                                         <!-- Accordion Header -->
-                                        <summary class="album-summary">
+                                        <summary class="toggle-header">
                                             <span>{{ album.name }}</span>
-                                            <span class="album-expand-badge"></span>
+                                            <span class="toggle-arrow"></span>
                                         </summary>
 
                                         <!-- Accordion Tracklist -->
-                                        <div class="album-tracklist-container">
+                                        <div class="toggle-body">
                                             {% if album.songs is empty %}
                                                 <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks added to this album yet.</p>
                                             {% else %}
@@ -300,6 +318,26 @@
 
             </div>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                // Find all status messages on the page
+                const statusMessages = document.querySelectorAll(".status-msg");
+        
+                if (statusMessages.length > 0) {
+                    // Wait 3 seconds (3000ms), then fade out and remove them
+                    setTimeout(() => {
+                        statusMessages.forEach(msg => {
+                            msg.style.opacity = "0"; // Trigger CSS fade out
+                            
+                            // Remove from layout after fade completes (0.5s transition)
+                            setTimeout(() => {
+                                msg.style.display = "none";
+                            }, 500);
+                        });
+                    }, 3000);
+                }
+            });
+        </script>
     </body>
 </html>
 

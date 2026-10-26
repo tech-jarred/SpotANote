@@ -269,7 +269,7 @@ body {
    Custom Album Component Styles
    ========================================== */
 
-.album-details {
+.toggle-section {
     background: #f9fafb;
     border: 1.5px solid #e5e7eb;
     border-radius: 8px;
@@ -277,11 +277,11 @@ body {
     cursor: pointer;
 }
 
-.album-details[open] {
+.toggle-section[open] {
     border-color: #6d28d9;
 }
 
-.album-summary {
+.toggle-header {
     font-weight: 600;
     color: #2e1065;
     display: flex;
@@ -290,11 +290,11 @@ body {
 }
 
 /* Default state when album is collapsed */
-.album-expand-badge::after {
+.toggle-arrow::after {
     content: "Expand ▼";
 }
 
-.album-expand-badge {
+.toggle-arrow {
     font-size: 0.8rem;
     color: #6c42f5;
     font-weight: 700;
@@ -304,11 +304,11 @@ body {
 }
 
 /* State when album is open/expanded */
-.album-details[open] .album-expand-badge::after {
+.toggle-section[open] .toggle-arrow::after {
     content: "Collapse ▲";
 }
 
-.album-tracklist-container {
+.toggle-body {
     margin-top: 0.75rem;
     border-top: 1px solid #e5e7eb;
     padding-top: 0.5rem;
