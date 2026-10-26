@@ -49,15 +49,17 @@
 
     <!-- Frontend Dynamic Script -->
     <script>
-        // State store for currently liked songs
         let likedSongs = [];
+        let userPlaylists = [];
 
-        // Fetch user's liked songs from the REST API on page load
         document.addEventListener("DOMContentLoaded", () => {
-            fetchLikedSongs();
+            // Fetch liked songs first, then user playlists so heart statuses sync correctly
+            fetchLikedSongs().then(() => {
+                fetchUserPlaylists();
+            });
         });
 
-        // 1. Fetch liked songs from backend
+        // 1. Fetch Liked Songs
         async function fetchLikedSongs() {
             try {
                 const response = await fetch('/api/liked-songs');
@@ -73,7 +75,23 @@
             renderLikedSongs();
         }
 
-        // 2. Render Liked Songs inside the dropdown container
+        // 2. Fetch User Created Playlists
+        async function fetchUserPlaylists() {
+            try {
+                const response = await fetch('/api/user-playlists');
+                if (response.ok) {
+                    userPlaylists = await response.json();
+                } else {
+                    userPlaylists = [];
+                }
+            } catch (err) {
+                console.error("Error fetching user playlists:", err);
+                userPlaylists = [];
+            }
+            renderUserPlaylists();
+        }
+
+        // 3. Render Liked Songs
         function renderLikedSongs() {
             const wrapper = document.getElementById('liked-songs-wrapper');
             wrapper.innerHTML = '';
@@ -89,7 +107,52 @@
             });
         }
 
-        // 3. Helper to build a song pill element with icon buttons & tooltips
+        // 4. Render User Created Playlists
+        function renderUserPlaylists() {
+            const container = document.getElementById('user-playlists-container');
+            container.innerHTML = '';
+
+            if (!userPlaylists || userPlaylists.length === 0) {
+                return;
+            }
+
+            userPlaylists.forEach(playlist => {
+                const wrapperId = `playlist-wrapper-${playlist.playlistId}`;
+
+                // Create Playlist Header Pill
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'playlist-card';
+                cardHeader.onclick = function () { togglePlaylist(wrapperId, this); };
+                cardHeader.innerHTML = `
+                    <span class="playlist-title">
+                        <span class="playlist-arrow">▼</span>
+                        ${escapeHtml(playlist.playlistName)}
+                        <span class="playlist-arrow">▼</span>
+                    </span>
+                `;
+
+                // Create Accordion Dropdown Wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'playlist-songs-wrapper';
+                wrapper.id = wrapperId;
+
+                if (!playlist.songs || playlist.songs.length === 0) {
+                    wrapper.innerHTML = '<div class="empty-playlist-msg">This playlist has no songs yet.</div>';
+                } else {
+                    playlist.songs.forEach(song => {
+                        // Check if song is liked by cross-referencing likedSongs array
+                        const isLiked = likedSongs.some(ls => ls.songId === song.songId);
+                        const songPill = createSongPill(song, isLiked);
+                        wrapper.appendChild(songPill);
+                    });
+                }
+
+                container.appendChild(cardHeader);
+                container.appendChild(wrapper);
+            });
+        }
+
+        // 5. Build Song Pill Element
         function createSongPill(song, isLiked) {
             const pill = document.createElement('div');
             pill.className = 'song-pill';
@@ -117,14 +180,14 @@
             return pill;
         }
 
-        // 4. Toggle Playlist Accordion Open/Closed
+        // 6. Accordion Toggle
         function togglePlaylist(wrapperId, headerElement) {
             const wrapper = document.getElementById(wrapperId);
             wrapper.classList.toggle('open');
             headerElement.classList.toggle('open');
         }
 
-        // 5. Handle Like / Dislike Toggle API Call
+        // 7. Toggle Like Status
         async function toggleLikeSong(songId, songName, currentlyLiked) {
             try {
                 const endpoint = currentlyLiked 
@@ -135,13 +198,13 @@
 
                 if (response.ok) {
                     if (currentlyLiked) {
-                        // Remove song from local array
                         likedSongs = likedSongs.filter(s => s.songId !== songId);
                     } else {
-                        // Add song to local array
                         likedSongs.push({ songId: songId, songName: songName });
                     }
+                    // Re-render both views to reflect heart status across all playlists
                     renderLikedSongs();
+                    renderUserPlaylists();
                 } else {
                     alert("Could not update song status. Please try again.");
                 }
@@ -150,9 +213,8 @@
             }
         }
 
-        // 6. Action Handlers
+        // Utility Handlers
         function selectSong(songId) {
-            // Post selection to current select-song route
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/select-song';
@@ -169,15 +231,12 @@
 
         function addToQueue(songId) {
             console.log(`Add song ${songId} to queue`);
-            // Place backend call for queue insertion here when ready
         }
 
         function addToPlaylist(songId) {
             console.log(`Open playlist modal for song ${songId}`);
-            // Place playlist creation/assignment flow here when ready
         }
 
-        // Utility sanitation helpers
         function escapeHtml(str) {
             return str.replace(/[&<>'"]/g, 
                 tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));

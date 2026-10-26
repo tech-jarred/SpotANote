@@ -7,7 +7,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
  * PowerfulPlaylist class
@@ -193,5 +196,60 @@ public class PowerfulPlaylist {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * 
+     * @param userId an int, the id of the user who's playlists we want to obtain.
+     * @throws RuntimeException in the event of a database connection failure.
+     * @return List of PlaylistsSummary records, all playlists (and associated songs) a user has
+     */
+    public static List<PlaylistSummary> getUserPlaylists(int userId) {
+        String query = """
+            SELECT p.id AS playlist_id, p.playlist_name, s.id AS song_id, s.song_name
+            FROM Playlist p
+            LEFT JOIN PlaylistSong ps ON p.id = ps.playlist_id
+            LEFT JOIN Song s ON ps.song_id = s.id
+            WHERE p.user_id = ?
+            ORDER BY p.id, ps.song_order ASC
+        """;
+
+        // Use LinkedHashMap to preserve query sort order for playlists
+        Map<Integer, String> playlistNames = new LinkedHashMap<>();
+        Map<Integer, List<SongSummary>> playlistSongs = new HashMap<>();
+
+        try (Connection conn = DBExplorer.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setInt(1, userId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    int playlistId = rs.getInt("playlist_id");
+                    String playlistName = rs.getString("playlist_name");
+
+                    playlistNames.putIfAbsent(playlistId, playlistName);
+                    playlistSongs.putIfAbsent(playlistId, new ArrayList<>());
+
+                    int songId = rs.getInt("song_id");
+                    // Check if the LEFT JOIN produced a valid song (playlist is not empty)
+                    if (!rs.wasNull()) {
+                        String songName = rs.getString("song_name");
+                        playlistSongs.get(playlistId).add(new SongSummary(songId, songName));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving user playlists for userId: " + userId, e);
+        }
+
+        // Build result DTO list
+        List<PlaylistSummary> result = new ArrayList<>();
+        for (Map.Entry<Integer, String> entry : playlistNames.entrySet()) {
+            int pId = entry.getKey();
+            result.add(new PlaylistSummary(pId, entry.getValue(), playlistSongs.get(pId)));
+        }
+
+        return result;
     }
 }

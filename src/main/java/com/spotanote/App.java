@@ -530,6 +530,27 @@ public class App {
             });
 
             /**
+             * /api/user-playlists
+             * 
+             * Obtain information to display about a user's playlists.
+             */
+            config.routes.get("/api/user-playlists", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+
+                try {
+                    List<PlaylistSummary> userPlaylists = PowerfulPlaylist.getUserPlaylists(currentUser.getId());
+                    ctx.json(userPlaylists);
+                    System.out.println("Obtained playlists: " + userPlaylists.toString());
+                } catch (Exception e) {
+                    ctx.status(500).result("Error fetching user playlists");
+                }
+            });
+
+            /**
              * /api/like/song
              * 
              * Handles a user liking a song.
