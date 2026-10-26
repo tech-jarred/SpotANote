@@ -111,6 +111,27 @@
 
                 <div class="card decision-card">
                     <div class="decision-info" style="width: 100%;">
+                        <h4>Create New Playlist / Album</h4>
+
+                        {% if status == "playlist_created" %}
+                            <p style="color: #1db954; font-weight: bold; margin-bottom: 1rem;">Playlist created successfully as a draft!</p>
+                        {% elseif status == "invalid_playlist_name" %}
+                            <p style="color: #ff4d4d; font-weight: bold; margin-bottom: 1rem;">Error: Playlist name cannot be empty.</p>
+                        {% endif %}
+
+                        <form action="/create-playlist" method="POST">
+                            <div class="form-group">
+                                <label for="playlistName">Playlist / Album Name</label>
+                                <input type="text" id="playlistName" name="playlistName" placeholder="e.g., Summer Vibes 2026" required>
+                            </div>
+
+                            <button type="submit" class="btn-submit">Create Draft Playlist</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card decision-card">
+                    <div class="decision-info" style="width: 100%;">
                         <h4>Upload New Music</h4>
 
                         <!-- Pebble Template Logic Placement -->
@@ -139,47 +160,6 @@
                             </div>
                             <button type="submit" class="btn-submit">Upload Track</button>
                         </form>
-
-                    </div>
-                </div>
-
-                <div class="card decision-card">
-                    <div class="decision-info" style="width: 100%;">
-                        <h4>Uploaded Albums</h4>
-
-                        {% if uploadedAlbums is empty %}
-                            <p class="subtitle" style="font-style: italic;">No uploaded albums found.</p>
-                        {% else %}
-                            <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
-                                {% for album in uploadedAlbums %}
-                                    <details class="album-details">
-                                        
-                                        <!-- Accordion Header -->
-                                        <summary class="album-summary">
-                                            <span>{{ album.name }}</span>
-                                            <span class="album-expand-badge"></span>
-                                        </summary>
-
-                                        <!-- Accordion Tracklist -->
-                                        <div class="album-tracklist-container">
-                                            {% if album.songs is empty %}
-                                                <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks added to this album yet.</p>
-                                            {% else %}
-                                                <ul style="list-style: none;">
-                                                    {% for song in album.songs %}
-                                                        <li class="album-track-item">
-                                                            <span>{{ song.name }}</span>
-                                                            <span class="album-track-duration">{{ song.formattedDuration }}</span>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        </div>
-
-                                    </details>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
 
                     </div>
                 </div>
@@ -251,6 +231,47 @@
                                             </ul>
                                         </div>
                                     
+                                    </details>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="card decision-card">
+                    <div class="decision-info" style="width: 100%;">
+                        <h4>Uploaded Albums</h4>
+
+                        {% if uploadedAlbums is empty %}
+                            <p class="subtitle" style="font-style: italic;">No uploaded albums found.</p>
+                        {% else %}
+                            <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+                                {% for album in uploadedAlbums %}
+                                    <details class="album-details">
+                                        
+                                        <!-- Accordion Header -->
+                                        <summary class="album-summary">
+                                            <span>{{ album.name }}</span>
+                                            <span class="album-expand-badge"></span>
+                                        </summary>
+
+                                        <!-- Accordion Tracklist -->
+                                        <div class="album-tracklist-container">
+                                            {% if album.songs is empty %}
+                                                <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks added to this album yet.</p>
+                                            {% else %}
+                                                <ul style="list-style: none;">
+                                                    {% for song in album.songs %}
+                                                        <li class="album-track-item">
+                                                            <span>{{ song.name }}</span>
+                                                            <span class="album-track-duration">{{ song.formattedDuration }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </div>
+
                                     </details>
                                 {% endfor %}
                             </div>

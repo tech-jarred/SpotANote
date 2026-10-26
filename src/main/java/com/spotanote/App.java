@@ -201,8 +201,8 @@ public class App {
                 model.put("status", status);
 
                 //fetching public albums created by this artist/user
-                List<Playlist> uploadedAlbums = PlaylistVisibility.getArtistUploadedAlbums(currentUser.getId());
-                List<Playlist> draftedAlbums = PlaylistVisibility.getArtistDraftedAlbums(currentUser.getId());
+                List<Playlist> uploadedAlbums = PowerfulPlaylist.getArtistUploadedAlbums(currentUser.getId());
+                List<Playlist> draftedAlbums = PowerfulPlaylist.getArtistDraftedAlbums(currentUser.getId());
 
                 model.put("uploadedAlbums", uploadedAlbums);
                 model.put("draftedAlbums", draftedAlbums);
@@ -325,6 +325,39 @@ public class App {
             });
 
             /**
+             * /create-playlist route
+             * 
+             * Handles creating a new draft playlist/album for the logged-in user
+             */
+            config.routes.post("/create-playlist", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistName = ctx.formParam("playlistName");
+
+                if (playlistName == null || playlistName.trim().isEmpty()) {
+                    ctx.redirect("/managepublications?status=invalid_playlist_name");
+                    return;
+                }
+
+                try {
+                    // Always creates as draft
+                    Playlist newPlaylist = PowerfulPlaylist.createPlaylist(currentUser.getId(), playlistName);
+
+                    if (newPlaylist != null) {
+                        ctx.redirect("/managepublications?status=playlist_created");
+                    } else {
+                        ctx.redirect("/managepublications?status=failed");
+                    }
+                } catch (IllegalArgumentException e) {
+                    ctx.redirect("/managepublications?status=error");
+                }
+            });
+
+            /**
              * /rename-album route
              * 
              * Updates the title of a draft album
@@ -342,7 +375,7 @@ public class App {
                 if (playlistIdStr != null && newTitle != null) {
                     try {
                         int playlistId = Integer.parseInt(playlistIdStr);
-                        boolean success = PlaylistVisibility.renamePlaylist(playlistId, newTitle);
+                        boolean success = PowerfulPlaylist.renamePlaylist(playlistId, newTitle);
 
                         if (success) {
                             ctx.redirect("/managepublications?status=album_renamed");
