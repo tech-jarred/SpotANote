@@ -74,6 +74,7 @@ public class SongQueue {
         // Get the old current song (one to be replaced), and if it isn't null, add it to head of upcomingSongs deque.
         Song oldCurrentSong = getCurrentSong();
         if (oldCurrentSong != null){
+            updateCurrentSongTimeStamp(0); // Change the time stamp to zero seconds before moving its place in queue.
             upcomingSongs.addFirst(oldCurrentSong);
         }
 
@@ -192,6 +193,7 @@ public class SongQueue {
         Song oldCurrentSong = getCurrentSong();
         
         if (oldCurrentSong != null){ // only add oldCurrentSong to priorSongs deque if its not null.
+            updateCurrentSongTimeStamp(0); // Change the time stamp to zero seconds before moving its place in queue.
             addToPriorSongs(oldCurrentSong);
         }
 
@@ -211,6 +213,15 @@ public class SongQueue {
 
         // Update the current song.
         setCurrentSong(newCurrentSong);
+    }
+
+    /**
+     * Updates the timeStamp value of the current song attribute.
+     * 
+     * @param seconds a double, the amount of seconds which has passed through the song. Between 0 and the maximum length of the song.
+     */
+    public void updateCurrentSongTimeStamp(double seconds){
+        currentSong.setTimeStampFromSeconds(seconds);
     }
 
     /**

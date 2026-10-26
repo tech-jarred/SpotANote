@@ -89,18 +89,17 @@ public class App {
                 }
                 SongQueue sq = ctx.sessionAttribute("SongQueue");
                 Song currentSong = sq.getCurrentSong();
-                //System.out.println(sq.getCurrentSong().getName());
+
                 if (currentSong == null && !sq.isQueuedSongsEmpty()) {
                     // If the currentSong is empty and there are songs waaiting in queue, get the first song.
                     sq.getNext();
-                    currentSong = sq.getCurrentSong(); System.out.println("I'm inside the if" + currentSong.getName());
+                    currentSong = sq.getCurrentSong();
                 }
                 else if (currentSong == null) {
-                    currentSong = new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/"); System.out.println("lolfuku");
+                    currentSong = new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/");
                 }
 
                 // Render Home.html file, passing username through for Pebble formatting.
-                System.out.println("Before render, values are {filePath, timeStamp, name} " + currentSong.getFilePath() + currentSong.getFormattedDuration() + currentSong.getName());
                 ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
                         "current_song_file_path", currentSong.getFilePath(),
                         "timeStamp", currentSong.getTimeStamp().toSeconds(),
@@ -159,7 +158,7 @@ public class App {
                     // Store updated song queue in session attribute if valid
                     ctx.sessionAttribute("SongQueue", sq);
 
-                    SongQueue help = ctx.sessionAttribute("SongQueue"); System.out.println("The current song of song queue inside of select-song is " + help.getCurrentSong().getName());
+                    SongQueue help = ctx.sessionAttribute("SongQueue");
                 }
 
                 // Redirect back to home route
@@ -469,15 +468,15 @@ public class App {
              */
             config.routes.post("/api/song/timeStamp", ctx -> {
                 // Initialize needed values for this route.
-                Song currentSong = ctx.sessionAttribute("currentSong");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
                 String timeStampInSeconds = ctx.formParam("seconds");
 
                 // As long as there is a currentSong and a timeStamp from the forum, update the
                 // time stamp of the current song.
-                if (currentSong != null && timeStampInSeconds != null) {
+                if (sq.getCurrentSong() != null && timeStampInSeconds != null) {
                     double seconds = Double.parseDouble(timeStampInSeconds);
-                    currentSong.setTimeStampFromSeconds(seconds);
-                    ctx.sessionAttribute("currentSong", currentSong);
+                    sq.updateCurrentSongTimeStamp(seconds);//currentSong.setTimeStampFromSeconds(seconds);
+                    ctx.sessionAttribute("SongQueue", sq);
                     ctx.status(200); // tells the client the server successfully processed request.
                 } else {
                     ctx.status(500); // tells frontend the request came through but wasn't able to finished to due an
@@ -530,7 +529,6 @@ public class App {
                 try {
                     List<PlaylistSummary> userPlaylists = PowerfulPlaylist.getUserPlaylists(currentUser.getId());
                     ctx.json(userPlaylists);
-                    System.out.println("Obtained playlists: " + userPlaylists.toString());
                 } catch (Exception e) {
                     ctx.status(500).result("Error fetching user playlists");
                 }
@@ -590,6 +588,8 @@ public class App {
             });
 
             /**
+             * /api/queue/add
+             * 
              * This is responsible for adding a song to the song queue.
              */
             config.routes.post("/api/queue/add", ctx -> {
@@ -611,6 +611,76 @@ public class App {
                     ctx.status(400).result("Invalid song ID");
                 } catch (RuntimeException e) {
                     ctx.status(500).result("Internal Server Error");
+                }
+            });
+
+            /**
+             * /api/queue/skip
+             * 
+             * This route handles requests to move to the next song in a queue.
+             * In context, this could be either a song finishing or the user wanting to jump ahead.
+             */
+            config.routes.post("/api/queue/skip", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.getNext();
+                    ctx.sessionAttribute("SongQueue", sq); // make sure to update session state of the song queue.
+                    ctx.status(200).result("Moved to next song");
+                } catch (Exception e) {
+                    ctx.status(500).result("Error moving forward track: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/queue/back
+             * 
+             * This route handles requests to move back a song in the queue.
+             */
+            config.routes.post("/api/queue/back", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.getPrior();
+                    ctx.sessionAttribute("SongQueue", sq);
+                    ctx.status(200).result("Returned to previous song"); // make sure to update session state of the song queue.
+                } catch (Exception e) {
+                    ctx.status(500).result("Error moving to previous track: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/queue/shuffle
+             * 
+             * This route handles requests to shuffle the upcoming songs in a queue.
+             */
+            config.routes.post("/api/queue/shuffle", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    sq.shuffle();
+                    ctx.sessionAttribute("SongQueue", sq); // make sure to update session state of the song queue.
+                    ctx.status(200).result("Queue shuffled");
+                } catch (Exception e) {
+                    ctx.status(500).result("Error shuffling queue: " + e.getMessage());
                 }
             });
 
