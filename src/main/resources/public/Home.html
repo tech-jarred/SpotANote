@@ -9,17 +9,24 @@
 <body>
 
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-brand">Spotanote</div>
-        <div class="nav-user-controls">
-            <a href="/home" class="nav-link">Home</a>
-            <a href="/promotions" class="nav-link">Promotion</a>
-            <a href="/music" class="nav-link">Music Library</a>
-            <form action="/logout" method="POST">
-                <button type="submit" class="btn-logout">Logout</button>
-            </form>
-        </div>
-    </nav>
+        <nav class="navbar">
+            <div class="nav-brand">Spotanote</div>
+            <div class="nav-user-controls">
+                <a href="/home" class="nav-link">Home</a>
+                <a href="/promotions" class="nav-link">Promotion</a>
+                <a href="/music-library" class="nav-link">Music Library</a>
+                
+                {% if isArtist %}
+                    <a href="/managepublications" class="nav-link">Manage Publications</a>
+                {% endif %}
+
+                <a href="/search" class="nav-link">Search</a>
+                
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            </div>
+        </nav>
 
     <!-- Main Wrapper -->
     <div class="main-wrapper">

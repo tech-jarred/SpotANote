@@ -95,7 +95,7 @@ public class AppTest {
             loginTestUser(client);
 
             // Simulate and verify user navigating to music selection page.
-            var musicPageResponse = client.get("/music");
+            var musicPageResponse = client.get("/music-library");
             assertEquals(200, musicPageResponse.code(), "Should successfully render the music library page.");
 
             // Simulate user selecting song "Revenge" from music page.

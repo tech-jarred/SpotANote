@@ -103,16 +103,17 @@ public class App {
                 ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
                         "current_song_file_path", currentSong.getFilePath(),
                         "timeStamp", currentSong.getTimeStamp().toSeconds(),
-                        "songName", currentSong.getName()));
+                        "songName", currentSong.getName(),
+                        "isArtist", currentUser.getRole().equals("Artist")));
             });
 
             /**
-             * /music route
+             * /music-library route
              * 
              * This route is the landing page for all music on the platform. Users can
              * select either an individual song OR playlist from this page.
              */
-            config.routes.get("/music", ctx -> {
+            config.routes.get("/music-library", ctx -> {
                 // Verify user is logged in
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null) {
@@ -121,7 +122,7 @@ public class App {
                 }
 
                 // Render music selection page
-                ctx.render("public/music.html");
+                ctx.render("public/music.html", java.util.Map.of("isArtist", currentUser.getRole().equals("Artist")));
             });
 
             /**
@@ -196,6 +197,7 @@ public class App {
 
                 model.put("uploadedAlbums", uploadedAlbums);
                 model.put("draftedAlbums", draftedAlbums);
+                model.put("isArtist", currentUser.getRole().equals("Artist"));
 
                 ctx.render("public/managepublications.html", model);
             });
@@ -687,6 +689,11 @@ public class App {
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
             config.routes.get("/promotions", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+
+                // Redirect to /login if user is not logged in.
+                if (currentUser == null){ ctx.redirect("/login"); }
+
                 //grabbing the list of all promotions from the CreatePromotion class
                 CreatePromotion[] promotionArray = CreatePromotion.getAllPromotions();
 
@@ -699,7 +706,7 @@ public class App {
                         .filter(java.util.Objects::nonNull)
                         .toArray(CreatePromotion[]::new);
                 //then rendering the promotions.html page and passing the list of promotions to it.
-                ctx.render("public/promotions.html", Map.of("promotions", promotionArray));
+                ctx.render("public/promotions.html", Map.of("promotions", promotionArray, "isArtist", currentUser.getRole().equals("Artist")));
             });
 
 
@@ -707,7 +714,7 @@ public class App {
             //once the user clicks on a promotion from the list, they will be redirected to this route, which will display the details of the promotion.
             config.routes.get("/specific-promotion/{id}", ctx -> {
                 int id = Integer.parseInt(ctx.pathParam("id"));
-                //System.out.println("\n\npromotion ID: " + id+"\n\n");
+
                 //grabbing the promotion details from the CreatePromotion class using the promotion ID.
                 String name = CreatePromotion.getPromotionName(id);
                 String description = CreatePromotion.getPromotionDescription(id);
@@ -721,7 +728,6 @@ public class App {
                     return;
                 }
 
-                System.out.println("Liked: " + hasLiked);
                 if(hasLiked == true)
                 {
                     ctx.render("public/SpecificPromotion.html", Map.of(
@@ -731,7 +737,8 @@ public class App {
                         "promotion_id", id,
                         "userId", currentUser.getId(),
                         "hasLiked", "Unlike",
-                        "likeAmount", likeAmount));
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
                 }
                 else
                 {
@@ -742,7 +749,8 @@ public class App {
                         "promotion_id", id,
                         "userId", currentUser.getId(),
                         "hasLiked", "Like",
-                        "likeAmount", likeAmount));
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
                 }
             });
 
