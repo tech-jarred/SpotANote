@@ -177,11 +177,12 @@ public class PowerfulPlaylist {
         if (newName == null || newName.trim().isEmpty()) {
             return false;
         }
-
-        String sql = "UPDATE Playlist SET name = ? WHERE id = ?";
-        
+    
+        // Match the column name 'playlist_name' used across PowerfulPlaylist
+        String sql = "UPDATE Playlist SET playlist_name = ? WHERE id = ?";
+                
         try (Connection conn = DBExplorer.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, newName.trim());
             stmt.setInt(2, playlistId);

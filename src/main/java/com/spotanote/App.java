@@ -207,6 +207,7 @@ public class App {
                 //fetching public albums created by this artist/user
                 List<Playlist> uploadedAlbums = PowerfulPlaylist.getArtistUploadedAlbums(currentUser.getId());
                 List<Playlist> draftedAlbums = PowerfulPlaylist.getArtistDraftedAlbums(currentUser.getId());
+                model.put("status", ctx.queryParam("status"));
 
                 model.put("uploadedAlbums", uploadedAlbums);
                 model.put("draftedAlbums", draftedAlbums);
@@ -386,6 +387,7 @@ public class App {
              * 
              * Updates the title of a draft album
              */
+            // Route 1: Rename Draft Album
             config.routes.post("/rename-album", ctx -> {
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null) {
@@ -396,22 +398,62 @@ public class App {
                 String playlistIdStr = ctx.formParam("playlistId");
                 String newTitle = ctx.formParam("newTitle");
 
-                if (playlistIdStr != null && newTitle != null) {
+                if (playlistIdStr != null && newTitle != null && !newTitle.trim().isEmpty()) {
                     try {
                         int playlistId = Integer.parseInt(playlistIdStr);
+                        
+                        // Delegate database update to PowerfulPlaylist
                         boolean success = PowerfulPlaylist.renamePlaylist(playlistId, newTitle);
 
                         if (success) {
                             ctx.redirect("/managepublications?status=album_renamed");
-                        } else {
-                            ctx.redirect("/managepublications?status=error");
+                            return;
                         }
                     } catch (NumberFormatException e) {
-                        ctx.redirect("/managepublications?status=error");
+                        e.printStackTrace();
                     }
-                } else {
-                    ctx.redirect("/managepublications");
                 }
+                
+                ctx.redirect("/managepublications?status=rename_failed");
+            });
+
+            // Route 2: Delete Draft Album
+            config.routes.post("/delete-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+
+                if (playlistIdStr != null) {
+                    try (Connection conn = DBExplorer.getConnection()) {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+
+                        // 1. Unlink song mappings in PlaylistSong table first
+                        try (PreparedStatement stmtJunction = conn.prepareStatement(
+                                "DELETE FROM PlaylistSong WHERE playlist_id = ?")) {
+                            stmtJunction.setInt(1, playlistId);
+                            stmtJunction.executeUpdate();
+                        }
+
+                        // 2. Delete the draft playlist
+                        try (PreparedStatement stmtPlaylist = conn.prepareStatement(
+                                "DELETE FROM Playlist WHERE id = ? AND is_public = FALSE")) {
+                            stmtPlaylist.setInt(1, playlistId);
+                            int rowsDeleted = stmtPlaylist.executeUpdate();
+
+                            if (rowsDeleted > 0) {
+                                ctx.redirect("/managepublications?status=album_deleted");
+                                return;
+                            }
+                        }
+                    } catch (SQLException | NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                }
+                ctx.redirect("/managepublications?status=delete_failed");
             });
 
             /**
