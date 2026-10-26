@@ -1,5 +1,9 @@
 package com.spotanote;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -222,34 +226,55 @@ public class App {
                     return;
                 }
 
-                //extracting form fields from html
                 String songName = ctx.formParam("songName");
                 String songLengthStr = ctx.formParam("songLength");
                 String filePath = ctx.formParam("filePath");
+                String playlistIdStr = ctx.formParam("playlistId");
 
-                //checks to see if fields are empty
-                if (songLengthStr == null || songLengthStr.trim().isEmpty()) {
+                if (songLengthStr == null || songLengthStr.trim().isEmpty() ||
+                    playlistIdStr == null || playlistIdStr.trim().isEmpty()) {
                     ctx.redirect("/managepublications?status=missing_fields");
                     return;
                 }
 
                 try {
                     int songLength = Integer.parseInt(songLengthStr);
+                    int playlistId = Integer.parseInt(playlistIdStr);
 
-                    //call the static helper method from MusicUpload
                     int recordMemberId = MusicUpload.getRecordMemberIdByUserId(currentUser.getId());
 
                     if (recordMemberId <= 0) {
-                        System.err.println("User ID " + currentUser.getId() + " is not registered in RecordMember table.");
                         ctx.redirect("/managepublications?status=not_a_record_member");
                         return;
                     }
 
-                    //passing values into MusicUpload method
+                    // 1. Call your original musicUpload method unchanged
                     int songId = MusicUpload.musicUpload(songName, songLength, filePath, recordMemberId);
 
                     if (songId > 0) {
-                        //success: redirect back to manage publications
+                        // 2. Link the new song to the chosen playlist/album in PlaylistSong
+                        String getMaxOrderSql = "SELECT COALESCE(MAX(song_order), 0) + 1 FROM PlaylistSong WHERE playlist_id = ?";
+                        String insertJunctionSql = "INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES (?, ?, ?)";
+
+                        try (Connection conn = DBExplorer.getConnection()) {
+                            int nextOrder = 1;
+                            try (PreparedStatement orderStmt = conn.prepareStatement(getMaxOrderSql)) {
+                                orderStmt.setInt(1, playlistId);
+                                try (ResultSet rs = orderStmt.executeQuery()) {
+                                    if (rs.next()) {
+                                        nextOrder = rs.getInt(1);
+                                    }
+                                }
+                            }
+
+                            try (PreparedStatement junctionStmt = conn.prepareStatement(insertJunctionSql)) {
+                                junctionStmt.setInt(1, playlistId);
+                                junctionStmt.setInt(2, songId);
+                                junctionStmt.setInt(3, nextOrder);
+                                junctionStmt.executeUpdate();
+                            }
+                        }
+
                         ctx.redirect("/managepublications?status=success");
                     } else {
                         ctx.redirect("/managepublications?status=failed");
@@ -258,12 +283,11 @@ public class App {
                 } catch (NumberFormatException e) {
                     ctx.redirect("/managepublications?status=invalid_length");
                 } catch (IllegalArgumentException e) {
-                    //catches duplicate file paths or blank input errors thrown by MusicUpload
+                    ctx.redirect("/managepublications?status=error");
+                } catch (SQLException e) {
+                    System.err.println("Error linking song to playlist: " + e.getMessage());
                     ctx.redirect("/managepublications?status=error");
                 }
-
-                //render music selection page
-                //ctx.render("public/managepublications.html");
             });
 
             /**

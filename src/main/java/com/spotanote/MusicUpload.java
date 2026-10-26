@@ -96,10 +96,10 @@ public class MusicUpload {
      * Frontend helper method to find the RecordMember ID associated with a given User ID
      */
     public static int getRecordMemberIdByUserId(int userId) {
-        //String sql = "SELECT id FROM RecordMember WHERE artist_id = ?";
-        String sql = "SELECT rm.id FROM RecordMember rm " +
+        String sql = "SELECT id FROM RecordMember WHERE artist_id = ?";
+        /*String sql = "SELECT rm.id FROM RecordMember rm " +
                  "JOIN User u ON rm.artist_id = u.roleid1 OR rm.artist_id = u.roleid2 " +
-                 "WHERE u.id = ?";
+                 "WHERE u.id = ?";*/
 
         try (Connection connect = DBExplorer.getConnection();
              PreparedStatement stmt = connect.prepareStatement(sql)) {
