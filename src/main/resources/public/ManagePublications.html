@@ -103,7 +103,7 @@
 
         <div class="main-wrapper">
             <div class="card">
-                <h2 class=""page-title>Manage Publications</h2>
+                <h2 class="page-title">Manage Publications</h2>
                 <p class="subtitle">Manage your publications here.</p>
             </div>
 
@@ -219,18 +219,36 @@
                                     
                                         <!-- Accordion Tracklist -->
                                         <div class="album-tracklist-container">
-                                            {% if album.songs is empty %}
-                                                <p class="subtitle" style="font-size: 0.85rem; margin: 0.4rem 0;">No tracks in this draft yet.</p>
-                                            {% else %}
-                                                <ul style="list-style: none;">
-                                                    {% for song in album.songs %}
-                                                        <li class="album-track-item">
-                                                            <span>{{ song.name }}</span>
+    
+                                            <!-- Rename Form Header
+                                            <div style="margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                                                <form action="/rename-album" method="POST" style="display: flex; gap: 0.5rem; align-items: center;">
+                                                    <input type="hidden" name="playlistId" value="{{ album.id }}">
+                                                    <input type="text" name="newTitle" value="{{ album.name }}" required
+                                                           style="padding: 0.35rem 0.6rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.85rem; flex: 1;">
+                                                    <button type="submit" class="btn-action-publish" style="padding: 0.35rem 0.75rem;">Save Title</button>
+                                                </form>
+                                            </div>-->
+                                        
+                                            <!-- Tracklist -->
+                                            <ul style="list-style: none; padding: 0; margin: 0.5rem 0 0 0;">
+                                                {% for song in album.songs %}
+                                                    <li class="album-track-item">
+                                                        <span>{{ song.name }}</span>
+                                                        
+                                                        <div style="display: flex; align-items: center; gap: 0.75rem;">
                                                             <span class="album-track-duration">{{ song.formattedDuration }}</span>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
+                                                            
+                                                            <!-- Delete Song Form -->
+                                                            <form action="/delete-song" method="POST" style="margin: 0;"
+                                                                  onsubmit="return confirm('Are you sure you want to permanently delete &quot;{{ song.name }}&quot;?');">
+                                                                <input type="hidden" name="songId" value="{{ song.id }}">
+                                                                <button type="submit" class="btn-action-delete">Delete Track</button>
+                                                            </form>
+                                                        </div>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
                                         </div>
                                     
                                     </details>

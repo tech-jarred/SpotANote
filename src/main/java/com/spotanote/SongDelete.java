@@ -21,6 +21,7 @@ public class SongDelete {
     public static void deleteSong(int songID)
     {
         String checkSql = "SELECT id FROM Song WHERE id = ?";
+        String deleteJunctionSql = "DELETE FROM PlaylistSong WHERE song_id = ?"; //added method for dependencies
         String deleteSql = "DELETE FROM Song WHERE id = ?";
         try (Connection connect = DBExplorer.getConnection())
         {
@@ -34,6 +35,12 @@ public class SongDelete {
                         throw new IllegalArgumentException("Song with ID " + songID + " does not exist.");
                     }
                 }
+            }
+
+            //remove entries in junction table
+            try (PreparedStatement junctionStmt = connect.prepareStatement(deleteJunctionSql)) {
+                junctionStmt.setInt(1, songID);
+                junctionStmt.executeUpdate();
             }
 
             //update database

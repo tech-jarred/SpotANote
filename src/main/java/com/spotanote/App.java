@@ -296,6 +296,68 @@ public class App {
             });
 
             /**
+             * /delete-song route
+             * 
+             * Permanently deletes a song from the database
+             */
+            config.routes.post("/delete-song", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String songIdStr = ctx.formParam("songId");
+
+                if (songIdStr != null) {
+                    try {
+                        int songId = Integer.parseInt(songIdStr);
+
+                        SongDelete.deleteSong(songId);
+
+                        ctx.redirect("/managepublications?status=song_deleted");
+                    } catch (NumberFormatException e) {
+                        ctx.redirect("/managepublications?status=error");
+                    }
+                } else {
+                    ctx.redirect("/managepublications");
+                }
+            });
+
+            /**
+             * /rename-album route
+             * 
+             * Updates the title of a draft album
+             */
+            config.routes.post("/rename-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+                String newTitle = ctx.formParam("newTitle");
+
+                if (playlistIdStr != null && newTitle != null) {
+                    try {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+                        boolean success = PlaylistVisibility.renamePlaylist(playlistId, newTitle);
+
+                        if (success) {
+                            ctx.redirect("/managepublications?status=album_renamed");
+                        } else {
+                            ctx.redirect("/managepublications?status=error");
+                        }
+                    } catch (NumberFormatException e) {
+                        ctx.redirect("/managepublications?status=error");
+                    }
+                } else {
+                    ctx.redirect("/managepublications");
+                }
+            });
+
+            /**
              * /logout route
              * 
              * This route will be responsible for clearing session variables, and

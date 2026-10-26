@@ -201,4 +201,32 @@ public class PlaylistVisibility {
 
         return draftAlbums;
     }
+
+    /**
+     * Renames a playlist/album.
+     * 
+     * @param playlistId The ID of the playlist
+     * @param newName The new title for the playlist
+     * @return true if updated successfully
+     */
+    public static boolean renamePlaylist(int playlistId, String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            return false;
+        }
+
+        String sql = "UPDATE Playlist SET name = ? WHERE id = ?";
+        
+        try (Connection conn = DBExplorer.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, newName.trim());
+            stmt.setInt(2, playlistId);
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error renaming playlist: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
