@@ -69,6 +69,9 @@ public class Song {
         long minutes = this.DURATION.toMinutes();
         long seconds = this.DURATION.minusMinutes(minutes).getSeconds();
         return String.format("%d:%02d", minutes, seconds);
+    }
+
+    /**
      * To determine if a different song object is equivalent to this one.
      * 
      * @param obj -- an object we are going to compare this one against to see if they are the same.
