@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- Original Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
@@ -21,39 +20,37 @@
         </div>
     </nav>
 
-    <!-- Main Music Library Layout -->
     <div class="main-wrapper">
         <div class="library-container">
 
-            <!-- Liked Songs Playlist Pill Header -->
-            <div class="playlist-card" id="liked-playlist-header" onclick="togglePlaylist('liked-songs-wrapper', this)">
-                <span class="playlist-title">
-                    <span class="playlist-arrow">▼</span>
-                    Liked Songs
-                    <span class="playlist-arrow">▼</span>
-                </span>
+            <!-- Liked Songs Playlist Group -->
+            <div class="playlist-group" id="liked-playlist-group">
+                <div class="playlist-card" id="liked-playlist-header" onclick="togglePlaylist('liked-songs-wrapper', this)">
+                    <span class="playlist-title">
+                        <span class="playlist-arrow">▼</span>
+                        Liked Songs
+                        <span class="playlist-arrow">▼</span>
+                    </span>
+                </div>
+
+                <div class="playlist-songs-wrapper" id="liked-songs-wrapper">
+                    <!-- JS populates songs -->
+                </div>
             </div>
 
-            <!-- Dynamic Liked Songs Dropdown Wrapper -->
-            <div class="playlist-songs-wrapper" id="liked-songs-wrapper">
-                <!-- JS populates liked songs dynamically -->
-            </div>
-
-            <!-- Placeholder for User Created Playlists -->
+            <!-- Dynamic User Created Playlists -->
             <div id="user-playlists-container" class="library-container">
-                <!-- Additional user created playlists will render here -->
+                <!-- Additional user created playlists render here -->
             </div>
 
         </div>
     </div>
 
-    <!-- Frontend Dynamic Script -->
     <script>
         let likedSongs = [];
         let userPlaylists = [];
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Fetch liked songs first, then user playlists so heart statuses sync correctly
             fetchLikedSongs().then(() => {
                 fetchUserPlaylists();
             });
@@ -75,7 +72,7 @@
             renderLikedSongs();
         }
 
-        // 2. Fetch User Created Playlists
+        // 2. Fetch User Playlists
         async function fetchUserPlaylists() {
             try {
                 const response = await fetch('/api/user-playlists');
@@ -91,7 +88,7 @@
             renderUserPlaylists();
         }
 
-        // 3. Render Liked Songs
+        // 3. Initial Render of Liked Songs
         function renderLikedSongs() {
             const wrapper = document.getElementById('liked-songs-wrapper');
             wrapper.innerHTML = '';
@@ -103,11 +100,12 @@
 
             likedSongs.forEach(song => {
                 const songPill = createSongPill(song, true);
+                songPill.id = `liked-pill-${song.songId}`;
                 wrapper.appendChild(songPill);
             });
         }
 
-        // 4. Render User Created Playlists
+        // 4. Initial Render of User Playlists
         function renderUserPlaylists() {
             const container = document.getElementById('user-playlists-container');
             container.innerHTML = '';
@@ -118,8 +116,12 @@
 
             userPlaylists.forEach(playlist => {
                 const wrapperId = `playlist-wrapper-${playlist.playlistId}`;
+                const groupId = `playlist-group-${playlist.playlistId}`;
 
-                // Create Playlist Header Pill
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'playlist-group';
+                groupDiv.id = groupId;
+
                 const cardHeader = document.createElement('div');
                 cardHeader.className = 'playlist-card';
                 cardHeader.onclick = function () { togglePlaylist(wrapperId, this); };
@@ -131,7 +133,6 @@
                     </span>
                 `;
 
-                // Create Accordion Dropdown Wrapper
                 const wrapper = document.createElement('div');
                 wrapper.className = 'playlist-songs-wrapper';
                 wrapper.id = wrapperId;
@@ -140,26 +141,26 @@
                     wrapper.innerHTML = '<div class="empty-playlist-msg">This playlist has no songs yet.</div>';
                 } else {
                     playlist.songs.forEach(song => {
-                        // Check if song is liked by cross-referencing likedSongs array
                         const isLiked = likedSongs.some(ls => ls.songId === song.songId);
                         const songPill = createSongPill(song, isLiked);
                         wrapper.appendChild(songPill);
                     });
                 }
 
-                container.appendChild(cardHeader);
-                container.appendChild(wrapper);
+                groupDiv.appendChild(cardHeader);
+                groupDiv.appendChild(wrapper);
+                container.appendChild(groupDiv);
             });
         }
 
-        // 5. Build Song Pill Element
+        // 5. Create Song Pill
         function createSongPill(song, isLiked) {
             const pill = document.createElement('div');
             pill.className = 'song-pill';
-            pill.id = `song-pill-${song.songId}`;
 
             pill.innerHTML = `
                 <button class="icon-btn heart-btn ${isLiked ? '' : 'unliked'}" 
+                        data-song-id="${song.songId}"
                         data-tooltip="${isLiked ? 'Dislike' : 'Like'}" 
                         onclick="toggleLikeSong(${song.songId}, '${escapeJsString(song.songName)}', ${isLiked})">
                     ${isLiked ? '❤️' : '♡'}
@@ -180,14 +181,47 @@
             return pill;
         }
 
-        // 6. Accordion Toggle
+        // 6. Single-Open Accordion Toggle
         function togglePlaylist(wrapperId, headerElement) {
-            const wrapper = document.getElementById(wrapperId);
-            wrapper.classList.toggle('open');
-            headerElement.classList.toggle('open');
+            const targetWrapper = document.getElementById(wrapperId);
+            const targetGroup = headerElement.closest('.playlist-group');
+            const isTargetOpen = targetWrapper.classList.contains('open');
+
+            // Close any currently open playlist accordion
+            document.querySelectorAll('.playlist-songs-wrapper.open').forEach(openWrapper => {
+                if (openWrapper.id !== wrapperId) {
+                    closeWrapper(openWrapper);
+                }
+            });
+
+            // Toggle target playlist
+            if (isTargetOpen) {
+                closeWrapper(targetWrapper);
+            } else {
+                openWrapper(targetWrapper, headerElement, targetGroup);
+            }
         }
 
-        // 7. Toggle Like Status
+        function closeWrapper(wrapper) {
+            const header = wrapper.previousElementSibling || document.getElementById('liked-playlist-header');
+            const group = wrapper.closest('.playlist-group');
+
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+            wrapper.offsetHeight; // Force reflow
+            wrapper.style.maxHeight = '0px';
+            wrapper.classList.remove('open');
+            if (header) header.classList.remove('open');
+            if (group) group.classList.remove('open');
+        }
+
+        function openWrapper(wrapper, header, group) {
+            if (group) group.classList.add('open');
+            if (header) header.classList.add('open');
+            wrapper.classList.add('open');
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+        }
+
+        // 7. In-Place Like / Dislike Toggle (Zero Scroll Jumps or Page Reloads)
         async function toggleLikeSong(songId, songName, currentlyLiked) {
             try {
                 const endpoint = currentlyLiked 
@@ -197,19 +231,65 @@
                 const response = await fetch(endpoint, { method: 'POST' });
 
                 if (response.ok) {
+                    const isNowLiked = !currentlyLiked;
+
+                    // Update state array
                     if (currentlyLiked) {
                         likedSongs = likedSongs.filter(s => s.songId !== songId);
                     } else {
                         likedSongs.push({ songId: songId, songName: songName });
                     }
-                    // Re-render both views to reflect heart status across all playlists
-                    renderLikedSongs();
-                    renderUserPlaylists();
+
+                    // 1. Update ALL heart buttons in place across all playlists
+                    document.querySelectorAll(`.heart-btn[data-song-id="${songId}"]`).forEach(btn => {
+                        btn.innerHTML = isNowLiked ? '❤️' : '♡';
+                        btn.setAttribute('data-tooltip', isNowLiked ? 'Dislike' : 'Like');
+                        btn.onclick = () => toggleLikeSong(songId, songName, isNowLiked);
+                        if (isNowLiked) {
+                            btn.classList.remove('unliked');
+                        } else {
+                            btn.classList.add('unliked');
+                        }
+                    });
+
+                    // 2. Update Liked Songs list dynamically without wiping DOM
+                    updateLikedSongsContainer(songId, songName, isNowLiked);
+
                 } else {
                     alert("Could not update song status. Please try again.");
                 }
             } catch (err) {
                 console.error("Error toggling like status:", err);
+            }
+        }
+
+        // Helper to update the Liked Songs playlist container dynamically
+        function updateLikedSongsContainer(songId, songName, isNowLiked) {
+            const likedWrapper = document.getElementById('liked-songs-wrapper');
+            
+            if (isNowLiked) {
+                const emptyMsg = likedWrapper.querySelector('.empty-playlist-msg');
+                if (emptyMsg) emptyMsg.remove();
+
+                if (!likedWrapper.querySelector(`#liked-pill-${songId}`)) {
+                    const newPill = createSongPill({ songId: songId, songName: songName }, true);
+                    newPill.id = `liked-pill-${songId}`;
+                    likedWrapper.appendChild(newPill);
+                }
+            } else {
+                const existingPill = likedWrapper.querySelector(`#liked-pill-${songId}`);
+                if (existingPill) {
+                    existingPill.remove();
+                }
+
+                if (likedWrapper.children.length === 0) {
+                    likedWrapper.innerHTML = '<div class="empty-playlist-msg">No liked songs yet. Click the heart icon on any song to add it!</div>';
+                }
+            }
+
+            // Adjust height if Liked Songs playlist is currently open
+            if (likedWrapper.classList.contains('open')) {
+                likedWrapper.style.maxHeight = likedWrapper.scrollHeight + 'px';
             }
         }
 
