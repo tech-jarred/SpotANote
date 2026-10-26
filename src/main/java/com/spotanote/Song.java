@@ -60,6 +60,15 @@ public class Song {
     }
 
     /**
+     * To format the time duration
+     * 
+     * @return String formatted as "0:00"
+     */
+    public String getFormattedDuration() {
+        if (this.DURATION == null) return "0:00";
+        long minutes = this.DURATION.toMinutes();
+        long seconds = this.DURATION.minusMinutes(minutes).getSeconds();
+        return String.format("%d:%02d", minutes, seconds);
      * To determine if a different song object is equivalent to this one.
      * 
      * @param obj -- an object we are going to compare this one against to see if they are the same.

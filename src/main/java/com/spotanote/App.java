@@ -1,9 +1,16 @@
 package com.spotanote;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinPebble;
-import java.time.Duration;
-import java.util.Map;
 
 public class App {
     public static Javalin createApp() {
@@ -180,6 +187,276 @@ public class App {
             });
 
             /**
+             * /managepublications route
+             * 
+             * This route will be responsible for managing publications as an artist
+             */
+            config.routes.get("/managepublications", ctx -> {
+                //verify user is logged in
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                //passing the status parameter to Pebble
+                String status = ctx.queryParam("status");
+                Map<String, Object> model = new HashMap<>();
+                model.put("status", status);
+
+                //fetching public albums created by this artist/user
+                List<Playlist> uploadedAlbums = PowerfulPlaylist.getArtistUploadedAlbums(currentUser.getId());
+                List<Playlist> draftedAlbums = PowerfulPlaylist.getArtistDraftedAlbums(currentUser.getId());
+                model.put("status", ctx.queryParam("status"));
+
+                model.put("uploadedAlbums", uploadedAlbums);
+                model.put("draftedAlbums", draftedAlbums);
+
+                ctx.render("public/managepublications.html", model);
+            });
+
+            /**
+             * /upload-music route
+             * 
+             * This will handle uploading whatever song a listener wants to upload
+             */
+            config.routes.post("/upload-music", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String songName = ctx.formParam("songName");
+                String songLengthStr = ctx.formParam("songLength");
+                String filePath = ctx.formParam("filePath");
+                String playlistIdStr = ctx.formParam("playlistId");
+
+                if (songLengthStr == null || songLengthStr.trim().isEmpty() ||
+                    playlistIdStr == null || playlistIdStr.trim().isEmpty()) {
+                    ctx.redirect("/managepublications?status=missing_fields");
+                    return;
+                }
+
+                try {
+                    int songLength = Integer.parseInt(songLengthStr);
+                    int playlistId = Integer.parseInt(playlistIdStr);
+
+                    int recordMemberId = MusicUpload.getRecordMemberIdByUserId(currentUser.getId());
+
+                    if (recordMemberId <= 0) {
+                        ctx.redirect("/managepublications?status=not_a_record_member");
+                        return;
+                    }
+
+                    // 1. Call your original musicUpload method unchanged
+                    int songId = MusicUpload.musicUpload(songName, songLength, filePath, recordMemberId);
+
+                    if (songId > 0) {
+                        // 2. Link the new song to the chosen playlist/album in PlaylistSong
+                        String getMaxOrderSql = "SELECT COALESCE(MAX(song_order), 0) + 1 FROM PlaylistSong WHERE playlist_id = ?";
+                        String insertJunctionSql = "INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES (?, ?, ?)";
+
+                        try (Connection conn = DBExplorer.getConnection()) {
+                            int nextOrder = 1;
+                            try (PreparedStatement orderStmt = conn.prepareStatement(getMaxOrderSql)) {
+                                orderStmt.setInt(1, playlistId);
+                                try (ResultSet rs = orderStmt.executeQuery()) {
+                                    if (rs.next()) {
+                                        nextOrder = rs.getInt(1);
+                                    }
+                                }
+                            }
+
+                            try (PreparedStatement junctionStmt = conn.prepareStatement(insertJunctionSql)) {
+                                junctionStmt.setInt(1, playlistId);
+                                junctionStmt.setInt(2, songId);
+                                junctionStmt.setInt(3, nextOrder);
+                                junctionStmt.executeUpdate();
+                            }
+                        }
+
+                        ctx.redirect("/managepublications?status=success");
+                    } else {
+                        ctx.redirect("/managepublications?status=failed");
+                    }
+
+                } catch (NumberFormatException e) {
+                    ctx.redirect("/managepublications?status=invalid_length");
+                } catch (IllegalArgumentException e) {
+                    ctx.redirect("/managepublications?status=error");
+                } catch (SQLException e) {
+                    System.err.println("Error linking song to playlist: " + e.getMessage());
+                    ctx.redirect("/managepublications?status=error");
+                }
+            });
+
+            /**
+             * /publish-album route
+             * 
+             * Publishes a drafted playlist by setting its visibility to true
+             */
+            config.routes.post("/publish-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+                if (playlistIdStr != null) {
+                    try {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+                        
+                        // Using your publicPlaylist function
+                        PlaylistVisibility.publicPlaylist(playlistId);
+
+                        ctx.redirect("/managepublications?status=album_published");
+                    } catch (NumberFormatException e) {
+                        ctx.redirect("/managepublications?status=error");
+                    }
+                } else {
+                    ctx.redirect("/managepublications");
+                }
+            });
+
+            /**
+             * /delete-song route
+             * 
+             * Permanently deletes a song from the database
+             */
+            config.routes.post("/delete-song", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String songIdStr = ctx.formParam("songId");
+
+                if (songIdStr != null) {
+                    try {
+                        int songId = Integer.parseInt(songIdStr);
+
+                        SongDelete.deleteSong(songId);
+
+                        ctx.redirect("/managepublications?status=song_deleted");
+                    } catch (NumberFormatException e) {
+                        ctx.redirect("/managepublications?status=error");
+                    }
+                } else {
+                    ctx.redirect("/managepublications");
+                }
+            });
+
+            /**
+             * /create-playlist route
+             * 
+             * Handles creating a new draft playlist/album for the logged-in user
+             */
+            config.routes.post("/create-playlist", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistName = ctx.formParam("playlistName");
+
+                if (playlistName == null || playlistName.trim().isEmpty()) {
+                    ctx.redirect("/managepublications?status=invalid_playlist_name");
+                    return;
+                }
+
+                try {
+                    // Always creates as draft
+                    Playlist newPlaylist = PowerfulPlaylist.createPlaylist(currentUser.getId(), playlistName);
+
+                    if (newPlaylist != null) {
+                        ctx.redirect("/managepublications?status=playlist_created");
+                    } else {
+                        ctx.redirect("/managepublications?status=failed");
+                    }
+                } catch (IllegalArgumentException e) {
+                    ctx.redirect("/managepublications?status=error");
+                }
+            });
+
+            /**
+             * /rename-album route
+             * 
+             * Updates the title of a draft album
+             */
+            // Route 1: Rename Draft Album
+            config.routes.post("/rename-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+                String newTitle = ctx.formParam("newTitle");
+
+                if (playlistIdStr != null && newTitle != null && !newTitle.trim().isEmpty()) {
+                    try {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+                        
+                        // Delegate database update to PowerfulPlaylist
+                        boolean success = PowerfulPlaylist.renamePlaylist(playlistId, newTitle);
+
+                        if (success) {
+                            ctx.redirect("/managepublications?status=album_renamed");
+                            return;
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                }
+                
+                ctx.redirect("/managepublications?status=rename_failed");
+            });
+
+            // Route 2: Delete Draft Album
+            config.routes.post("/delete-album", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+
+                String playlistIdStr = ctx.formParam("playlistId");
+
+                if (playlistIdStr != null) {
+                    try (Connection conn = DBExplorer.getConnection()) {
+                        int playlistId = Integer.parseInt(playlistIdStr);
+
+                        // 1. Unlink song mappings in PlaylistSong table first
+                        try (PreparedStatement stmtJunction = conn.prepareStatement(
+                                "DELETE FROM PlaylistSong WHERE playlist_id = ?")) {
+                            stmtJunction.setInt(1, playlistId);
+                            stmtJunction.executeUpdate();
+                        }
+
+                        // 2. Delete the draft playlist
+                        try (PreparedStatement stmtPlaylist = conn.prepareStatement(
+                                "DELETE FROM Playlist WHERE id = ? AND is_public = FALSE")) {
+                            stmtPlaylist.setInt(1, playlistId);
+                            int rowsDeleted = stmtPlaylist.executeUpdate();
+
+                            if (rowsDeleted > 0) {
+                                ctx.redirect("/managepublications?status=album_deleted");
+                                return;
+                            }
+                        }
+                    } catch (SQLException | NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                }
+                ctx.redirect("/managepublications?status=delete_failed");
+            });
+
+            /**
              * /logout route
              * 
              * This route will be responsible for clearing session variables, and
@@ -317,7 +594,7 @@ public class App {
     public static void main(String[] args) {
         // Create Javalin instance.
         Javalin app = createApp();
-        int port = 7000;
+        int port = 8080;
 
         // Start the application.
         app.start(port); // use port 8080 if something is running on port 7000

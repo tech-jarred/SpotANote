@@ -264,3 +264,133 @@ body {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
+
+/* ==========================================
+   Custom Album Component Styles
+   ========================================== */
+
+.toggle-section {
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+}
+
+.toggle-section[open] {
+    border-color: #6d28d9;
+}
+
+.toggle-header {
+    font-weight: 600;
+    color: #2e1065;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Default state when album is collapsed */
+.toggle-arrow::after {
+    content: "Expand ▼";
+}
+
+.toggle-arrow {
+    font-size: 0.8rem;
+    color: #6c42f5;
+    font-weight: 700;
+    background: rgba(108, 66, 245, 0.1);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+}
+
+/* State when album is open/expanded */
+.toggle-section[open] .toggle-arrow::after {
+    content: "Collapse ▲";
+}
+
+.toggle-body {
+    margin-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 0.5rem;
+}
+
+.album-track-item {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+}
+
+.album-track-item:last-child {
+    border-bottom: none;
+}
+
+.album-track-duration {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.btn-action-publish {
+    background: #6c42f5;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap; /* Prevents text wrapping onto 2 lines */
+}
+
+.btn-action-publish:hover {
+    background: #7c55f8;
+}
+
+.btn-action-delete {
+    background: #dc2626;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.25rem 0.55rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-action-delete:hover {
+    background: #ef4444;
+}
+
+.btn-icon {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-icon-rename {
+    color: #4b5563;
+}
+
+.btn-icon-rename:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+.btn-icon-delete {
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+.btn-icon-delete:hover {
+    background-color: #fef2f2;
+    border-color: #ef4444;
+}
