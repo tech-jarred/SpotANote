@@ -302,6 +302,9 @@
 
         // Utility Handlers
         function selectSong(songId) {
+            // Flag autoplay in session storage prior to navigating/submitting. This will trigger music to autoplay on return to /home.
+            sessionStorage.setItem('shouldAutoplay', 'true');
+
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/select-song';
@@ -323,6 +326,8 @@
                 });
 
                 if (response.ok) {
+                    // Set autoplay flag so returning to /home automatically starts playback
+                    sessionStorage.setItem('shouldAutoplay', 'true');
                     showToast(`Added "${songName}" to queue`);
                 } else {
                     showToast(`Failed to queue "${songName}"`);

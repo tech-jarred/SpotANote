@@ -684,6 +684,28 @@ public class App {
                 }
             });
 
+            /**
+             * /api/queue/clear
+             * 
+             * This route is responsible for clearing all upcoming songs from the queue.
+             */
+            config.routes.post("/api/queue/clear", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                SongQueue sq = ctx.sessionAttribute("SongQueue");
+
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                // Empty queue, and then update session state.
+                sq.empty();
+                ctx.sessionAttribute("SongQueue", sq);
+
+                // Give good status message.
+                ctx.status(200);
+            });
+
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
             config.routes.get("/promotions", ctx -> {
