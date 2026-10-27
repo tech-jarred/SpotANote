@@ -843,6 +843,104 @@ public class App {
                 ctx.redirect("/specific-promotion/" + promotionId);
             });
 
+            config.routes.get("/records", ctx ->
+            {
+                //shows all records from the database
+                RecordInfo[] recordArray = RecordInfo.getAllRecords();
+                if (recordArray == null) {
+                    ctx.status(500).result("Failed to retrieve promotions");
+                    return;
+                }
+                recordArray = java.util.Arrays.stream(recordArray)
+                        .filter(java.util.Objects::nonNull)
+                        .toArray(RecordInfo[]::new);
+                //then rendering the promotions.html page and passing the list of promotions to it.
+                ctx.render("public/Records.html", Map.of("records", recordArray));
+
+            });
+
+            config.routes.get("/specific-record/{id}", ctx ->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int id = Integer.parseInt(ctx.pathParam("id"));
+                String name = RecordInfo.getRecordName(id);
+                int managerId = RecordInfo.getRecordManagerId(id);
+                //System.out.println("\n\n\n\nName: "+name+"\nManagerId: "+managerId+"\n\n\n\n");
+                if(name == null || managerId <= 0)
+                {
+                    ctx.status(404).result("Record not found");
+                    return;
+                }
+                boolean isFollowed = RecordInfo.isRecordFollowedByUser(id, currentUser.getId());
+                //System.out.println("\n\nBoolean Worked");
+                if(isFollowed == true)
+                {
+                    System.out.println("\n\nRendering Something User Is Following");
+                    ctx.render("public/SpecificRecord.html", 
+                    Map.of("recordName", name,
+                           "managerId", managerId,
+                           "recordId", id,
+                           "isUserFollowing", "Unfollow")
+                    );
+                }
+                else
+                {
+                    System.out.println("\n\nRendering Something User Isnt Following");
+                    ctx.render("public/SpecificRecord.html", 
+                    Map.of("recordName", name,
+                           "managerId", managerId,
+                           "recordId", id,
+                           "isUserFollowing", "Follow")
+                    );
+                }     
+            });
+
+            config.routes.post("/followRecord", ctx ->
+            {
+                int recordId = Integer.parseInt(ctx.formParam("recordId"));
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int userId = currentUser.getId();
+                boolean isFollowing = RecordInfo.isRecordFollowedByUser(recordId, userId);
+                if(recordId <= 0)
+                {
+                    ctx.redirect("/records");
+                    return;
+                }
+                if(isFollowing == true)
+                {
+                    RecordInfo.unfollowRecord(userId, recordId);
+                }
+                else
+                {
+                    RecordInfo.followRecord(userId, recordId);
+                }
+                ctx.redirect("/specific-record/" + recordId);
+            });
+
+            config.routes.get("/profile", ctx->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int userId = currentUser.getId();
+                String username = currentUser.getUsername();
+                String role = currentUser.getRole();
+                RecordInfo[] recordArray = RecordInfo.allFollowedRecords(userId);
+                CreatePromotion[] promotionArray = CreatePromotion.getAllLikedPromotions(userId);
+                promotionArray = java.util.Arrays.stream(promotionArray)
+                        .filter(java.util.Objects::nonNull)
+                        .toArray(CreatePromotion[]::new);
+                        
+                recordArray = java.util.Arrays.stream(recordArray)
+                        .filter(java.util.Objects::nonNull)
+                        .toArray(RecordInfo[]::new);
+                
+                ctx.render("public/Profile.html", 
+                    Map.of("recordArray", recordArray,
+                           "promotionArray", promotionArray,
+                           "username", username,
+                           "userRole", role)
+                    );
+            });
+
 
 
 

@@ -1,16 +1,41 @@
 <main>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <style>
+.promotion-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+    color: #e0e7ff;
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 450px;
+}
 
-  <html>
-
-  <head>
-    <h2>Available Promotions</h2>
-  </head>
+.promotion-link:hover {
+    transform: scale(1.05);
+}
+</style>
 
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
             <a href="/home" class="nav-link">Home</a>
+            <a href="/records" class="nav-link">Records</a>
             <a href="/promotions" class="nav-link">Promotion</a>
             <a href="/music-library" class="nav-link">Music Library</a>
             
@@ -26,26 +51,32 @@
         </div>
     </nav>
 
+    <div style="margin-bottom: 16px;"></div>
+      <head>
+      <div style="text-align: center;">
+    <div class="welcome-banner" style="display: inline-block; width: fit-content;">
+    <h2>Available Promotions</h2>
+    </div></div>
+  </head>
+  <div style="margin-bottom: 16px;"></div>
 
 
     <!--Now this is a loop where we will display each promotion by name-->
 {% for promotion in promotions %}
-  <div>
-    <h2>
-      <a href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}">
+  <div style="text-align: center; margin-bottom: 16px;">
+    <a
+      class="promotion-link"
+      href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"
+    >
+      <h2 style="color: #2d1466; margin: 0;">
         {{ promotion.promotionName }}
-      </a>
-    </h2>
+      </h2>
+    </a>
   </div>
 {% else %}
   <p>No promotions found.</p>
 {% endfor %}
 
 
-  <!--This is just a placeholder for the background-->
-
-  <body
-    style="background-image: url('https://th.bing.com/th/id/R.1f6631027539a1b06e19b45816d23f7a?rik=9BVw%2fME5n5zX2w&riu=http%3a%2f%2fwww.freeppt.net%2fbackground%2frainbow-colors-backgrounds-for-powerpoint.jpg&ehk=XY1ESIgPIcgwG5iFugKq55lWzIRWXQv6UnAudwRYdUQ%3d&risl=&pid=ImgRaw&r=0'); background-size: cover; background-repeat: no-repeat;">
-</main>
 
 </main>

@@ -1,4 +1,5 @@
 package com.spotanote;
+
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -7,37 +8,39 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CreatePromotionTest 
-{
+public class CreatePromotionTest {
     int currentPromotionId;
 
     @BeforeEach
-    void setUp() 
-    {
-        // Set up any necessary preconditions for the tests, such as creating a promotion in the database.
+    void setUp() {
+        // Set up any necessary preconditions for the tests, such as creating a
+        // promotion in the database.
         CreatePromotion.createPromotion("Test Promotion2", "This is a test promotion.", "Test Song", 1);
         int promotionId = CreatePromotion.getPromotionIdByName("Test Promotion2");
-        //System.out.println("Promotion ID: " + promotionId);
+        // System.out.println("Promotion ID: " + promotionId);
         assertTrue(promotionId > 0, "Promotion should be created");
         this.currentPromotionId = promotionId;
 
     }
+
     @AfterEach
     void tearDown() throws SQLException {
-        // Clean up any resources or reset the state after each test, such as deleting the test promotion from the database.
+        // Clean up any resources or reset the state after each test, such as deleting
+        // the test promotion from the database.
         CreatePromotion.clearLikesForUser(1, currentPromotionId);
         CreatePromotion.clearLikesForUser(2, this.currentPromotionId);
         CreatePromotion.clearLikesForUser(3, this.currentPromotionId);
         CreatePromotion.clearLikesForUser(4, this.currentPromotionId);
-        //System.out.println("\n\n\n\nCurrent PromotionId: "+this.currentPromotionId+"\n\n\n\n");
+        // System.out.println("\n\n\n\nCurrent PromotionId:
+        // "+this.currentPromotionId+"\n\n\n\n");
         CreatePromotion.removePromotion(this.currentPromotionId);
 
     }
 
     @Test
-    void testUploadToDatabase() throws SQLException
-    {
-        //CreatePromotion.createPromotion("Test Promotion", "This is a test promotion.", "Test Song", 2);
+    void testUploadToDatabase() throws SQLException {
+        // CreatePromotion.createPromotion("Test Promotion", "This is a test
+        // promotion.", "Test Song", 2);
         CreatePromotion.createPromotion("TestPromotion", "From Testing To See if it exists", "Test Song", 1);
         // Check if the promotion was successfully created in the database
         int id = CreatePromotion.getPromotionIdByName("TestPromotion");
@@ -48,10 +51,9 @@ public class CreatePromotionTest
 
     }
 
-    //testing to see if the removePromotion function works correctly
+    // testing to see if the removePromotion function works correctly
     @Test
-    void removePromotion()
-    {
+    void removePromotion() {
         CreatePromotion.createPromotion("Test Deletion", "This is a test promotion.", "Test Song", 2);
         int id = CreatePromotion.getPromotionIdByName("Test Deletion");
         boolean outcome = CreatePromotion.removePromotion(id);
@@ -90,15 +92,45 @@ public class CreatePromotionTest
         assertEquals("Record ID cannot be null or empty", exception.getMessage());
     }
 
-    //here we are trying to test to see if we can get all the promotions from inside the database
-    @Test void getAllPromotions()
-    {
-        
+    // here we are trying to test to see if we can get all the promotions from
+    // inside the database
+    @Test
+    void getAllPromotions() {
+        CreatePromotion.createPromotion(
+                "AllPromotionsTest",
+                "Test Description",
+                "Test Song",
+                1);
+
+        int id = CreatePromotion.getPromotionIdByName("AllPromotionsTest");
+
+        assertTrue(id > 0);
+
+        CreatePromotion[] promotions = CreatePromotion.getAllPromotions();
+
+        assertNotNull(promotions);
+
+        boolean found = false;
+
+        for (CreatePromotion promotion : promotions) {
+            if (promotion != null &&
+                    "AllPromotionsTest".equals(promotion.promotionName)) {
+                found = true;
+                assertEquals("Test Description",
+                        promotion.promotionDescription);
+                assertEquals("Test Song", promotion.promotionSong);
+                assertEquals(1, promotion.recordId);
+                break;
+            }
+        }
+
+        assertTrue(found, "The created promotion should be in the results");
+
+        CreatePromotion.removePromotion(id);
     }
 
-    @Test 
-    void savingCorrectTitle()
-    {
+    @Test
+    void savingCorrectTitle() {
         CreatePromotion.createPromotion("Name2", "Description", "Song", 1);
         int id = CreatePromotion.getPromotionIdByName("Name2");
         String actual = CreatePromotion.getPromotionName(id);
@@ -106,9 +138,9 @@ public class CreatePromotionTest
         CreatePromotion.removePromotion(id);
         assertEquals(correctName, actual);
     }
-    @Test 
-    void savingCorrectDescription()
-    {
+
+    @Test
+    void savingCorrectDescription() {
         CreatePromotion.createPromotion("Name2", "Description", "Song", 1);
         int id = CreatePromotion.getPromotionIdByName("Name2");
         String actual = CreatePromotion.getPromotionDescription(id);
@@ -118,8 +150,7 @@ public class CreatePromotionTest
     }
 
     @Test
-    void savingCorrectSong()
-    {
+    void savingCorrectSong() {
         CreatePromotion.createPromotion("Name2", "Description", "SongTest", 1);
         int id = CreatePromotion.getPromotionIdByName("Name2");
         String actual = CreatePromotion.getPromotionSong(id);
@@ -128,7 +159,9 @@ public class CreatePromotionTest
         assertEquals(correctName, actual);
     }
 
-    //here we are testing the like promotion functionality that was created in CreatePromotion.java. This test will check if the like promotion functionality is working as expected.
+    // here we are testing the like promotion functionality that was created in
+    // CreatePromotion.java. This test will check if the like promotion
+    // functionality is working as expected.
     @Test
     void testLikePromotion() {
 
@@ -136,28 +169,30 @@ public class CreatePromotionTest
 
         // First call: add the like.
         assertTrue(
-            CreatePromotion.likePromotion(this.currentPromotionId, 1)
-        );
+                CreatePromotion.likePromotion(this.currentPromotionId, 1));
 
     }
 
     @Test
-    void testIsPromotionLikedByUser()
-    {
+    void testIsPromotionLikedByUser() {
         // Check if the promotion is liked by the user
-        boolean isLiked = CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 1); // Assuming user_id = 1 and promotion_id = 1
-        //System.out.println("Is promotion liked by user: " + isLiked);
+        boolean isLiked = CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 1);
+        // Assuming user_id = 1
+        // and promotion_id = 1
+        // System.out.println("Is promotion liked by user: " + isLiked);
         if (!isLiked) {
             // If not liked, like the promotion first
             isLiked = CreatePromotion.likePromotion(this.currentPromotionId, 1);
-            //System.out.println("Promotion liked by user.");
+            // System.out.println("Promotion liked by user.");
         }
-        //System.out.println("Checking if promotion is liked by user after liking it.");
+        // System.out.println("Checking if promotion is liked by user after liking
+        // it.");
         assertTrue(isLiked);
     }
 
-    //for this test we first want to like the promotion, then we call it again since
-    //like checks to see if it is already liked and if so it unlikes itself
+    // for this test we first want to like the promotion, then we call it again
+    // since
+    // like checks to see if it is already liked and if so it unlikes itself
     @Test
     void testUnlikePromotion() {
         // First, like the promotion
@@ -170,28 +205,73 @@ public class CreatePromotionTest
 
     }
 
-    //here we are just testing to see if we can count the right number of likes that is associated with the promotion
-    //also if the account / user has already liked it we don't unlike because we are just checking to see if there
-    //are the right nnumber of likes in the database
+    // here we are just testing to see if we can count the right number of likes
+    // that is associated with the promotion
+    // also if the account / user has already liked it we don't unlike because we
+    // are just checking to see if there
+    // are the right nnumber of likes in the database
     @Test
-    void testLikeAmount() throws SQLException
-    {
-        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 4) != true)
-            {
-                CreatePromotion.likePromotion(this.currentPromotionId, 4);
-            }
+    void testLikeAmount() throws SQLException {
+        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 4) != true) {
+            CreatePromotion.likePromotion(this.currentPromotionId, 4);
+        }
 
-        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 3) != true)
-            {
-                CreatePromotion.likePromotion(this.currentPromotionId, 3);
-            }
-        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 2) != true)
-            {
-                CreatePromotion.likePromotion(this.currentPromotionId, 2);
-            }
+        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 3) != true) {
+            CreatePromotion.likePromotion(this.currentPromotionId, 3);
+        }
+        if (CreatePromotion.isPromotionLikedByUser(this.currentPromotionId, 2) != true) {
+            CreatePromotion.likePromotion(this.currentPromotionId, 2);
+        }
         int likeAmount = CreatePromotion.getLikeAmount(currentPromotionId);
         assertEquals(likeAmount, 3);
-
     }
 
+    // here we are testing to see if we can get all the promotions the user has
+    // liked
+    @Test
+    void testGetAllLikedPromotions() throws SQLException {
+        int userId = 1;
+
+        assertTrue(
+                CreatePromotion.likePromotion(currentPromotionId, userId));
+
+        CreatePromotion[] promotions = CreatePromotion.getAllLikedPromotions(userId);
+
+        assertNotNull(promotions);
+
+        boolean found = false;
+
+        for (CreatePromotion promotion : promotions) {
+            if (promotion != null &&
+                    "Test Promotion2".equals(promotion.promotionName)) {
+                found = true;
+                assertEquals(
+                        "This is a test promotion.",
+                        promotion.promotionDescription);
+                assertEquals("Test Song", promotion.promotionSong);
+                assertEquals(1, promotion.recordId);
+                break;
+            }
+        }
+
+        assertTrue(found, "The user's liked promotions should include the promotion");
+    }
+
+    @Test
+    void testRemoveNonexistentPromotion() {
+        int nonexistentId = 999999999;
+
+        boolean result = CreatePromotion.removePromotion(nonexistentId);
+
+        assertFalse(result,
+                "Removing a nonexistent promotion should return false");
+    }
+
+    @Test
+    void testGetLikeAmountWithNoLikes() throws SQLException {
+        int likeCount = CreatePromotion.getLikeAmount(currentPromotionId);
+
+        assertEquals(0, likeCount,
+                "A promotion with no likes should have a like count of zero");
+    }
 }
