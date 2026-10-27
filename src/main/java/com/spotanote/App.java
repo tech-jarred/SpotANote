@@ -602,13 +602,11 @@ public class App {
                 try {
                     int songId = Integer.parseInt(ctx.queryParam("songId"));
                     int playlistId = Integer.parseInt(ctx.queryParam("playlistId"));
-                System.out.println("inside add song to personal playlist api");
+
                     // Attempt to create the playlist in the database.
                     PowerfulPlaylist.addSongToPersonalPlaylist(playlistId, songId);
                     ctx.status(200).result("Song added to playlist");
                 } catch (Exception e) {
-                System.out.println("FAILED inside add song to personal playlist api");
-
                     ctx.status(500).result("Error adding song to playlist: " + e.getMessage());
                 }
             });
@@ -624,7 +622,7 @@ public class App {
                     ctx.status(401).result("Unauthorized");
                     return;
                 }
-                System.out.println("inside create personal playlist api");
+
                 try {
                     String playlistName = ctx.formParam("playlistName");
                     int songId = Integer.parseInt(ctx.formParam("songId"));
@@ -634,7 +632,6 @@ public class App {
                     
                     ctx.status(200).result("Playlist created successfully");
                 } catch (Exception e) {
-                                    System.out.println("FAILED inside create personal playlist api");
                     ctx.status(500).result("Error creating playlist: " + e.getMessage());
                 }
             });
@@ -865,17 +862,16 @@ public class App {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 String name = RecordInfo.getRecordName(id);
                 int managerId = RecordInfo.getRecordManagerId(id);
-                //System.out.println("\n\n\n\nName: "+name+"\nManagerId: "+managerId+"\n\n\n\n");
+
                 if(name == null || managerId <= 0)
                 {
                     ctx.status(404).result("Record not found");
                     return;
                 }
                 boolean isFollowed = RecordInfo.isRecordFollowedByUser(id, currentUser.getId());
-                //System.out.println("\n\nBoolean Worked");
+
                 if(isFollowed == true)
                 {
-                    System.out.println("\n\nRendering Something User Is Following");
                     ctx.render("public/SpecificRecord.html", 
                     Map.of("recordName", name,
                            "managerId", managerId,
@@ -885,7 +881,6 @@ public class App {
                 }
                 else
                 {
-                    System.out.println("\n\nRendering Something User Isnt Following");
                     ctx.render("public/SpecificRecord.html", 
                     Map.of("recordName", name,
                            "managerId", managerId,

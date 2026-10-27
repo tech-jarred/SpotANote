@@ -198,7 +198,7 @@ INSERT INTO Record (record_name, record_manager_id) VALUES
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES
-(1, 7071707);
+(1, 7071707),
 (1, 1),
 (2, 2);
 
