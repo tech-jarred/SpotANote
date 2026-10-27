@@ -87,19 +87,19 @@
         </style>
     </head>
     <body>
+        <!-- Navigation Bar -->
         <nav class="navbar">
             <div class="nav-brand">Spotanote</div>
             <div class="nav-user-controls">
                 <a href="/home" class="nav-link">Home</a>
+                <a href="/records" class="nav-link">Records</a>
                 <a href="/promotions" class="nav-link">Promotion</a>
                 <a href="/music-library" class="nav-link">Music Library</a>
-                
                 {% if isArtist %}
                     <a href="/managepublications" class="nav-link">Manage Publications</a>
                 {% endif %}
-
                 <a href="/search" class="nav-link">Search</a>
-                
+                <a href="/profile" class="nav-link">Profile</a>
                 <form action="/logout" method="POST">
                     <button type="submit" class="btn-logout">Logout</button>
                 </form>
