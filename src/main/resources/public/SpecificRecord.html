@@ -42,18 +42,33 @@
             <div style="text-align: center; margin: 20px;">
                 <form action="/followRecord" method="POST">
                     <input type="hidden" name="recordId" value="{{ recordId }}">
-                    <button type="submit"
-                        style="background-color: #e74c3c;
-                        color: white;
-                        border: none;
-                        border-radius: 25px;
-                        padding: 12px 28px;
-                        font-size: 16px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
-                        {{ isUserFollowing }}
-                    </button>
+                    {% if isUserFollowing == "Follow" %}
+                        <button type="submit"
+                            style="background-color: #078605;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            padding: 12px 28px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                         {{ isUserFollowing }}
+                        </button>
+                    {% else %}
+                        <button type="submit"
+                            style="background-color: #e74c3c;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            padding: 12px 28px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                         {{ isUserFollowing }}
+                        </button>
+                    {% endif %}
                 </form>
             </div>
        </body>

@@ -381,7 +381,7 @@ public class App {
             {
                 User currentUser = ctx.sessionAttribute("currentUser");
                 int userId = currentUser.getId();
-                String username = currentUser.getName();
+                String username = currentUser.getUsername();
                 String role = currentUser.getRole();
                 RecordInfo[] recordArray = RecordInfo.allFollowedRecords(userId);
                 CreatePromotion[] promotionArray = CreatePromotion.getAllLikedPromotions(userId);

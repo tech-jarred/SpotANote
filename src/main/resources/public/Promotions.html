@@ -8,6 +8,27 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+  <style>
+.promotion-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    text-align: center;
+    color: #e0e7ff;
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 450px;
+}
+
+.promotion-link:hover {
+    transform: scale(1.05);
+}
+</style>
 
   <html>
 
@@ -39,15 +60,12 @@
 {% for promotion in promotions %}
   <div style="text-align: center; margin-bottom: 16px;">
     <a
+      class="promotion-link"
       href="/specific-promotion/{{ promotion.getPromotionIdByName(promotion.promotionName) }}"
-      style="color: #2d1466; text-decoration: none;"
     >
-      <div class="card song-card"
-           style="display: inline-block; width: fit-content; margin-bottom: 0;">
-        <h2 style="color: #2d1466; margin: 0;">
-          {{ promotion.promotionName }}
-        </h2>
-      </div>
+      <h2 style="color: #2d1466; margin: 0;">
+        {{ promotion.promotionName }}
+      </h2>
     </a>
   </div>
 {% else %}
