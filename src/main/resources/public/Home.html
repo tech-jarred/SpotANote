@@ -8,58 +8,79 @@
 </head>
 <body>
 
-    
+    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-brand">Spotanote</div>
         <div class="nav-user-controls">
-            <a href="/home" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Home</a>
-            <a href="/promotions" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Promotion</a>
-            <a href="/records" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Records</a>
-            <a href="/music" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Music Library</a>
-            <a href="/profile" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 0.9rem;">Profile</a>
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/records" class="nav-link">Records</a>
+            <a href="/promotions" class="nav-link">Promotion</a>
+            <a href="/music-library" class="nav-link">Music Library</a>
+            {% if isArtist %}
+                <a href="/managepublications" class="nav-link">Manage Publications</a>
+            {% endif %}
+            <a href="/search" class="nav-link">Search</a>
             <form action="/logout" method="POST">
                 <button type="submit" class="btn-logout">Logout</button>
             </form>
         </div>
     </nav>
 
-    
+    <!-- Main Wrapper -->
     <div class="main-wrapper">
         <div class="home-container">
             
-            
+            <!-- Player Card -->
             <div class="card player-card">
+
+                <!-- Song Title -->
                 <h2 class="player-title">{{ songName }}</h2>
-                
+
+                <!-- Bottom-Left: Clear Queue Button -->
+                <button id="clearQueueBtn" class="btn-clear-queue" title="Clear Queue" aria-label="Clear Queue">
+                    🗑
+                </button>
+
+                <!-- Bottom-Right: One-Time Shuffle Button -->
+                <button id="shuffleBtn" class="btn-shuffle" title="Shuffle Queue" aria-label="Shuffle Queue">
+                    ↳↰
+                </button>
                 
                 <audio id="myAudio" src="{{ current_song_file_path }}" preload="auto"></audio>
 
-                
                 <div class="custom-player-container">
-                    <div class="controls-row">
-                        
+                    <!-- Centered Time Display Above Seek Bar -->
+                    <span id="timeDisplay" class="time-display-centered">0:00 / 0:00</span>
+
+                    <!-- Full Width Seek Bar -->
+                    <div class="progress-row">
+                        <input type="range" id="seekBar" class="seek-bar" value="0" min="0" step="0.1">
+                    </div>
+
+                    <!-- Playback Controls Row: Back, Play/Pause, Skip -->
+                    <div class="playback-controls-row">
+                        <button id="backBtn" class="btn-nav-control" title="Previous Song" aria-label="Previous Song">
+                            ⏮
+                        </button>
+
                         <button id="playPauseBtn" class="btn-play-circle" aria-label="Play">
-                            
                             <svg id="playIcon" viewBox="0 0 24 24">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
-                            
                             <svg id="pauseIcon" viewBox="0 0 24 24" style="display: none;">
                                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                             </svg>
                         </button>
 
-                        
-                        <input type="range" id="seekBar" class="seek-bar" value="0" min="0" step="0.1">
-
-                        
-                        <span id="timeDisplay" class="time-display">0:00 / 0:00</span>
+                        <button id="skipBtn" class="btn-nav-control" title="Next Song" aria-label="Next Song">
+                            ⏭
+                        </button>
                     </div>
                 </div>
 
             </div>
 
-            
+            <!-- Welcome Banner -->
             <div class="welcome-banner">
                 <p class="welcome-text">Welcome, <strong>{{ username }}</strong>!</p>
                 <p class="welcome-subtext">You have successfully signed into Spotanote.</p>
@@ -68,7 +89,6 @@
         </div>
     </div>
 
-    
     <script>
         const audio = document.getElementById('myAudio');
         const playPauseBtn = document.getElementById('playPauseBtn');
@@ -76,11 +96,14 @@
         const pauseIcon = document.getElementById('pauseIcon');
         const seekBar = document.getElementById('seekBar');
         const timeDisplay = document.getElementById('timeDisplay');
+        const backBtn = document.getElementById('backBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const clearQueueBtn = document.getElementById('clearQueueBtn');
         const savedTime = parseFloat("{{ timeStamp | default(0) }}");
 
         let isScrubbing = false;
 
-        // Converts total seconds to MM:SS string without using ES6 template literals
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds <= 0) return "0:00";
             const mins = Math.floor(seconds / 60);
@@ -88,19 +111,22 @@
             return mins + ":" + (secs < 10 ? "0" : "") + secs;
         }
 
-        // Updates timer label safely
         function updateTimeDisplay(seconds) {
             const current = formatTime(seconds !== undefined ? seconds : audio.currentTime);
             const total = formatTime(audio.duration);
             timeDisplay.textContent = current + " / " + total;
         }
 
-        // Toggle Play / Pause state and update icon visibility
-        playPauseBtn.addEventListener('click', () => {
-            if (audio.paused) {
-                audio.play();
+        function startPlayback() {
+            audio.play().then(() => {
                 playIcon.style.display = 'none';
                 pauseIcon.style.display = 'block';
+            }).catch(err => console.error('Autoplay prevented:', err));
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                startPlayback();
             } else {
                 audio.pause();
                 playIcon.style.display = 'block';
@@ -108,7 +134,6 @@
             }
         });
 
-        // Initialize range slider and saved timestamp once media metadata is loaded
         audio.addEventListener('loadedmetadata', () => {
             seekBar.max = audio.duration;
             updateTimeDisplay();
@@ -118,9 +143,13 @@
                 seekBar.value = savedTime;
                 updateTimeDisplay();
             }
+
+            if (sessionStorage.getItem('shouldAutoplay') === 'true') {
+                sessionStorage.removeItem('shouldAutoplay');
+                startPlayback();
+            }
         });
 
-        // Continuous sync as song plays
         audio.addEventListener('timeupdate', () => {
             if (!isScrubbing) {
                 seekBar.value = audio.currentTime;
@@ -128,23 +157,17 @@
             }
         });
 
-        // User starts dragging/interacting with slider
-        seekBar.addEventListener('pointerdown', () => {
-            isScrubbing = true;
-        });
-
-        // Dynamic time feedback while dragging
+        seekBar.addEventListener('pointerdown', () => { isScrubbing = true; });
         seekBar.addEventListener('input', () => {
             isScrubbing = true;
             updateTimeDisplay(seekBar.value);
         });
 
-        // User releases slider - commit change and clear focus
         function finishScrubbing() {
             if (isScrubbing) {
                 audio.currentTime = seekBar.value;
                 isScrubbing = false;
-                seekBar.blur(); // Remove focus outline and unlock automatic slider progression
+                seekBar.blur();
                 updateTimeDisplay();
             }
         }
@@ -152,16 +175,96 @@
         seekBar.addEventListener('change', finishScrubbing);
         seekBar.addEventListener('pointerup', finishScrubbing);
 
-        // Reset UI upon song completion
+        // Queue Navigation Handlers (Require track change & page reload)
+        skipBtn.addEventListener('click', async () => {
+            syncTimestamp();
+            try {
+                const res = await fetch('/api/queue/skip', { method: 'POST' });
+                if (res.ok) {
+                    sessionStorage.setItem('shouldAutoplay', 'true');
+                    window.location.reload();
+                }
+            } catch (err) {
+                console.error('Error skipping track:', err);
+            }
+        });
+
+        backBtn.addEventListener('click', async () => {
+            if (audio.currentTime > 3) {
+                audio.currentTime = 0;
+                seekBar.value = 0;
+            } else {
+                syncTimestamp();
+                try {
+                    const res = await fetch('/api/queue/back', { method: 'POST' });
+                    if (res.ok) {
+                        sessionStorage.setItem('shouldAutoplay', 'true');
+                        window.location.reload();
+                    }
+                } catch (err) {
+                    console.error('Error going back:', err);
+                }
+            }
+        });
+
+        // Background AJAX Handlers (No page reload = zero audio interruption)
+        shuffleBtn.addEventListener('click', async () => {
+            try {
+                const res = await fetch('/api/queue/shuffle', { method: 'POST' });
+                if (res.ok) {
+                    showToast("Queue shuffled");
+                } else {
+                    showToast("Could not shuffle queue");
+                }
+            } catch (err) {
+                console.error('Error shuffling queue:', err);
+                showToast("Error shuffling queue");
+            }
+        });
+
+        clearQueueBtn.addEventListener('click', async () => {
+            if (!confirm("Are you sure you want to clear your current queue?")) return;
+
+            try {
+                const res = await fetch('/api/queue/clear', { method: 'POST' });
+                if (res.ok) {
+                    showToast("Queue cleared");
+                } else {
+                    showToast("Could not clear queue");
+                }
+            } catch (err) {
+                console.error('Error clearing queue:', err);
+                showToast("Error clearing queue");
+            }
+        });
+
+        // Toast Notification Helper
+        function showToast(message) {
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Auto-skip when track finishes playing
         audio.addEventListener('ended', () => {
             playIcon.style.display = 'block';
             pauseIcon.style.display = 'none';
-            seekBar.value = 0;
-            audio.currentTime = 0;
             syncTimestamp();
+            sessionStorage.setItem('shouldAutoplay', 'true');
+            skipBtn.click();
         });
 
-        // Sync timestamp with Javalin backend
         function syncTimestamp() {
             if (!audio || isNaN(audio.currentTime)) return;
 
@@ -170,9 +273,7 @@
 
             fetch('/api/song/timeStamp', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params,
                 keepalive: true
             }).catch(err => console.error('Failed to sync timestamp:', err));

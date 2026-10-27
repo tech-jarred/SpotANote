@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class PlaylistVisibility {
 
-    /*
+    /**
      * Private Playlist function
      * 
      * @param playlist's id which is the int id associated to a playlist
@@ -25,7 +25,7 @@ public class PlaylistVisibility {
         setVisibility(playlistID, false);
     }
 
-    /*
+    /**
     * Public Playlist function
     * 
     * @param playlist's id which is the int id associated to a playlist
@@ -36,7 +36,7 @@ public class PlaylistVisibility {
         setVisibility(playlistID, true);
     }
 
-    /*
+    /**
      * Set Visibility function - helper function for privatePlaylist() and publicPlaylist()
      * 
      *  @param int playlist id as its stored in the database
