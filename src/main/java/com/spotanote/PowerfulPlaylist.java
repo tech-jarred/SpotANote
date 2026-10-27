@@ -80,7 +80,7 @@ public class PowerfulPlaylist {
      */
     public static List<Playlist> getArtistDraftedAlbums(int userId) {
         List<Playlist> draftAlbums = new ArrayList<>();
-        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = FALSE";
+        String albumSql = "SELECT id, playlist_name, is_public FROM Playlist WHERE user_id = ? AND is_public = FALSE AND is_personal = FALSE";
         String songSql = "SELECT s.id, s.song_name, s.song_duration, s.file_path, s.is_public " +
                         "FROM Song s JOIN PlaylistSong ps ON s.id = ps.song_id " +
                         "WHERE ps.playlist_id = ? ORDER BY ps.song_order ASC";
@@ -210,7 +210,7 @@ public class PowerfulPlaylist {
             FROM Playlist p
             LEFT JOIN PlaylistSong ps ON p.id = ps.playlist_id
             LEFT JOIN Song s ON ps.song_id = s.id
-            WHERE p.user_id = ?
+            WHERE p.user_id = ? AND p.is_personal = TRUE
             ORDER BY p.id, ps.song_order ASC
         """;
 
@@ -251,5 +251,69 @@ public class PowerfulPlaylist {
         }
 
         return result;
+    }
+
+    /**
+     * Will add a song to a person playlist based on the given playlistId and songId.
+     * 
+     * @param playlistId
+     * @param songId
+     * @throws IllegalArgumentExeception when either the playlist or song id can not be found in the database.
+     * @throws RuntimeException when the connection to the database fails.
+     */
+    public static void addSongToPersonalPlaylist(int playlistId, int songId){
+        String insertSongSql = "INSERT INTO PlaylistSong (playlist_id, song_id, song_order) SELECT ?, ?, COALESCE(MAX(song_order), 0) + 1 FROM PlaylistSong WHERE playlist_id = ?";
+
+            // Insert the song into PlaylistSong
+            try (Connection conn = DBExplorer.getConnection(); PreparedStatement stmt = conn.prepareStatement(insertSongSql)) {
+                stmt.setInt(1, playlistId);
+                stmt.setInt(2, songId);
+                stmt.setInt(3, playlistId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException("Database connection or execution failed while adding song to playlist", e);
+            }
+    }
+
+    /**
+     * Creates a personal playlist and immediately adds its initial song in a single transaction.
+     * 
+     * @param userId the id of the user creating the playlist
+     * @param playlistName the name of the new playlist
+     * @param songId the id of the initial song to add
+     * @throws IllegalArgumentException if the song does not exist
+     * @throws RuntimeException if the database connection or execution fails
+     */
+    public static void createPersonalPlaylistWithSong(int userId, String playlistName, int songId) {
+        String insertPlaylistSql = "INSERT INTO Playlist (user_id, playlist_name, is_public, is_personal) VALUES (?, ?, FALSE, TRUE)";
+        String insertSongSql = "INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES (?, ?, 1)";
+
+            // Single try-with-resources managing both PreparedStatements
+        try (Connection conn = DBExplorer.getConnection();
+             PreparedStatement stmtPlaylist = conn.prepareStatement(insertPlaylistSql, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement stmtSong = conn.prepareStatement(insertSongSql)) {
+
+            // Insert new Playlist
+            stmtPlaylist.setInt(1, userId);
+            stmtPlaylist.setString(2, playlistName);
+            stmtPlaylist.executeUpdate();
+
+            // Retrieve generated playlist ID
+            ResultSet rs = stmtPlaylist.getGeneratedKeys();
+            if (!rs.next()) {
+                throw new SQLException("Creating playlist failed, no ID returned.");
+            }
+
+            int newPlaylistId = rs.getInt(1);
+
+            // Insert initial song as song_order = 1
+            stmtSong.setInt(1, newPlaylistId);
+            stmtSong.setInt(2, songId);
+            stmtSong.executeUpdate();
+
+        } catch (SQLException e){
+            if (e.getErrorCode() == 1452){ throw new IllegalArgumentException("Error in creating playlist: either invalid playlist id or song id."); }
+            throw new RuntimeException("Error occured in connecting to the database.");
+        }
     }
 }
