@@ -588,6 +588,58 @@ public class App {
             });
 
             /**
+             * /api/add/song/personal/playlist
+             * 
+             * This route is responsible for adding a song to a user's playlist.
+             */
+            config.routes.post("/api/add/song/personal/playlist", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized"); // only allow authenticated users access to this route.
+                    return;
+                }
+
+                try {
+                    int songId = Integer.parseInt(ctx.queryParam("songId"));
+                    int playlistId = Integer.parseInt(ctx.queryParam("playlistId"));
+                System.out.println("inside add song to personal playlist api");
+                    // Attempt to create the playlist in the database.
+                    PowerfulPlaylist.addSongToPersonalPlaylist(playlistId, songId);
+                    ctx.status(200).result("Song added to playlist");
+                } catch (Exception e) {
+                System.out.println("FAILED inside add song to personal playlist api");
+
+                    ctx.status(500).result("Error adding song to playlist: " + e.getMessage());
+                }
+            });
+
+            /**
+             * /api/create/personal/playlist
+             * 
+             * This route is responsible for handling requests to create a new playlist for listeners to add songs to.
+             */
+            config.routes.post("/api/create/personal/playlist", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).result("Unauthorized");
+                    return;
+                }
+                System.out.println("inside create personal playlist api");
+                try {
+                    String playlistName = ctx.formParam("playlistName");
+                    int songId = Integer.parseInt(ctx.formParam("songId"));
+
+                    // Attempt to create the playlist in the database.
+                    PowerfulPlaylist.createPersonalPlaylistWithSong(currentUser.getId(), playlistName, songId);
+                    
+                    ctx.status(200).result("Playlist created successfully");
+                } catch (Exception e) {
+                                    System.out.println("FAILED inside create personal playlist api");
+                    ctx.status(500).result("Error creating playlist: " + e.getMessage());
+                }
+            });
+
+            /**
              * /api/queue/add
              * 
              * This is responsible for adding a song to the song queue.

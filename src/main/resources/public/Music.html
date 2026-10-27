@@ -174,7 +174,7 @@
                 </button>
                 <span class="song-name">${escapeHtml(song.songName)}</span>
                 <div class="song-actions">
-                    <button class="icon-btn" data-tooltip="Add to Playlist" onclick="addToPlaylist(${song.songId})">
+                    <button class="icon-btn" data-tooltip="Add to Playlist" onclick="toggleAddToPlaylistPopover(${song.songId}, event)">
                         ⊕
                     </button>
                     <button class="icon-btn" data-tooltip="Add to Queue" onclick="addToQueue(${song.songId}, '${escapeJsString(song.songName)}')">
@@ -354,6 +354,134 @@
             toast.timeoutId = setTimeout(() => {
                 toast.classList.remove('show');
             }, 2500);
+        }
+
+        let activePopover = null;
+
+        function toggleAddToPlaylistPopover(songId, event) {
+            event.stopPropagation();
+            
+            // Toggle off if clicking the same song's button again
+            if (activePopover && activePopover.id === `popover-${songId}`) {
+                closePlaylistPopover();
+                return;
+            }
+
+            closePlaylistPopover();
+
+            const songPill = event.target.closest('.song-pill');
+            if (!songPill) return;
+
+            const popover = document.createElement('div');
+            popover.className = 'playlist-popover';
+            popover.id = `popover-${songId}`;
+
+            let playlistListHtml = '';
+            if (userPlaylists && userPlaylists.length > 0) {
+                playlistListHtml = userPlaylists.map(pl => `
+                    <button class="popover-playlist-item" onclick="addSongToExistingPlaylist(${songId}, ${pl.playlistId})">
+                        ${escapeHtml(pl.playlistName)}
+                    </button>
+                `).join('');
+            } else {
+                playlistListHtml = '<div class="popover-empty-msg">No existing playlists</div>';
+            }
+
+            popover.innerHTML = `
+                <div class="popover-create-row">
+                    <span class="popover-label">New</span>
+                    <input type="text" id="popover-input-${songId}" class="popover-input" placeholder="Enter Name">
+                    <button class="popover-btn-add" title="Create Playlist" onclick="createNewPlaylistWithSong(${songId})">+</button>
+                </div>
+                <div class="popover-playlist-list">
+                    ${playlistListHtml}
+                </div>
+            `;
+
+            songPill.appendChild(popover);
+            activePopover = popover;
+
+            const inputField = popover.querySelector(`#popover-input-${songId}`);
+            if (inputField) {
+                inputField.focus();
+                inputField.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        createNewPlaylistWithSong(songId);
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                document.addEventListener('click', closePopoverOnOutsideClick);
+            }, 10);
+        }
+
+        // 1. Handler to add a song to an existing playlist
+        async function addSongToExistingPlaylist(songId, playlistId) {
+            try {
+                const response = await fetch(`/api/add/song/personal/playlist?songId=${songId}&playlistId=${playlistId}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    closePlaylistPopover();
+                    showToast("Added to playlist!");
+                    await fetchUserPlaylists(); // Instantly refresh the playlist view
+                } else {
+                    showToast("Failed to add song to playlist");
+                }
+            } catch (err) {
+                console.error("Error adding to playlist:", err);
+                showToast("Error connecting to server");
+            }
+        }
+
+        // 2. Handler to create a new playlist with the initial song
+        async function createNewPlaylistWithSong(songId) {
+            const input = document.getElementById(`popover-input-${songId}`);
+            if (!input || !input.value.trim()) {
+                showToast("Please enter a playlist name");
+                return;
+            }
+
+            const playlistName = input.value.trim();
+
+            try {
+                const params = new URLSearchParams();
+                params.append('playlistName', playlistName);
+                params.append('songId', songId);
+
+                const response = await fetch('/api/create/personal/playlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+
+                if (response.ok) {
+                    closePlaylistPopover();
+                    showToast(`Created "${playlistName}"`);
+                    await fetchUserPlaylists(); // Instantly render the new playlist
+                } else {
+                    showToast("Failed to create playlist");
+                }
+            } catch (err) {
+                console.error("Error creating playlist:", err);
+                showToast("Error connecting to server");
+            }
+        }
+
+        function closePlaylistPopover() {
+            if (activePopover) {
+                activePopover.remove();
+                activePopover = null;
+            }
+            document.removeEventListener('click', closePopoverOnOutsideClick);
+        }
+
+        function closePopoverOnOutsideClick(e) {
+            if (activePopover && !activePopover.contains(e.target)) {
+                closePlaylistPopover();
+            }
         }
 
         function addToPlaylist(songId) {
