@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Search</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Large Top Search Pill */
+        .search-bar-pill {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            background: #e6e6f0;
+            border-radius: 50px;
+            padding: 0.35rem 0.5rem 0.35rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .search-bar-pill input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Circular Magnifying Glass Search Button */
+        .search-icon-btn {
+            background: #6c42f5;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s ease;
+        }
+
+        .search-icon-btn:hover {
+            background: #5b33e0;
+        }
+
+        .search-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Category Filter Buttons */
+        .category-filters {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #ffffff;
+            padding: 0.4rem 1.1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Search Results Container */
+        .search-output {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .artist-pill {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .artist-badge {
+            font-size: 0.75rem;
+            background: rgba(108, 66, 245, 0.6);
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/records" class="nav-link">Records</a>
+            <a href="/promotions" class="nav-link">Promotion</a>
+            <a href="/music-library" class="nav-link">Music Library</a>
+            {% if isArtist %}
+                <a href="/managepublications" class="nav-link">Manage Publications</a>
+            {% endif %}
+            <a href="/search" class="nav-link">Search</a>
+            <a href="/profile" class="nav-link">Profile</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="search-container">
+            
+            <!-- Top Search Bar Pill -->
+            <form id="search-form" onsubmit="handleSearch(event)" class="search-bar-pill">
+                <input 
+                    type="text" 
+                    id="search-input"
+                    name="q" 
+                    placeholder="Search artists, albums, songs, and records..." 
+                    value="{{ searchQuery }}" 
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="search-icon-btn" aria-label="Search">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="16.5" y1="16.5" x2="22" y2="22"></line>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- Bottom Filter Buttons -->
+            <div class="category-filters">
+                <button type="button" class="filter-btn active" data-category="all">All</button>
+                <button type="button" class="filter-btn" data-category="artists">Artists</button>
+                <button type="button" class="filter-btn" data-category="albums">Albums</button>
+                <button type="button" class="filter-btn" data-category="songs">Songs</button>
+                <button type="button" class="filter-btn" data-category="records">Records</button>
+            </div>
+
+            <!-- Output Results -->
+            <div class="search-output" id="search-output"></div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.getAttribute('data-category');
+
+                    const query = document.getElementById('search-input').value.trim();
+                    if (query) {
+                        executeSearch(query);
+                    }
+                });
+            });
+
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                executeSearch(query);
+            }
+        });
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                executeSearch(query);
+            }
+        }
+
+        function executeSearch(query) {
+            const output = document.getElementById('search-output');
+            output.innerHTML = '';
+
+            if (currentCategory === 'artists') {
+                searchArtists(query);
+            } else if (currentCategory === 'albums') {
+                searchAlbums(query);
+            } else if (currentCategory === 'all') {
+                searchArtists(query);
+                searchAlbums(query);
+            } else {
+                output.innerHTML = `<div class="empty-playlist-msg">Search for ${currentCategory} coming next!</div>`;
+            }
+        }
+
+        // --- ARTIST SEARCH ---
+        async function searchArtists(query) {
+            try {
+                const response = await fetch(`/api/search/artists?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const artists = await response.json();
+                    renderArtists(artists);
+                }
+            } catch (err) {
+                console.error("Artist search error:", err);
+            }
+        }
+
+        function renderArtists(artists) {
+            const output = document.getElementById('search-output');
+            if (!artists || artists.length === 0) return;
+
+            artists.forEach(artist => {
+                const pill = document.createElement('div');
+                pill.className = 'artist-pill';
+                pill.innerHTML = `
+                    <span>${escapeHtml(artist.artistName)}</span>
+                    <span class="artist-badge">Artist</span>
+                `;
+                output.appendChild(pill);
+            });
+        }
+
+        // --- ALBUM / PLAYLIST SEARCH ---
+        async function searchAlbums(query) {
+            try {
+                const response = await fetch(`/api/search/albums?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const albums = await response.json();
+                    renderAlbums(albums);
+                }
+            } catch (err) {
+                console.error("Album search error:", err);
+            }
+        }
+
+        function renderAlbums(albums) {
+            const output = document.getElementById('search-output');
+            if (!albums || albums.length === 0) return;
+
+            albums.forEach(album => {
+                const pill = document.createElement('div');
+                pill.className = 'artist-pill';
+                pill.innerHTML = `
+                    <span>${escapeHtml(album.albumName)}</span>
+                    <span class="artist-badge" style="background: rgba(59, 130, 246, 0.6);">Album</span>
+                `;
+                output.appendChild(pill);
+            });
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+    </script>
+</body>
+</html>

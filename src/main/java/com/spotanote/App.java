@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -442,6 +443,22 @@ public class App {
             });
 
             /**
+             * /search route
+             * This route will be responsible for searching
+             */
+            config.routes.get("/search", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.redirect("/login");
+                    return;
+                }
+                ctx.render("public/search.html", Map.of(
+                    "isArtist", currentUser.getRole().equals("Artist"),
+                    "searchQuery", ctx.queryParam("q") != null ? ctx.queryParam("q") : ""
+                ));
+            });
+
+            /**
              * /logout route
              * 
              * This route will be responsible for clearing session variables, and
@@ -753,6 +770,86 @@ public class App {
 
                 // Give good status message.
                 ctx.status(200);
+            });
+
+            /**
+             * /api/search/artists
+             * Searches for Artists using ArtistRecordSearch.java
+             */
+            config.routes.get("/api/search/artists", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).json(List.of());
+                    return;
+                }
+
+                String query = ctx.queryParam("q");
+                if (query == null || query.trim().isEmpty()) {
+                    ctx.json(List.of());
+                    return;
+                }
+
+                List<Map<String, Object>> artists = new ArrayList<>();
+
+                try {
+                    List<Integer> artistIds = ArtistRecordSearch.discoverySearch(query.trim(), "User");
+
+                    for (Integer id : artistIds) {
+                        String name = ArtistRecordSearch.artistLookup(id);
+                        if (name != null) {
+                            Map<String, Object> artist = new HashMap<>();
+                            artist.put("artistId", id);
+                            artist.put("artistName", name);
+                            artists.add(artist);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    ctx.status(500).result("Database Error");
+                    return;
+                }
+
+                ctx.json(artists);
+            });
+
+            /**
+             * /api/search/albums
+             * Searches for public Playlists (Albums) using MusicSearch.java
+             */
+            config.routes.get("/api/search/albums", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).json(List.of());
+                    return;
+                }
+
+                String query = ctx.queryParam("q");
+                if (query == null || query.trim().isEmpty()) {
+                    ctx.json(List.of());
+                    return;
+                }
+
+                List<Map<String, Object>> albums = new ArrayList<>();
+
+                try {
+                    List<Integer> playlistIds = MusicSearch.musicSearch(query.trim(), "Playlist");
+
+                    for (Integer id : playlistIds) {
+                        String playlistName = MusicSearch.playlistLookup(id);
+                        if (playlistName != null) {
+                            Map<String, Object> album = new HashMap<>();
+                            album.put("albumId", id);
+                            album.put("albumName", playlistName);
+                            albums.add(album);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    ctx.status(500).result("Database Error");
+                    return;
+                }
+
+                ctx.json(albums);
             });
 
             //This route will be responsible for displaying all promotions to the user.
