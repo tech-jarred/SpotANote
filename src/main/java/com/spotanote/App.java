@@ -852,6 +852,89 @@ public class App {
                 ctx.json(albums);
             });
 
+            /**
+             * /api/search/songs
+             * Searches for public Songs using MusicSearch.java
+             */
+            config.routes.get("/api/search/songs", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).json(List.of());
+                    return;
+                }
+
+                String query = ctx.queryParam("q");
+                if (query == null || query.trim().isEmpty()) {
+                    ctx.json(List.of());
+                    return;
+                }
+
+                List<Map<String, Object>> songs = new ArrayList<>();
+
+                try {
+                    // 1. Search Song table for matching public song IDs
+                    List<Integer> songIds = MusicSearch.musicSearch(query.trim(), "Song");
+
+                    // 2. Fetch full Song object for each ID
+                    for (Integer id : songIds) {
+                        Song s = MusicSearch.songLookup(id);
+                        if (s != null) {
+                            Map<String, Object> songMap = new HashMap<>();
+                            songMap.put("songId", s.getId());
+                            songMap.put("songName", s.getName());
+                            songMap.put("filePath", s.getFilePath());
+                            songs.add(songMap);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    ctx.status(500).result("Database Error");
+                    return;
+                }
+
+                ctx.json(songs);
+            });
+
+            /**
+             * /api/search/records
+             * Searches for Records using ArtistRecordSearch.java
+             */
+            config.routes.get("/api/search/records", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).json(List.of());
+                    return;
+                }
+
+                String query = ctx.queryParam("q");
+                if (query == null || query.trim().isEmpty()) {
+                    ctx.json(List.of());
+                    return;
+                }
+
+                List<Map<String, Object>> records = new ArrayList<>();
+
+                try {
+                    List<Integer> recordIds = ArtistRecordSearch.discoverySearch(query.trim(), "Record");
+
+                    for (Integer id : recordIds) {
+                        String recordName = ArtistRecordSearch.recordLookup(id);
+                        if (recordName != null) {
+                            Map<String, Object> recordMap = new HashMap<>();
+                            recordMap.put("recordId", id);
+                            recordMap.put("recordName", recordName);
+                            records.add(recordMap);
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    ctx.status(500).result("Database Error");
+                    return;
+                }
+
+                ctx.json(records);
+            });
+
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
             config.routes.get("/promotions", ctx -> {
