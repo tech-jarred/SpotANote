@@ -100,11 +100,23 @@ public class App {
                 }
 
                 // Render Home.html file, passing username through for Pebble formatting.
-                ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
-                        "current_song_file_path", currentSong.getFilePath(),
-                        "timeStamp", currentSong.getTimeStamp().toSeconds(),
-                        "songName", currentSong.getName(),
-                        "isArtist", currentUser.getRole().equals("Artist")));
+                if(currentUser.getRole().equals("Record"))
+                    {
+                        if (currentUser == null){ ctx.redirect("/login"); }
+                        int userId = currentUser.getId();
+                        RecordInfo temp = new RecordInfo();
+                        int recordId = temp.getRecordIdFromUserId(userId);
+                        CreatePromotion promotion = new CreatePromotion();
+                        CreatePromotion[] collection = promotion.getAllCreatePromotions(recordId);
+                        ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
+                    }
+                else{
+                        ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
+                            "current_song_file_path", currentSong.getFilePath(),
+                            "timeStamp", currentSong.getTimeStamp().toSeconds(),
+                            "songName", currentSong.getName(),
+                            "isArtist", currentUser.getRole().equals("Artist")));
+                }
             });
 
             /**
@@ -822,6 +834,47 @@ public class App {
                         "isArtist", currentUser.getRole().equals("Artist")));
                 }
             });
+            config.routes.get("/Recordspecific-promotion/{id}", ctx -> {
+                int id = Integer.parseInt(ctx.pathParam("id"));
+
+                //grabbing the promotion details from the CreatePromotion class using the promotion ID.
+                String name = CreatePromotion.getPromotionName(id);
+                String description = CreatePromotion.getPromotionDescription(id);
+                String song = CreatePromotion.getPromotionSong(id);
+                User currentUser = ctx.sessionAttribute("currentUser");
+                int likeAmount = CreatePromotion.getLikeAmount(id);
+                Boolean hasLiked = CreatePromotion.isPromotionLikedByUser(id, currentUser.getId());
+                //making sure that the promotion is not null, if not, return a 404 error.
+                if (name == null || description == null || song == null) {
+                    ctx.status(404).result("Promotion not found");
+                    return;
+                }
+
+                if(hasLiked == true)
+                {
+                    ctx.render("public/RecordSpecificPromotion.html", Map.of(
+                        "promotionName", name,
+                        "promotionDescription", description,
+                        "promotionId", id,
+                        "promotionSong", song,
+                        "userId", currentUser.getId(),
+                        "hasLiked", "Unlike",
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
+                }
+                else
+                {
+                    ctx.render("public/RecordSpecificPromotion.html", Map.of(
+                        "promotionName", name,
+                        "promotionDescription", description,
+                        "promotionId", id,
+                        "promotionSong", song,
+                        "userId", currentUser.getId(),
+                        "hasLiked", "Like",
+                        "likeAmount", likeAmount,
+                        "isArtist", currentUser.getRole().equals("Artist")));
+                }
+            });
 
             config.routes.post("/likePromotion", ctx -> {
                 // Get the promotion ID from the form parameter
@@ -936,7 +989,68 @@ public class App {
                     );
             });
 
+            config.routes.get("/ownCreatedPromotions", ctx ->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null){ ctx.redirect("/login"); }
+                int userId = currentUser.getId();
+                RecordInfo temp = new RecordInfo();
+                int recordId = temp.getRecordIdFromUserId(userId);
+                CreatePromotion[] promotionArray = CreatePromotion.getAllCreatePromotions(recordId);
+                if (promotionArray == null) {
+                    ctx.status(500).result("Failed to retrieve promotions");
+                    return;
+                }
+                ctx.render("public/RecordHome.html", Map.of("promotionArray", promotionArray, "isRecord", currentUser.getRole().equals("Record")));
+            });
 
+            config.routes.get("/gotoCreation", ctx ->
+            {
+                ctx.render("public/CreatePromotion.html");
+            });
+
+            config.routes.post("/createPromotion", ctx ->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null){ ctx.redirect("/login"); }
+                int userId = currentUser.getId();
+                RecordInfo temp = new RecordInfo();
+                int recordId = temp.getRecordIdFromUserId(userId);
+                CreatePromotion promotion = new CreatePromotion();
+                String title = ctx.formParam("title");
+                String description = ctx.formParam("description");
+                String song = ctx.formParam("song");
+
+                System.out.println("\n\n\n\nTitle: "+title+"\nDescription: "+description+"\nSong: "+song+"\n\n\n\n");
+                if(title == null || description == null || song == null)
+                {
+                    ctx.render("public/CreatePromotion.html", Map.of("error", "Error, Please Fill Out Everything"));
+                }
+                else
+                {
+                    promotion.createPromotion(title, description, song, recordId);
+                    ctx.render("public/CreatePromotion.html", Map.of("error", "Successfully Created Promotion"));
+                }
+            });
+
+            config.routes.get("/deletePromotion/{promotionId}", ctx ->
+            {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null){ ctx.redirect("/login"); }
+                int userId = currentUser.getId();
+                int promotionId = Integer.parseInt(ctx.pathParam("promotionId"));
+                RecordInfo temp = new RecordInfo();
+                int recordId = temp.getRecordIdFromUserId(userId);
+                System.out.println("\n\n\n\nPromotionId: "+promotionId+"\n\n\n\n");
+                CreatePromotion promotion = new CreatePromotion();
+                promotion.removePromotion(promotionId);
+                CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(recordId);
+                if (collection == null) {
+                    ctx.status(500).result("Failed to retrieve promotions");
+                    return;
+                }
+                ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
+            });
 
 
 

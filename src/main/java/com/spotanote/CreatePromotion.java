@@ -467,4 +467,32 @@ public class CreatePromotion {
         }
     }
 
+    public static CreatePromotion[] getAllCreatePromotions(int recordId) throws SQLException
+    {
+        CreatePromotion[] promotions = new CreatePromotion[100];
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "SELECT * FROM promotion WHERE record_id = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, recordId);
+                try(ResultSet resultSet = statement.executeQuery())
+                {
+                    int index = 0;
+                    while (resultSet.next())
+                    {
+                        //FIX THIS I NEED TO FIRST GET ID FIRST THEN I NEED TO GET THE INFORMATION, SO I NEED TO DO A JOIN ON SOMETHING
+                        CreatePromotion promotion = new CreatePromotion();
+                        promotion.promotionName = resultSet.getString("promotion_name");
+                        promotion.promotionDescription = resultSet.getString("promotion_description");
+                        promotion.promotionSong = resultSet.getString("promotion_song");
+                        promotion.recordId = resultSet.getInt("record_Id");
+                        promotions[index++] = promotion;
+                    }
+                    return promotions;
+                }
+            }
+        }
+    }
+
 }
