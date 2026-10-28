@@ -29,7 +29,7 @@ CREATE TABLE User (
     name VARCHAR(50) NULL,
     is_name_public BOOLEAN NOT NULL DEFAULT FALSE,
     roleid1 INT NOT NULL,
-    roleid2 INT NULL,
+    roleid2 INT NOT NULL,
     FOREIGN KEY (roleid1) REFERENCES Role(id),
     FOREIGN KEY (roleid2) REFERENCES Role(id)
 );
@@ -180,15 +180,15 @@ INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2
 (7071707, "hazelp", "hazelpswd1", "Hazel", TRUE, 1, 2), -- name has to be public for an artist
 (3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, 1),
 (5150515, "connors", "connorpswd3", "Connor", TRUE, 3, 1), -- record holders should also have public names
-(1, "test", "testpswd", "Test", FALSE, 1, 3),
+(1, "test", "testpswd", "Test", FALSE, 1, 3), -- this guy is a record
 (2, "testAccount2", "recordpswd", "Record", TRUE, 3, 1),
 (3, "testAccount3", "testpswd", "Bot", TRUE, 3, 1),
 (4, "testAccount4", "testpswd", "Bot2", TRUE, 3, 1),
 (5, "jvalentine", "stars4life", "Jill", TRUE, 1, 2),
-(6, "leonkennedy", "RCPD1996", "Leon S. Kennedy", TRUE, 1, 1),
+(6, "leonkennedy", "RCPD1996", "Leon S. Kennedy", TRUE, 1, 3), -- this guy is a record
 (7, "aripley", "WhereIsNostromo", "Amanda Ripley", TRUE, 1, 1),
 (8, "Dutch", "tahiti", "Van Der Linde", TRUE, 1, 1),
-(9, "reddeadshooterguy", "rdr2", "Arthur", TRUE, 1, 1);
+(9, "reddeadshooterguy", "rdr2", "Arthur", TRUE, 1, 3); -- this guy is a record
 
 -- Record inserts
 INSERT INTO Record (record_name, record_manager_id, userId) VALUES
