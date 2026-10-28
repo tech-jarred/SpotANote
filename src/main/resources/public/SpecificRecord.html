@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Home</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+        <!-- Navigation Bar -->
+        <nav class="navbar">
+            <div class="nav-brand">Spotanote</div>
+            <div class="nav-user-controls">
+                <a href="/home" class="nav-link">Home</a>
+                <a href="/records" class="nav-link">Records</a>
+                <a href="/promotions" class="nav-link">Promotion</a>
+                <a href="/music-library" class="nav-link">Music Library</a>
+                {% if isArtist %}
+                    <a href="/managepublications" class="nav-link">Manage Publications</a>
+                {% endif %}
+                <a href="/search" class="nav-link">Search</a>
+                <a href="/profile" class="nav-link">Profile</a>
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
+            </div>
+        </nav>
+
+    
+        <div style="text-align: center; margin-bottom: 16px;"></div>
+        <div style="text-align: center;">
+            <!--<h2>Promotion Id: {{ promotion_id }}</h2>-->
+            <div class="welcome-banner"style="display: inline-block; width: fit-content">
+            <h2>{{ recordName }}</h2>
+            </div></div>
+            <div style="text-align: center; margin-bottom: 16px;"></div>
+
+            <div style="text-align: center;">
+            <div class="card song-card"
+           style="display: inline-block; width: fit-content; margin-bottom: 0;">
+        
+                <h2>Record Id: {{recordId}}</h2>
+                <h2>Record Manager Id: {{ managerId }}</h2>
+        </div></div>
+
+
+            <div style="text-align: center; margin: 20px;">
+                <form action="/followRecord" method="POST">
+                    <input type="hidden" name="recordId" value="{{ recordId }}">
+                    {% if isUserFollowing == "Follow" %}
+                        <button type="submit"
+                            style="background-color: #078605;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            padding: 12px 28px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                         {{ isUserFollowing }}
+                        </button>
+                    {% else %}
+                        <button type="submit"
+                            style="background-color: #e74c3c;
+                            color: white;
+                            border: none;
+                            border-radius: 25px;
+                            padding: 12px 28px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            box-shadow: 0 4px 8px rgba(0,0,0,0.15);">
+                         {{ isUserFollowing }}
+                        </button>
+                    {% endif %}
+                </form>
+            </div>
+       </body>

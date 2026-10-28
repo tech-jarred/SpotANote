@@ -60,7 +60,7 @@ class MusicSearchTest
     }
 
     /*
-     * Tears down environemtn after each test is ran
+     * Tears down environemnt after each test is ran
      */
     @AfterEach
     void tearDown()
