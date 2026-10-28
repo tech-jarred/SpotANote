@@ -935,6 +935,56 @@ public class App {
                 ctx.json(records);
             });
 
+            /**
+             * /api/album/songs
+             * Fetches all tracks contained within a specific Album/Playlist
+             */
+            config.routes.get("/api/album/songs", ctx -> {
+                User currentUser = ctx.sessionAttribute("currentUser");
+                if (currentUser == null) {
+                    ctx.status(401).json(List.of());
+                    return;
+                }
+
+                String albumIdParam = ctx.queryParam("albumId");
+                if (albumIdParam == null) {
+                    ctx.json(List.of());
+                    return;
+                }
+
+                List<Map<String, Object>> albumSongs = new ArrayList<>();
+
+                try (Connection conn = DBExplorer.getConnection()) {
+                    int albumId = Integer.parseInt(albumIdParam);
+
+                    // Query songs linked to this playlist/album ID ordered by song_order
+                    String sql = "SELECT s.id, s.song_name, s.file_path " +
+                                "FROM Song s " +
+                                "JOIN PlaylistSong ps ON s.id = ps.song_id " +
+                                "WHERE ps.playlist_id = ? " +
+                                "ORDER BY ps.song_order ASC";
+
+                    try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                        stmt.setInt(1, albumId);
+                        try (ResultSet rs = stmt.executeQuery()) {
+                            while (rs.next()) {
+                                Map<String, Object> songMap = new HashMap<>();
+                                songMap.put("songId", rs.getInt("id"));
+                                songMap.put("songName", rs.getString("song_name"));
+                                songMap.put("filePath", rs.getString("file_path"));
+                                albumSongs.add(songMap);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    ctx.status(500).result("Database Error");
+                    return;
+                }
+
+                ctx.json(albumSongs);
+            });
+
             //This route will be responsible for displaying all promotions to the user.
             //The promotions will be displayed in a list format, and the user can click on a promotion to view more details about it.
             config.routes.get("/promotions", ctx -> {
