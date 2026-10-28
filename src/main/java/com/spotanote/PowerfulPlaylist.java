@@ -143,7 +143,7 @@ public class PowerfulPlaylist {
         }
 
         // is_public always defaults to FALSE (draft/private)
-        String sql = "INSERT INTO Playlist (user_id, playlist_name, is_public) VALUES (?, ?, FALSE)";
+        String sql = "INSERT INTO Playlist (user_id, playlist_name, is_public, is_personal) VALUES (?, ?, FALSE, FALSE)";
 
         try (Connection conn = DBExplorer.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
