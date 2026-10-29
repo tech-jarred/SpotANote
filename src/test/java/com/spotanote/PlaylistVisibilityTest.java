@@ -24,7 +24,7 @@ public class PlaylistVisibilityTest {
     private int pubPlaylistID = 0;
     private int privPlaylistID = 0;
 
-    /*
+    /**
      * Sets up environment for testing before each test is ran
      */
     @BeforeEach
@@ -39,7 +39,7 @@ public class PlaylistVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tears down environment after each test is ran
      */
     @AfterEach
@@ -52,7 +52,7 @@ public class PlaylistVisibilityTest {
         privPlaylistID = 0;
     }
 
-    /*
+    /**
      * Tests to see if the playlist has been privated successfully
      */
     @Test
@@ -62,7 +62,7 @@ public class PlaylistVisibilityTest {
         assertTrue(checkIsPrivateInDatabase(pubPlaylistID), "Playlist Private Unsuccessful: playlist is still public");
     }
 
-    /*
+    /**
      * Tests to see what happens when the playlist wasn't actually privated b/c it doesn't exist
      */
     @Test
@@ -77,7 +77,7 @@ public class PlaylistVisibilityTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect playlist is privated
     */
     @Test
@@ -95,7 +95,7 @@ public class PlaylistVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when trying to private an already private playlist
     */
     @Test
@@ -106,7 +106,7 @@ public class PlaylistVisibilityTest {
         });
     }
 
-    /*
+    /**
      * createPlaylist - setUp() helper method to create playlists
      * 
      *  @return int playlistID
@@ -123,7 +123,7 @@ public class PlaylistVisibilityTest {
         throw new SQLException("Failed to retrieve generated key for playlist.");
     }
 
-    /*
+    /**
      * checkIsPrivateInDatabase - successfullPrivatePlaylistTest() helper method to check viewable status through the database
      * 
      *  @return True if the playlist is private, else return False
@@ -148,7 +148,7 @@ public class PlaylistVisibilityTest {
         return false;
     }
 
-    /*
+    /**
      * checkIsPrivateInDatabase - IncorrectPlaylistPrivatedTest() helper method to check viewable status through the database
      * 
      *  @return True if the playlist is private, else return False
@@ -173,7 +173,7 @@ public class PlaylistVisibilityTest {
         return false;
     }
 
-    /*
+    /**
      * deletePlaylist(int id) - helper method to delete playlists by a given int id
      */
     private void deletePlaylist(int id)
@@ -188,7 +188,7 @@ public class PlaylistVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see if the playlist has been publicized successfully
      */
     @Test
@@ -198,7 +198,7 @@ public class PlaylistVisibilityTest {
         assertTrue(checkIsPublicInDatabase(privPlaylistID), "Playlist Public Unsuccessful: playlist is still private");
     }
 
-    /*
+    /**
      * Tests to see what happens when the playlist wasn't actually publicized b/c it doesn't exist
      */
     @Test
@@ -213,7 +213,7 @@ public class PlaylistVisibilityTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect playlist is publicized
     */
     @Test
@@ -232,7 +232,7 @@ public class PlaylistVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when trying to publicize an already public playlist
     */
     @Test

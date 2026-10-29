@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/*
+/**
  * MusicSearchTest class
  * Focuses on testing the MusicSearch class
  */
@@ -25,7 +25,7 @@ class MusicSearchTest
     int songID = 0;
     int playlistID = 0;
 
-    /*
+    /**
      * Sets up environment for testing before each test is ran
      */
     @BeforeEach
@@ -59,7 +59,7 @@ class MusicSearchTest
         }
     }
 
-    /*
+    /**
      * Tears down environemnt after each test is ran
      */
     @AfterEach
@@ -96,7 +96,7 @@ class MusicSearchTest
         assertTrue(ids.contains(songID), "List of ids should contain inserted song ID: " + songID);
     }
 
-    /*
+    /**
      * Tests to see what happens when the alleged full song name is searched for but doesn't show up
      */
     @Test
@@ -109,7 +109,7 @@ class MusicSearchTest
         assertTrue(ids.isEmpty(), "List of ids should be empty when full song title is not found");
     }
 
-    /*
+    /**
      * Tests to see if a song is correctly searched for using some of its name
      */
     @Test
@@ -122,7 +122,7 @@ class MusicSearchTest
         assertTrue(ids.contains(songID), "Partial search should find the song ID");
     }
 
-    /*
+    /**
      * Tests to see what happens when part of the song name is searched for but doesn't show up
      */
     @Test
@@ -135,7 +135,7 @@ class MusicSearchTest
         assertTrue(ids.isEmpty(), "List of ids should be empty when partial song title is not found");
     }
 
-    /*
+    /**
      * Tests to see what happens when searching for a song that doesn't exist publicly in the database
      */
     @Test
@@ -159,7 +159,7 @@ class MusicSearchTest
         assertFalse(ids.contains(songID), "Private songs should not be returned in search results");
     }
 
-    /*
+    /**
      * Tests to see what happens when searching for a song that doesn't exist at all in the database
      */
     @Test
@@ -172,7 +172,7 @@ class MusicSearchTest
         assertTrue(ids.isEmpty(), "List of ids should be empty when full song title is not found");
     }
 
-    /*
+    /**
      * Tests to see if a playlist is correctly searched for using its full playlist name
      */
     @Test
@@ -186,7 +186,7 @@ class MusicSearchTest
         assertTrue(ids.contains(playlistID), "List of ids should contain inserted playlist ID: " + playlistID);
     }
 
-    /*
+    /**
      * Test to see what happens when the full playlist name is searched for but doesn't show up
      */
     @Test
@@ -199,7 +199,7 @@ class MusicSearchTest
         assertTrue(ids.isEmpty(), "List of ids should be empty when full playlist name is not found");
     }
 
-    /*
+    /**
      * Tests to see if a playlist is correctly searched for using some if its name
      */
     @Test
@@ -212,7 +212,7 @@ class MusicSearchTest
         assertTrue(ids.contains(playlistID), "Partial search should find the playlist ID");
     }
 
-    /*
+    /**
      * Tests to see what happens when part of the playlist name is searched but doesn't show up
      */
     @Test
@@ -225,7 +225,7 @@ class MusicSearchTest
         assertTrue(ids.isEmpty(), "List of ids should be empty when partial playlist name is not found");
     }
 
-    /*
+    /**
      * Tests to see what happens when searching for a playlist that doesn't exist publicly in the database
      */
     @Test
@@ -243,7 +243,7 @@ class MusicSearchTest
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when searching for a playlist that doesn't exhaust at all in the database
      */
     @Test

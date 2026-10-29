@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/*
+/**
  * SongVisibility class
  * Focuses on privating and publicizing songs
  * There will be two methods in this class
@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class SongVisibility {
 
-    /*
+    /**
      * Private Song function
      * 
      * @param song's id which is the int id associated to a song
@@ -25,7 +25,7 @@ public class SongVisibility {
         setVisibility(SongID, false);
     }
 
-    /*
+    /**
     * Public Song function
     * 
     * @param song's id which is the int id associated to a song
@@ -36,7 +36,7 @@ public class SongVisibility {
         setVisibility(songID, true);
     }
 
-    /*
+    /**
      * Set Visibility function - helper function for privateSong() and publicSong()
      * 
      *  @param int song id as its stored in the database

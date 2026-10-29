@@ -23,7 +23,7 @@ public class PlaylistDeleteTest {
 
     private int playlistID = 0;
 
-    /*
+    /**
      * Sets up environment for testing before each test is ran
      */
     @BeforeEach
@@ -37,7 +37,7 @@ public class PlaylistDeleteTest {
         }
     }
 
-    /*
+    /**
      * Tears down environment after each test is ran 
      */
     @AfterEach
@@ -55,7 +55,7 @@ public class PlaylistDeleteTest {
         playlistID = 0;
     }
 
-    /*
+    /**
      * Tests to see if the playlist was successfully deleted
      */
     @Test
@@ -65,7 +65,7 @@ public class PlaylistDeleteTest {
         assertFalse(checkIdExist(playlistID), "Playlist Deletion Unsuccessful: playlist still exists");
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect playlist is deleted
      */
     @Test
@@ -84,7 +84,7 @@ public class PlaylistDeleteTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when the playlist is privated instead of deleted
      */
     @Test
@@ -94,7 +94,7 @@ public class PlaylistDeleteTest {
         assertTrue(checkIdExist(playlistID), "Playlist Deletion Unsuccessful: playlist was privated instead of deleted");
     }
 
-    /*
+    /**
      * Tests to see what happens when a non-existing playlist is trying to be deleted
      */
     @Test
@@ -105,7 +105,7 @@ public class PlaylistDeleteTest {
         });
     }
 
-    /*
+    /**
      * createPlaylist - setUp() helper method to create playlists
      * 
      *  @return int playlistID
@@ -121,7 +121,7 @@ public class PlaylistDeleteTest {
         throw new SQLException("Failed to retrieve generated key for playlist.");
     }
 
-    /*
+    /**
      * checkIdExist - helper method to check if an ID exists in the database
      * 
      *  returns true if ID exists, false if it does not

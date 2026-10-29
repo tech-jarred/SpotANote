@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-/*
+/**
  * MusicUpload class
  * Focuses on uploading music
  */
@@ -21,7 +21,7 @@ Helpful database connection links:
 
 
 public class MusicUpload {
-    /*
+    /**
      * Upload Music function
      * 
      *  @param song's name as a string
@@ -118,13 +118,3 @@ public class MusicUpload {
         return -1; //id not found
     }
 }
-/*
-For reference:
-CREATE TABLE Song (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    song_name VARCHAR(100) NOT NULL,
-    song_duration INT, -- will be in seconds
-    file_path VARCHAR(300) NOT NULL,
-    artist_id INT NOT NULL,
-    FOREIGN KEY (artist_id) REFERENCES User(id)
- */

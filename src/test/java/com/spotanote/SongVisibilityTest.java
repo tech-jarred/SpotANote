@@ -24,7 +24,7 @@ public class SongVisibilityTest {
     private int pubSongID = 0;
     private int privSongID = 0;
 
-    /*
+    /**
      * Sets up environment for testing before each test is ran
      */
     @BeforeEach
@@ -39,7 +39,7 @@ public class SongVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tears down environment after each test is ran
      */
     @AfterEach
@@ -52,7 +52,7 @@ public class SongVisibilityTest {
         privSongID = 0;
     }
 
-    /*
+    /**
      * Tests to see if the song has been privated successfully
      */
     @Test
@@ -62,7 +62,7 @@ public class SongVisibilityTest {
         assertTrue(checkIsPrivateInDatabase(pubSongID), "Song Private Unsuccessful: song is still public");
     }
 
-    /*
+    /**
      * Tests to see what happens when the song wasn't actually privated b/c it doesn't exist
      */
     @Test
@@ -77,7 +77,7 @@ public class SongVisibilityTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect song is privated
     */
     @Test
@@ -95,7 +95,7 @@ public class SongVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when trying to private an already private song
     */
     @Test
@@ -106,7 +106,7 @@ public class SongVisibilityTest {
         });
     }
 
-    /*
+    /**
      * createSong - setUp() helper method to create songs
      * 
      *  @return int songID
@@ -135,7 +135,7 @@ public class SongVisibilityTest {
     throw new SQLException("Failed to retrieve generated key for song.");
 }
 
-    /*
+    /**
      * checkIsPrivateInDatabase - successfullPrivateSongTest() helper method to check viewable status through the database
      * 
      *  @return True if the song is private, else return False
@@ -160,7 +160,7 @@ public class SongVisibilityTest {
         return false;
     }
 
-    /*
+    /**
      * checkIsPrivateInDatabase - IncorrectSongPrivatedTest() helper method to check viewable status through the database
      * 
      *  @return True if the song is private, else return False
@@ -185,7 +185,7 @@ public class SongVisibilityTest {
         return false;
     }
 
-    /*
+    /**
      * deleteSong(int id) - helper method to delete songs by a given int id
      */
     private void deleteSong(int id)
@@ -200,7 +200,7 @@ public class SongVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see if the song has been publicized successfully
      */
     @Test
@@ -210,7 +210,7 @@ public class SongVisibilityTest {
         assertTrue(checkIsPublicInDatabase(privSongID), "Song Public Unsuccessful: song is still private");
     }
 
-    /*
+    /**
      * Tests to see what happens when the song wasn't actually publicized b/c it doesn't exist
      */
     @Test
@@ -225,7 +225,7 @@ public class SongVisibilityTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect song is publicized
     */
     @Test
@@ -244,7 +244,7 @@ public class SongVisibilityTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when trying to publicize an already public song
     */
     @Test
