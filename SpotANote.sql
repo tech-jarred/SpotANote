@@ -292,49 +292,25 @@ FROM Song;
 SELECT *
 FROM Record;
 
--- TO BE DELETED SHORTLY AFTER
--- 2. Ensure RecordMember mapping exists for this Artist
+-- REWORK LATER
+
 -- (Connects artist_id 7071707 to Record ID 1)
 INSERT IGNORE INTO RecordMember (id, record_id, artist_id) 
 VALUES (1, 1, 7071707);
 
--- 3. Insert Tracks for the Albums
+-- Song inserts
 INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES
-(101, 'Midnight Horizon', 210, '/music/midnight_horizon.mp3', 1, TRUE),
-(102, 'Neon Lights', 195, '/music/neon_lights.mp3', 1, TRUE),
-(103, 'Starlight Echoes', 240, '/music/starlight_echoes.mp3', 1, TRUE),
-(104, 'Coastal Breeze', 180, '/music/coastal_breeze.mp3', 1, TRUE),
-(105, 'Golden Hour', 225, '/music/golden_hour.mp3', 1, TRUE);
+(101, "Please Please Please", 186, "/music/pleasepleaseplease.mp3", 1, TRUE),
+(102, "Espresso", 175, "/music/espresso.mp3", 1, TRUE),
+(103, "Example Song", 100, "/music/songtest.mp3", 1, TRUE);
 
--- 4. Insert Published Albums/Playlists owned by the Artist
-INSERT INTO Playlist (id, user_id, playlist_name, is_public) VALUES
-(10, 7071707, 'Synthwave Dreams (Album)', TRUE),
-(11, 7071707, 'Summer Acoustic Sessions', TRUE);
+-- Playlist inserts
+INSERT INTO Playlist (id, user_id, playlist_name, is_public, is_personal) VALUES
+(10, 7071707, "Short n' Sweet", TRUE, FALSE),
+(11, 7071707, "Album (DRAFT)", FALSE, FALSE);
 
--- 5. Link Songs to Albums in PlaylistSong table
--- Album 1: Synthwave Dreams
+-- Songs in Playlist inserts
 INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
 (10, 101, 1),
 (10, 102, 2),
-(10, 103, 3);
-
--- Album 2: Summer Acoustic Sessions
-INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
-(11, 104, 1),
-(11, 105, 2);
-
--- Extra adds
-
--- Draft Songs (is_public = FALSE)
-INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES
-(201, 'Unreleased Demo 1', 185, '/music/demo1.mp3', 1, FALSE),
-(202, 'Unreleased Demo 2', 215, '/music/demo2.mp3', 1, FALSE);
-
--- Draft Album (is_public = FALSE)
-INSERT INTO Playlist (id, user_id, playlist_name, is_public) VALUES
-(20, 7071707, 'Work In Progress (Draft)', FALSE);
-
--- Link Draft Songs to Draft Album
-INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
-(20, 201, 1),
-(20, 202, 2);
+(11, 103, 3);
