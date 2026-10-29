@@ -214,11 +214,11 @@ INSERT INTO RecordMember(record_id, artist_id) VALUES
 (2, 2);
 
 
-INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
-("Summer Hits", "A collection of the hottest tracks for the summer season.", "Soaking Sets", 1),
-("Chill Vibes", "Relax and unwind with these chill tunes.", "Frosty Frills", 1),
-("Top 40", "The most popular songs right now.", "Crazy Crew", 1),
-("Autumn Hits", "A song of the from the hottest tracks for the autumn season.", "Crimson Cloak", 1);
+-- INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES
+-- ("Summer Hits", "A collection of the hottest tracks for the summer season.", "Soaking Sets", 1),
+-- ("Chill Vibes", "Relax and unwind with these chill tunes.", "Frosty Frills", 1),
+-- ("Top 40", "The most popular songs right now.", "Crazy Crew", 1),
+-- ("Autumn Hits", "A song of the from the hottest tracks for the autumn season.", "Crimson Cloak", 1);
 
 -- TestSong Inserts
 -- INSERT INTO TestSong (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES 

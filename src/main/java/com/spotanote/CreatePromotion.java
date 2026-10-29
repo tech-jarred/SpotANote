@@ -40,7 +40,7 @@ public class CreatePromotion {
      * @param recordId - the int id of the record this promotion is connected to
      * @return int - the promotionId of the created promotion or -1 if something went wrong
      * **/
-    public static int createPromotion(String promotionName, String promotionDescription, String promotionSong, int recordId) 
+    public static int createPromotion(String promotionName, String promotionDescription, String promotionSong, int userId) 
     {
         // Validate input parameters
         if (promotionName == null || promotionName.trim().isEmpty()) {
@@ -52,18 +52,18 @@ public class CreatePromotion {
         if (promotionSong == null || promotionSong.trim().isEmpty()) {
             throw new IllegalArgumentException("Promotion song cannot be null or empty");
         }
-        if (recordId <= 0) {
+        if (userId <= 0) {
             throw new IllegalArgumentException("Record ID cannot be null or empty");
         }
 
         // Insert the promotion into the database
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            String sql = "INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_Id) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO Promotion (promotion_name, promotion_description, promotion_song, record_id) VALUES (?, ?, ?, (SELECT id FROM Record WHERE record_manager_id = ?));";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, promotionName);
                 statement.setString(2, promotionDescription);
                 statement.setString(3, promotionSong);
-                statement.setInt(4, recordId);
+                statement.setInt(4, userId);
                 int rowsAffected = statement.executeUpdate();
                 //return the promotionId of the newly created promotion
                 //by adding 1 to the last promotionId in the database

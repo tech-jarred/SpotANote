@@ -92,7 +92,6 @@ public class App {
                 {
                     int userId = currentUser.getId();
                     CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(userId);
-                    System.out.println("right before render");
                     ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
                     return;
                 }
@@ -108,17 +107,6 @@ public class App {
                     currentSong = new Song(0, "Choose A Song To Get Started!", Duration.ZERO, "/music/");
                 }
 
-                // Render Home.html file, passing username through for Pebble formatting.
-                if(currentUser.getRole().equals("Record"))
-                    {
-                        if (currentUser == null){ ctx.redirect("/login"); }
-                        int userId = currentUser.getId();
-                        RecordInfo temp = new RecordInfo();
-                        int recordId = temp.getRecordIdFromUserId(userId);
-                        CreatePromotion promotion = new CreatePromotion();
-                        CreatePromotion[] collection = promotion.getAllCreatePromotions(recordId);
-                        ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
-                    }
                 ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
                     "current_song_file_path", currentSong.getFilePath(),
                     "timeStamp", currentSong.getTimeStamp().toSeconds(),
@@ -1001,8 +989,7 @@ public class App {
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null){ ctx.redirect("/login"); }
                 int userId = currentUser.getId();
-                RecordInfo temp = new RecordInfo();
-                int recordId = temp.getRecordIdFromUserId(userId);
+                int recordId = RecordInfo.getRecordIdFromUserId(userId);
                 CreatePromotion[] promotionArray = CreatePromotion.getAllCreatePromotions(recordId);
                 if (promotionArray == null) {
                     ctx.status(500).result("Failed to retrieve promotions");
@@ -1021,9 +1008,6 @@ public class App {
                 User currentUser = ctx.sessionAttribute("currentUser");
                 if (currentUser == null){ ctx.redirect("/login"); }
                 int userId = currentUser.getId();
-                RecordInfo temp = new RecordInfo();
-                int recordId = temp.getRecordIdFromUserId(userId);
-                CreatePromotion promotion = new CreatePromotion();
                 String title = ctx.formParam("title");
                 String description = ctx.formParam("description");
                 String song = ctx.formParam("song");
@@ -1035,7 +1019,7 @@ public class App {
                 }
                 else
                 {
-                    promotion.createPromotion(title, description, song, recordId);
+                    CreatePromotion.createPromotion(title, description, song, userId);
                     ctx.render("public/CreatePromotion.html", Map.of("error", "Successfully Created Promotion"));
                 }
             });
@@ -1046,11 +1030,9 @@ public class App {
                 if (currentUser == null){ ctx.redirect("/login"); }
                 int userId = currentUser.getId();
                 int promotionId = Integer.parseInt(ctx.pathParam("promotionId"));
-                RecordInfo temp = new RecordInfo();
-                int recordId = temp.getRecordIdFromUserId(userId);
+                int recordId = RecordInfo.getRecordIdFromUserId(userId);
                 System.out.println("\n\n\n\nPromotionId: "+promotionId+"\n\n\n\n");
-                CreatePromotion promotion = new CreatePromotion();
-                promotion.removePromotion(promotionId);
+                CreatePromotion.removePromotion(promotionId);
                 CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(recordId);
                 if (collection == null) {
                     ctx.status(500).result("Failed to retrieve promotions");
