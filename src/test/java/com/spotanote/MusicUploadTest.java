@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 
 public class MusicUploadTest {
     
-    /*
+    /**
      * Tears down environment after each test is ran
      */
     @AfterEach
@@ -33,7 +33,7 @@ public class MusicUploadTest {
         }
     }
 
-    /*
+    /**
      * Tests to see if the music has been uploaded correctly
      */
     @Test
@@ -50,7 +50,7 @@ public class MusicUploadTest {
         assertTrue(generatedID > 0, "Music Upload Unsuccessful: music ID does not exist, instead it was " + generatedID);
     }
 
-    /*
+    /**
      * Tests to see what happens when attempting to upload without a music file
      */
     @Test
@@ -67,7 +67,7 @@ public class MusicUploadTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when attempting to upload without a song name
      */
     @Test
@@ -84,7 +84,7 @@ public class MusicUploadTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when attempting to upload without a record
      */
     @Test
@@ -101,7 +101,7 @@ public class MusicUploadTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when attempting to upload without song duration
      */
     @Test
@@ -118,7 +118,7 @@ public class MusicUploadTest {
         });
     }
 
-    /*
+    /**
      * Tests to see what happens when attempting to upload two music files
      */
     @Test

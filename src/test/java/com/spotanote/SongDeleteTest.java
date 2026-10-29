@@ -23,7 +23,7 @@ public class SongDeleteTest {
 
     private int songID = 0;
 
-    /*
+    /**
      * Sets up environment for testing before each test is ran
      */
     @BeforeEach
@@ -37,7 +37,7 @@ public class SongDeleteTest {
         }
     }
 
-    /*
+    /**
      * Tears down environment after each test is ran 
      */
     @AfterEach
@@ -55,7 +55,7 @@ public class SongDeleteTest {
         songID = 0;
     }
 
-    /*
+    /**
      * Tests to see if the song was successfully deleted
      */
     @Test
@@ -65,7 +65,7 @@ public class SongDeleteTest {
         assertFalse(checkIdExist(songID), "Song Deletion Unsuccessful: song still exists");
     }
 
-    /*
+    /**
      * Tests to see what happens when the incorrect song is deleted
      */
     @Test
@@ -84,7 +84,7 @@ public class SongDeleteTest {
         }
     }
 
-    /*
+    /**
      * Tests to see what happens when the song is privated instead of deleted
      */
     @Test
@@ -108,7 +108,7 @@ public class SongDeleteTest {
         assertTrue(checkIdExist(songID), "Song Deletion Unsuccessful: song was privated instead of deleted");
     }
 
-    /*
+    /**
      * Tests to see what happens when a non-existing song is trying to be deleted
      */
     @Test
@@ -119,7 +119,7 @@ public class SongDeleteTest {
         });
     }
 
-    /*
+    /**
      * createSong - setUp() helper method to create songs
      * 
      *  @return int songID
@@ -135,7 +135,7 @@ public class SongDeleteTest {
         throw new SQLException("Failed to retrieve generated key for song.");
     }
 
-    /*
+    /**
      * checkIdExist - helper method to check if an ID exists in the database
      * 
      *  returns true if ID exists, false if it does not
