@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotanote - Search</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">Spotanote</div>
+        <div class="nav-user-controls">
+            <a href="/home" class="nav-link">Home</a>
+            <a href="/records" class="nav-link">Records</a>
+            <a href="/promotions" class="nav-link">Promotion</a>
+            <a href="/music-library" class="nav-link">Music Library</a>
+            {% if isArtist %}
+                <a href="/managepublications" class="nav-link">Manage Publications</a>
+            {% endif %}
+            <a href="/search" class="nav-link">Search</a>
+            <a href="/profile" class="nav-link">Profile</a>
+            <form action="/logout" method="POST">
+                <button type="submit" class="btn-logout">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="search-container">
+            
+            <!-- Top Search Pill -->
+            <form id="search-form" onsubmit="handleSearch(event)" class="search-bar-pill">
+                <input 
+                    type="text" 
+                    id="search-input"
+                    name="q" 
+                    placeholder="Search artists, albums, songs, records..." 
+                    value="{{ searchQuery }}" 
+                    autocomplete="off"
+                    autofocus
+                >
+                <button type="submit" class="search-icon-btn" aria-label="Search">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="16.5" y1="16.5" x2="22" y2="22"></line>
+                    </svg>
+                </button>
+            </form>
+
+            <!-- Category Filters -->
+            <div class="category-filters">
+                <button type="button" class="filter-btn active" data-category="all">All</button>
+                <button type="button" class="filter-btn" data-category="artists">Artists</button>
+                <button type="button" class="filter-btn" data-category="albums">Albums</button>
+                <button type="button" class="filter-btn" data-category="songs">Songs</button>
+                <button type="button" class="filter-btn" data-category="records">Records</button>
+            </div>
+
+            <!-- Results Output -->
+            <div class="search-output" id="search-output"></div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentCategory = 'all';
+        let likedSongs = [];
+        let userPlaylists = [];
+        let activePopover = null;
+    
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchLikedSongs().then(() => {
+                fetchUserPlaylists();
+            });
+    
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.getAttribute('data-category');
+    
+                    const query = document.getElementById('search-input').value.trim();
+                    if (query) {
+                        await executeSearch(query);
+                    }
+                });
+            });
+    
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                executeSearch(query);
+            }
+        });
+    
+        // 1. Fetch Liked Songs
+        async function fetchLikedSongs() {
+            try {
+                const response = await fetch('/api/liked-songs');
+                if (response.ok) {
+                    likedSongs = await response.json();
+                } else {
+                    likedSongs = [];
+                }
+            } catch (err) {
+                console.error("Error fetching liked songs:", err);
+                likedSongs = [];
+            }
+        }
+    
+        // 2. Fetch User Playlists
+        async function fetchUserPlaylists() {
+            try {
+                const response = await fetch('/api/user-playlists');
+                if (response.ok) {
+                    userPlaylists = await response.json();
+                } else {
+                    userPlaylists = [];
+                }
+            } catch (err) {
+                console.error("Error fetching user playlists:", err);
+                userPlaylists = [];
+            }
+        }
+    
+        async function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value.trim();
+            if (query) {
+                await executeSearch(query);
+            }
+        }
+    
+        async function executeSearch(query) {
+            const output = document.getElementById('search-output');
+            output.innerHTML = ''; // Wipe container clean
+    
+            if (currentCategory === 'artists') {
+                await searchArtists(query);
+            } else if (currentCategory === 'albums') {
+                await searchAlbums(query);
+            } else if (currentCategory === 'songs') {
+                await searchSongs(query);
+            } else if (currentCategory === 'records') {
+                await searchRecords(query);
+            } else if (currentCategory === 'all') {
+                await searchArtists(query);
+                await searchAlbums(query);
+                await searchSongs(query);
+                await searchRecords(query);
+            }
+        }
+    
+        // --- ARTIST SEARCH ---
+        async function searchArtists(query) {
+            try {
+                const response = await fetch(`/api/search/artists?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const artists = await response.json();
+                    renderArtists(artists);
+                }
+            } catch (err) { console.error("Artist search error:", err); }
+        }
+    
+        function renderArtists(artists) {
+            const output = document.getElementById('search-output');
+            if (!artists || artists.length === 0) return;
+    
+            artists.forEach(artist => {
+                const pill = document.createElement('div');
+                pill.className = 'artist-pill';
+                pill.innerHTML = `
+                    <span>${escapeHtml(artist.artistName)}</span>
+                    <span class="artist-badge">Artist</span>
+                `;
+                output.appendChild(pill);
+            });
+        }
+    
+        // --- ALBUM SEARCH WITH DROPDOWN TRACKS ---
+        async function searchAlbums(query) {
+            try {
+                const response = await fetch(`/api/search/albums?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const albums = await response.json();
+                    renderAlbums(albums);
+                }
+            } catch (err) { console.error("Album search error:", err); }
+        }
+    
+        function renderAlbums(albums) {
+            const output = document.getElementById('search-output');
+            if (!albums || albums.length === 0) return;
+    
+            albums.forEach(album => {
+                const wrapperId = `album-tracks-wrapper-${album.albumId}`;
+    
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'playlist-group';
+                groupDiv.id = `album-group-${album.albumId}`;
+    
+                const cardHeader = document.createElement('div');
+                cardHeader.className = 'artist-pill';
+                cardHeader.style.cursor = 'pointer';
+                cardHeader.onclick = function () { toggleAlbumDropdown(album.albumId, wrapperId, this); };
+                cardHeader.innerHTML = `
+                    <span class="playlist-title">
+                        <span class="playlist-arrow">▼</span>
+                        ${escapeHtml(album.albumName)}
+                    </span>
+                    <span class="artist-badge" style="background: rgba(59, 130, 246, 0.6);">Album</span>
+                `;
+    
+                const wrapper = document.createElement('div');
+                wrapper.className = 'playlist-songs-wrapper';
+                wrapper.id = wrapperId;
+    
+                groupDiv.appendChild(cardHeader);
+                groupDiv.appendChild(wrapper);
+                output.appendChild(groupDiv);
+            });
+        }
+    
+        async function toggleAlbumDropdown(albumId, wrapperId, headerElement) {
+            const targetWrapper = document.getElementById(wrapperId);
+            const isTargetOpen = targetWrapper.classList.contains('open');
+    
+            // Close any other open album accordions
+            document.querySelectorAll('.playlist-songs-wrapper.open').forEach(openWrapper => {
+                if (openWrapper.id !== wrapperId) {
+                    closeAlbumWrapper(openWrapper);
+                }
+            });
+    
+            if (isTargetOpen) {
+                closeAlbumWrapper(targetWrapper);
+            } else {
+                // Fetch tracks if not already loaded
+                if (!targetWrapper.getAttribute('data-loaded')) {
+                    targetWrapper.innerHTML = '<div class="empty-playlist-msg">Loading album tracks...</div>';
+                    try {
+                        const res = await fetch(`/api/album/songs?albumId=${albumId}`);
+                        if (res.ok) {
+                            const songs = await res.json();
+                            targetWrapper.innerHTML = ''; // Clear loading text
+    
+                            if (!songs || songs.length === 0) {
+                                targetWrapper.innerHTML = '<div class="empty-playlist-msg">This album has no tracks.</div>';
+                            } else {
+                                songs.forEach(song => {
+                                    const isLiked = likedSongs.some(ls => ls.songId === song.songId);
+                                    const songPill = createSongPill(song, isLiked);
+                                    targetWrapper.appendChild(songPill);
+                                });
+                            }
+                            targetWrapper.setAttribute('data-loaded', 'true');
+                        }
+                    } catch (e) {
+                        console.error("Error fetching album tracks:", e);
+                        targetWrapper.innerHTML = '<div class="empty-playlist-msg">Error loading tracks.</div>';
+                    }
+                }
+    
+                openAlbumWrapper(targetWrapper, headerElement);
+            }
+        }
+    
+        function openAlbumWrapper(wrapper, header) {
+            if (header) header.classList.add('open');
+            wrapper.classList.add('open');
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+        }
+    
+        function closeAlbumWrapper(wrapper) {
+            const header = wrapper.previousElementSibling;
+            wrapper.style.maxHeight = wrapper.scrollHeight + 'px';
+            wrapper.offsetHeight; // Force reflow
+            wrapper.style.maxHeight = '0px';
+            wrapper.classList.remove('open');
+            if (header) header.classList.remove('open');
+        }
+    
+        // --- SONG SEARCH & RENDERING ---
+        async function searchSongs(query) {
+            try {
+                const response = await fetch(`/api/search/songs?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const songs = await response.json();
+                    renderSongs(songs);
+                }
+            } catch (err) { console.error("Song search error:", err); }
+        }
+    
+        function renderSongs(songs) {
+            const output = document.getElementById('search-output');
+            if (!songs || songs.length === 0) return;
+    
+            songs.forEach(song => {
+                const isLiked = likedSongs.some(ls => ls.songId === song.songId);
+                const songPill = createSongPill(song, isLiked);
+                output.appendChild(songPill);
+            });
+        }
+    
+        // --- RECORD SEARCH ---
+        async function searchRecords(query) {
+            try {
+                const response = await fetch(`/api/search/records?q=${encodeURIComponent(query)}`);
+                if (response.ok) {
+                    const records = await response.json();
+                    renderRecords(records);
+                }
+            } catch (err) { console.error("Record search error:", err); }
+        }
+    
+        function renderRecords(records) {
+            const output = document.getElementById('search-output');
+            if (!records || records.length === 0) return;
+    
+            records.forEach(record => {
+                const pill = document.createElement('div');
+                pill.className = 'artist-pill';
+                pill.innerHTML = `
+                    <span>${escapeHtml(record.recordName)}</span>
+                    <span class="artist-badge" style="background: rgba(16, 185, 129, 0.6);">Record Label</span>
+                `;
+                output.appendChild(pill);
+            });
+        }
+    
+        // --- CREATE SONG PILL ---
+        function createSongPill(song, isLiked) {
+            const pill = document.createElement('div');
+            pill.className = 'song-pill';
+    
+            pill.innerHTML = `
+                <button class="icon-btn heart-btn ${isLiked ? '' : 'unliked'}" 
+                        data-song-id="${song.songId}"
+                        data-tooltip="${isLiked ? 'Dislike' : 'Like'}" 
+                        onclick="toggleLikeSong(${song.songId}, '${escapeJsString(song.songName)}', ${isLiked})">
+                    ${isLiked ? '❤️' : '♡'}
+                </button>
+                <span class="song-name">${escapeHtml(song.songName)}</span>
+                <div class="song-actions">
+                    <button class="icon-btn" data-tooltip="Add to Playlist" onclick="toggleAddToPlaylistPopover(${song.songId}, event)">
+                        ⊕
+                    </button>
+                    <button class="icon-btn" data-tooltip="Add to Queue" onclick="addToQueue(${song.songId}, '${escapeJsString(song.songName)}')">
+                        ♫
+                    </button>
+                    <button class="icon-btn" data-tooltip="Play Song" onclick="selectSong(${song.songId})">
+                        ▶
+                    </button>
+                </div>
+            `;
+            return pill;
+        }
+    
+        // --- IN-PLACE LIKE / DISLIKE TOGGLE ---
+        async function toggleLikeSong(songId, songName, currentlyLiked) {
+            try {
+                const endpoint = currentlyLiked 
+                    ? `/api/dislike/song?songId=${songId}` 
+                    : `/api/like/song?songId=${songId}`;
+    
+                const response = await fetch(endpoint, { method: 'POST' });
+    
+                if (response.ok) {
+                    const isNowLiked = !currentlyLiked;
+    
+                    if (currentlyLiked) {
+                        likedSongs = likedSongs.filter(s => s.songId !== songId);
+                    } else {
+                        likedSongs.push({ songId: songId, songName: songName });
+                    }
+    
+                    document.querySelectorAll(`.heart-btn[data-song-id="${songId}"]`).forEach(btn => {
+                        btn.innerHTML = isNowLiked ? '❤️' : '♡';
+                        btn.setAttribute('data-tooltip', isNowLiked ? 'Dislike' : 'Like');
+                        btn.onclick = () => toggleLikeSong(songId, songName, isNowLiked);
+                        if (isNowLiked) {
+                            btn.classList.remove('unliked');
+                        } else {
+                            btn.classList.add('unliked');
+                        }
+                    });
+    
+                } else {
+                    showToast("Could not update song status. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error toggling like status:", err);
+            }
+        }
+    
+        // --- UTILITY HANDLERS ---
+        function selectSong(songId) {
+            sessionStorage.setItem('shouldAutoplay', 'true');
+    
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/select-song';
+            
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'songId';
+            input.value = songId;
+            
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    
+        async function addToQueue(songId, songName) {
+            try {
+                const response = await fetch(`/api/queue/add?songId=${songId}`, {
+                    method: 'POST'
+                });
+    
+                if (response.ok) {
+                    sessionStorage.setItem('shouldAutoplay', 'true');
+                    showToast(`Added "${songName}" to queue`);
+                } else {
+                    showToast(`Failed to queue "${songName}"`);
+                }
+            } catch (err) {
+                console.error("Error adding song to queue:", err);
+                showToast("Error connecting to server");
+            }
+        }
+    
+        function showToast(message) {
+            let toast = document.getElementById('toast-notification');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast-notification';
+                toast.className = 'toast-notification';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+    
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    
+        // --- ADD TO PLAYLIST POPOVER ---
+        function toggleAddToPlaylistPopover(songId, event) {
+            event.stopPropagation();
+            
+            if (activePopover && activePopover.id === `popover-${songId}`) {
+                closePlaylistPopover();
+                return;
+            }
+    
+            closePlaylistPopover();
+    
+            const songPill = event.target.closest('.song-pill');
+            if (!songPill) return;
+    
+            const popover = document.createElement('div');
+            popover.className = 'playlist-popover';
+            popover.id = `popover-${songId}`;
+    
+            let playlistListHtml = '';
+            if (userPlaylists && userPlaylists.length > 0) {
+                playlistListHtml = userPlaylists.map(pl => `
+                    <button class="popover-playlist-item" onclick="addSongToExistingPlaylist(${songId}, ${pl.playlistId})">
+                        ${escapeHtml(pl.playlistName)}
+                    </button>
+                `).join('');
+            } else {
+                playlistListHtml = '<div class="popover-empty-msg">No existing playlists</div>';
+            }
+    
+            popover.innerHTML = `
+                <div class="popover-create-row">
+                    <span class="popover-label">New</span>
+                    <input type="text" id="popover-input-${songId}" class="popover-input" placeholder="Enter Name">
+                    <button class="popover-btn-add" title="Create Playlist" onclick="createNewPlaylistWithSong(${songId})">+</button>
+                </div>
+                <div class="popover-playlist-list">
+                    ${playlistListHtml}
+                </div>
+            `;
+    
+            songPill.appendChild(popover);
+            activePopover = popover;
+    
+            const inputField = popover.querySelector(`#popover-input-${songId}`);
+            if (inputField) {
+                inputField.focus();
+                inputField.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        createNewPlaylistWithSong(songId);
+                    }
+                });
+            }
+    
+            setTimeout(() => {
+                document.addEventListener('click', closePopoverOnOutsideClick);
+            }, 10);
+        }
+    
+        async function addSongToExistingPlaylist(songId, playlistId) {
+            try {
+                const response = await fetch(`/api/add/song/personal/playlist?songId=${songId}&playlistId=${playlistId}`, {
+                    method: 'POST'
+                });
+    
+                if (response.ok) {
+                    closePlaylistPopover();
+                    showToast("Added to playlist!");
+                    await fetchUserPlaylists();
+                } else {
+                    showToast("Failed to add song to playlist");
+                }
+            } catch (err) {
+                console.error("Error adding to playlist:", err);
+                showToast("Error connecting to server");
+            }
+        }
+    
+        async function createNewPlaylistWithSong(songId) {
+            const input = document.getElementById(`popover-input-${songId}`);
+            if (!input || !input.value.trim()) {
+                showToast("Please enter a playlist name");
+                return;
+            }
+    
+            const playlistName = input.value.trim();
+    
+            try {
+                const params = new URLSearchParams();
+                params.append('playlistName', playlistName);
+                params.append('songId', songId);
+    
+                const response = await fetch('/api/create/personal/playlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+    
+                if (response.ok) {
+                    closePlaylistPopover();
+                    showToast(`Created "${playlistName}"`);
+                    await fetchUserPlaylists();
+                } else {
+                    showToast("Failed to create playlist");
+                }
+            } catch (err) {
+                console.error("Error creating playlist:", err);
+                showToast("Error connecting to server");
+            }
+        }
+    
+        function closePlaylistPopover() {
+            if (activePopover) {
+                activePopover.remove();
+                activePopover = null;
+            }
+            document.removeEventListener('click', closePopoverOnOutsideClick);
+        }
+    
+        function closePopoverOnOutsideClick(e) {
+            if (activePopover && !activePopover.contains(e.target)) {
+                closePlaylistPopover();
+            }
+        }
+    
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+        }
+    
+        function escapeJsString(str) {
+            return str.replace(/'/g, "\\'");
+        }
+    </script>
+
+</body>
+</html>
