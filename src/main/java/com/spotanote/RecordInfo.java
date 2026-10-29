@@ -313,5 +313,27 @@ public class RecordInfo {
         }
         return -1;
     }
+
+    public static int getRecordIdFromUserId(int userId) throws SQLException
+    {
+        try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
+        {
+            String sql = "SELECT id FROM record WHERE userId = ?";
+            try(PreparedStatement statement = connection.prepareStatement(sql))
+            {
+                statement.setInt(1, userId);
+                try (ResultSet resultSet = statement.executeQuery())
+                {
+                    if(resultSet.next());
+                    {
+                        int recordId = resultSet.getInt(1);
+                        return recordId;
+                    }
+                }
+            }
+        }
+    }
+
+    
 }
 
