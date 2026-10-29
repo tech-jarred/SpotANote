@@ -29,7 +29,7 @@ CREATE TABLE User (
     name VARCHAR(50) NULL,
     is_name_public BOOLEAN NOT NULL DEFAULT FALSE,
     roleid1 INT NOT NULL,
-    roleid2 INT NOT NULL,
+    roleid2 INT NULL,
     FOREIGN KEY (roleid1) REFERENCES Role(id),
     FOREIGN KEY (roleid2) REFERENCES Role(id)
 );
@@ -39,8 +39,7 @@ CREATE TABLE Record (
     id INT AUTO_INCREMENT PRIMARY KEY,
     record_name VARCHAR(100) NOT NULL UNIQUE,
     record_manager_id INT NOT NULL,
-    userId INT NOT NULL,
-    FOREIGN KEY (record_manager_id) REFERENCES Role(id)
+    FOREIGN KEY (record_manager_id) REFERENCES User(id)
 );
 
 -- Record Member
@@ -178,24 +177,35 @@ INSERT INTO Role (id, role_name) VALUES
 -- User inserts
 INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2) VALUES
 (7071707, "hazelp", "hazelpswd1", "Hazel", TRUE, 1, 2), -- name has to be public for an artist
-(3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, 1),
-(5150515, "connors", "connorpswd3", "Connor", TRUE, 3, 1), -- record holders should also have public names
-(1, "test", "testpswd", "Test", FALSE, 1, 3), -- this guy is a record
-(2, "testAccount2", "recordpswd", "Record", TRUE, 3, 1),
-(3, "testAccount3", "testpswd", "Bot", TRUE, 3, 1),
-(4, "testAccount4", "testpswd", "Bot2", TRUE, 3, 1),
+(3031303, "jarredn", "jarredpswd2", "Jarred", FALSE, 1, NULL),
+(5150515, "connors", "connorpswd3", "Connor", FALSE, 3, NULL), -- record holders should also have public names
+(1, "test", "testpswd", "Test", FALSE, 1, 2),
+(2, "testAccount2", "recordpswd", "Record", FALSE, 3, NULL),
+(3, "testAccount3", "testpswd", "Bot", FALSE, 3, NULL),
+(4, "testAccount4", "testpswd", "Bot2", FALSE, 3, NULL),
 (5, "jvalentine", "stars4life", "Jill", TRUE, 1, 2),
-(6, "leonkennedy", "RCPD1996", "Leon S. Kennedy", TRUE, 1, 3), -- this guy is a record
-(7, "aripley", "WhereIsNostromo", "Amanda Ripley", TRUE, 1, 1),
-(8, "Dutch", "tahiti", "Van Der Linde", TRUE, 1, 1),
-(9, "reddeadshooterguy", "rdr2", "Arthur", TRUE, 1, 3); -- this guy is a record
+(6, "leonkennedy", "RCPD1996", "Leon S. Kennedy", TRUE, 1, NULL),
+(7, "aripley", "WhereIsNostromo", "Amanda Ripley", TRUE, 1, NULL),
+(8, "Dutch", "tahiti", "Van Der Linde", TRUE, 1, NULL),
+(9, "reddeadshooterguy", "rdr2", "Arthur", TRUE, 1, NULL),
+(10, "j2k", "1234", "Jeff", FALSE, 3, NULL),
+(11, "1101", "12345", "Claude", FALSE, 3, NULL),
+(12, "don", "123456", "Don Disco", FALSE, 3, NULL);
 
 -- Record inserts
-INSERT INTO Record (record_name, record_manager_id, userId) VALUES
-("Test Record", 3, 1),
-("Second Record", 3, 5150515),
-("Third Record", 3, 5150515),
-("Fourth Record", 3, 5150515);
+INSERT INTO Record (record_name, record_manager_id) VALUES
+("Connor's Snazzy Songs", 5150515),
+("2k & Today", 10),
+("ProgramBEAT", 11),
+("DJ Disco", 12);
+
+-- -- Record
+-- CREATE TABLE Record (
+--     id INT AUTO_INCREMENT PRIMARY KEY,
+--     record_name VARCHAR(100) NOT NULL UNIQUE,
+--     record_manager_id INT NOT NULL,
+--     FOREIGN KEY (record_manager_id) REFERENCES User(id)
+-- );
 
 -- Record Member inserts
 INSERT INTO RecordMember(record_id, artist_id) VALUES

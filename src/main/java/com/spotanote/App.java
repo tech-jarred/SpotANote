@@ -87,6 +87,15 @@ public class App {
                     ctx.redirect("/login");
                     return;
                 }
+
+                if(currentUser.getRole().equals("Record"))
+                {
+                    int userId = currentUser.getId();
+                    CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(userId);
+                    System.out.println("right before render");
+                    ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
+                    return;
+                }
                 SongQueue sq = ctx.sessionAttribute("SongQueue");
                 Song currentSong = sq.getCurrentSong();
 
@@ -110,13 +119,11 @@ public class App {
                         CreatePromotion[] collection = promotion.getAllCreatePromotions(recordId);
                         ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
                     }
-                else{
-                        ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
-                            "current_song_file_path", currentSong.getFilePath(),
-                            "timeStamp", currentSong.getTimeStamp().toSeconds(),
-                            "songName", currentSong.getName(),
-                            "isArtist", currentUser.getRole().equals("Artist")));
-                }
+                ctx.render("public/Home.html", java.util.Map.of("username", currentUser.getName(),
+                    "current_song_file_path", currentSong.getFilePath(),
+                    "timeStamp", currentSong.getTimeStamp().toSeconds(),
+                    "songName", currentSong.getName(),
+                    "isArtist", currentUser.getRole().equals("Artist")));
             });
 
             /**
