@@ -318,7 +318,7 @@ public class RecordInfo {
     {
         try(Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD))
         {
-            String sql = "SELECT id FROM record WHERE userId = ?";
+            String sql = "SELECT id FROM record WHERE record_manager_id = ?";
             try(PreparedStatement statement = connection.prepareStatement(sql))
             {
                 statement.setInt(1, userId);

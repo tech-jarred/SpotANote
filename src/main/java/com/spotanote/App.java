@@ -92,7 +92,8 @@ public class App {
                 if(currentUser.getRole().equals("Record"))
                 {
                     int userId = currentUser.getId();
-                    CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(userId);
+                    int recordId = RecordInfo.getRecordIdFromUserId(userId);
+                    CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(recordId);
                     ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
                     return;
                 }
@@ -1242,7 +1243,7 @@ public class App {
                 String description = ctx.formParam("description");
                 String song = ctx.formParam("song");
 
-                System.out.println("\n\n\n\nTitle: "+title+"\nDescription: "+description+"\nSong: "+song+"\n\n\n\n");
+                //System.out.println("\n\n\n\nTitle: "+title+"\nDescription: "+description+"\nSong: "+song+"\nUserId: "+userId+"\n\n\n\n");
                 if(title == null || description == null || song == null)
                 {
                     ctx.render("public/CreatePromotion.html", Map.of("error", "Error, Please Fill Out Everything"));
@@ -1261,7 +1262,7 @@ public class App {
                 int userId = currentUser.getId();
                 int promotionId = Integer.parseInt(ctx.pathParam("promotionId"));
                 int recordId = RecordInfo.getRecordIdFromUserId(userId);
-                System.out.println("\n\n\n\nPromotionId: "+promotionId+"\n\n\n\n");
+                //System.out.println("\n\n\n\nPromotionId: "+promotionId+"\n\n\n\n");
                 CreatePromotion.removePromotion(promotionId);
                 CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(recordId);
                 if (collection == null) {

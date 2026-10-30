@@ -481,7 +481,6 @@ public class CreatePromotion {
                     int index = 0;
                     while (resultSet.next())
                     {
-                        //FIX THIS I NEED TO FIRST GET ID FIRST THEN I NEED TO GET THE INFORMATION, SO I NEED TO DO A JOIN ON SOMETHING
                         CreatePromotion promotion = new CreatePromotion();
                         promotion.promotionName = resultSet.getString("promotion_name");
                         promotion.promotionDescription = resultSet.getString("promotion_description");
