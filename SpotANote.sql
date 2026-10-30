@@ -298,11 +298,14 @@ FROM Record;
 INSERT IGNORE INTO RecordMember (id, record_id, artist_id) 
 VALUES (1, 1, 7071707);
 
+-- Artist inserts
+INSERT INTO USER (id, username, password, name, is_name_public, roleid1, roleid2) VALUES
+(13, "sabrinacarpenter", "livelaughlovesabrina", "Sabrina Carpenter", TRUE, 1, 2);
+
 -- Song inserts
 INSERT INTO Song (id, song_name, song_duration, file_path, record_member_id, is_public) VALUES
-(101, "Please Please Please", 186, "/music/pleasepleaseplease.mp3", 1, TRUE),
-(102, "Espresso", 175, "/music/espresso.mp3", 1, TRUE),
-(103, "Example Song", 100, "/music/songtest.mp3", 1, TRUE);
+(101, "Espresso", 175, "/music/espresso.mp3", 1, TRUE),
+(102, "Example Song", 100, "/music/songtest.mp3", 1, TRUE);
 
 -- Playlist inserts
 INSERT INTO Playlist (id, user_id, playlist_name, is_public, is_personal) VALUES
@@ -311,6 +314,6 @@ INSERT INTO Playlist (id, user_id, playlist_name, is_public, is_personal) VALUES
 
 -- Songs in Playlist inserts
 INSERT INTO PlaylistSong (playlist_id, song_id, song_order) VALUES
-(10, 101, 1),
-(10, 102, 2),
-(11, 103, 3);
+(10, 1, 1),
+(10, 101, 2),
+(11, 102, 3);
