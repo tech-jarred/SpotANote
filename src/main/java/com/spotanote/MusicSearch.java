@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * MusicSearch class
  * Focuses on searching for music (including both songs and playlists)
  */
