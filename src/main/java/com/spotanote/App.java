@@ -92,7 +92,8 @@ public class App {
                 if(currentUser.getRole().equals("Record"))
                 {
                     int userId = currentUser.getId();
-                    CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(userId);
+                    int recordId = RecordInfo.getRecordIdFromUserId(userId);
+                    CreatePromotion[] collection = CreatePromotion.getAllCreatePromotions(recordId);
                     ctx.render("public/RecordHome.html", java.util.Map.of("username", currentUser.getName(), "createdPromotions", collection));
                     return;
                 }
